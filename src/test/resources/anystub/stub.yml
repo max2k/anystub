@@ -1,0 +1,8 @@
+!!org.anystub.Document
+exception: []
+keys: [root]
+values: [fixed]
+--- !!org.anystub.Document
+exception: []
+keys: [rand, '1000']
+values: ['-1594594225']

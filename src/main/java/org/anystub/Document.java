@@ -59,15 +59,18 @@ public class Document {
     {
         this.values.clear();
         this.values.addAll(values);
+
     }
 
     public Document setValues(String... values)
     {
+        this.values.clear();
         stream(values)
                 .forEach(x -> this.values.add(x));
 
         return this;
     }
+
     public List<String> getException() {
         return exception;
     }

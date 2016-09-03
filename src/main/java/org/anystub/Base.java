@@ -5,10 +5,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -70,35 +67,33 @@ public class Base {
         return documentList.stream()
                 .filter(x -> x.keyEqual_to(keys))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("not found"))
+                .orElseThrow(() -> new NoSuchElementException())
                 .get();
     }
 
 
-    public <T, E extends Exception> T request(SupplierX<T, E> supplier, String... keys) throws E {
-//        Optional<String> opt = getOpt(keys);
-//        if (opt.isPresent()) {
-//            return opt.get();
-//        }
-//
-//        // execute
-//        String res;
-//        try {
-//            res = supplier.get();
-//        } catch (Exception ex) {
-//            put(ex, keys);
-//            throw ex;
-//        }
-//
-//        // extract values
-//        put(new Document(keys).setValues(res));
-//        try {
-//            save();
-//        } catch (IOException ex) {
-//            log.warning("keep data failed: " + ex.getMessage());
-//        }
-//        return res;
-        T res = null;
+    public < E extends Exception> String request(SupplierX<String , E> supplier, String... keys) throws E {
+        Optional<String> opt = getOpt(keys);
+        if (opt.isPresent()) {
+            return opt.get();
+        }
+
+        // execute
+        String res;
+        try {
+            res = supplier.get();
+        } catch (Exception ex) {
+            put(ex, keys);
+            throw ex;
+        }
+
+        // extract values
+        put(new Document(keys).setValues(res));
+        try {
+            save();
+        } catch (IOException ex) {
+            log.warning("keep data failed: " + ex.getMessage());
+        }
         return res;
     }
 

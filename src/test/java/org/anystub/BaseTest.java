@@ -11,12 +11,6 @@ import java.util.Optional;
  */
 public class BaseTest {
 
-//    @Test
-    public void load()
-    {
-//        new Base().load();
-    }
-
     @Test
     public void save() throws IOException {
         Base base = new Base("", "stubSaveTest.yml");
