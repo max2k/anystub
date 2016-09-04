@@ -44,8 +44,6 @@ public class WorkerTest {
     public void randTest() throws IOException {
         assertTrue("1", -1594594225 == worker.rand());
         assertTrue("2", -1594594225 == worker.rand());
-        assertTrue("3", -1594594225 == worker.rand());
-        assertTrue("4", -1594594225 == worker.rand());
     }
 
 
@@ -59,12 +57,18 @@ public class WorkerTest {
             Base base = new Base();
             base.init();
 
-            return new SourceSystem() {
+            return new SourceSystem("http://localhost:8080") {
                 @Override
                 public String get() throws IOException {
                     return base.request(() -> super.get(), "root");
                 }
 
+                /**
+                 * pay attention: the result of the function depends on
+                 * internal state of the object, which changed by invocation of the function
+                 * @param digit
+                 * @return
+                 */
                 @Override
                 public Integer rand(int digit) {
                     return Integer.valueOf(

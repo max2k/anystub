@@ -10,7 +10,6 @@ import java.io.IOException;
 @Component
 public class Worker {
 
-//    @Autowired
     private SourceSystem sourceSystem;
 
     public Worker(SourceSystem sourceSystem) {

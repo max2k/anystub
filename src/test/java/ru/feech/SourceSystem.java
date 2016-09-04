@@ -16,8 +16,14 @@ import java.util.stream.Collectors;
 @Component
 public class SourceSystem {
 
+    private final String url;
+
+    public SourceSystem(String externalSystemUrl) {
+        this.url = externalSystemUrl;
+    }
+
     public String get() throws IOException {
-        URL myURL = new URL("http://localhost:8080/");
+        URL myURL = new URL(url);
         URLConnection myURLConnection = myURL.openConnection();
         myURLConnection.connect();
 
