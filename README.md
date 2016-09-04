@@ -1,2 +1,93 @@
 # anystub
-record input output for tests in java
+record input/output for tests in java. inspired by vcr for rails
+
+Instal from Maven Central (comming soon)
+===
+
+``` xml
+    <dependency>
+      <groupId>org.anystub</groupId>
+      <artifactId>anystub</artifactId>
+      <version>0.0.1</version>
+    </dependency>
+```
+
+Example
+===
+you can find an example of using in tests folder of the repository
+
+you have a `class SourceSystem` which access to external resources.
+``` java
+public class SourceSystem {
+
+    public String get() throws IOException {
+        URL myURL = new URL("http://localhost:8080/");
+        URLConnection myURLConnection = myURL.openConnection();
+        myURLConnection.connect();
+
+
+        InputStream inputStream = myURLConnection.getInputStream();
+        return new BufferedReader(new InputStreamReader(inputStream))
+                .lines()
+                .collect(Collectors.joining());
+    }
+
+
+}
+```
+
+When you check the class enough you whant to go futher and tests classes that use the source system
+
+``` java 
+public class Worker {
+
+    private SourceSystem sourceSystem;
+
+    public Worker(SourceSystem sourceSystem) {
+        this.sourceSystem = sourceSystem;
+    }
+
+    public String get() throws IOException {
+        return sourceSystem.get();
+    }
+}
+```
+
+to make sure you tests will run everywhere you need to create stub for the SourceSystem and record data that is necasserily for the tests
+
+``` java
+public class WorkerEasyTest {
+
+    SourceSystem sourceSystem;
+
+    @Before
+    public void createStub()
+    {
+        Base base = new Base();
+        base.init();
+        sourceSystem = new SourceSystem("http://localhost:8080") {
+            @Override
+            public String get() throws IOException {
+                return base.request(() -> super.get(), "root");
+            }
+        };
+    }
+
+    @Test
+    public void xTest() throws IOException {
+
+        Worker worker = new Worker(sourceSystem);
+        assertEquals("fixed", worker.get());
+    }
+
+}
+```
+
+By default your data is kept in src/test/resources/anystub/stub.yml. base.request(Supplier<>, String keys..) looks for stored data in the file. In case the search is successful the found result is returned to the client. In other way your supplier would be invoced, produced value will be keep in the file the it will be provided for clients.
+
+**Recap**
+
+your workflow scenario:
+- extend your sourceSystem
+- create stub on your local system and add it to the repository
+- get benefits from automatic regression testing
