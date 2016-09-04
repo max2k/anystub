@@ -1,4 +1,4 @@
-# anystub
+# anystub   [![Build Status](https://travis-ci.org/feech/anystub.svg?branch=master)](https://travis-ci.org/feech/anystub) 
 record input/output for tests in java. inspired by vcr for rails
 
 Instal from Maven Central (comming soon)
