@@ -55,12 +55,14 @@ public class WorkerTest {
         public SourceSystem sourceSystem() {
 
             Base base = new Base();
-            base.init();
 
             return new SourceSystem("http://localhost:8080") {
                 @Override
                 public String get() throws IOException {
-                    return base.request(() -> super.get(), "root");
+                    return base.request(() ->
+                    {
+                        throw new IOException();
+                    }, "root");
                 }
 
                 /**
@@ -72,8 +74,10 @@ public class WorkerTest {
                 @Override
                 public Integer rand(int digit) {
                     return Integer.valueOf(
-                            base.request(() -> Integer.toString(super.rand(digit)),
-                                    "rand", Integer.toString(digit)));
+                            base.request(
+                                    () -> {
+                                        throw new RuntimeException();
+                                    }, "rand", Integer.toString(digit)));
                 }
             };
         }

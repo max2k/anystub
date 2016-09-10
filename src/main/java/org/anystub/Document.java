@@ -1,6 +1,7 @@
 package org.anystub;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -23,8 +24,7 @@ public class Document {
         this.xxx = xxx;
     }
 
-    public Document()
-    {
+    public Document() {
 
     }
 
@@ -34,8 +34,7 @@ public class Document {
 
     }
 
-    public Document(Throwable ex, String... keys)
-    {
+    public Document(Throwable ex, String... keys) {
         this.keys.addAll(asList(keys));
 
         this.exception.add(ex.getClass().getCanonicalName());
@@ -45,8 +44,8 @@ public class Document {
     public List<String> getKeys() {
         return keys;
     }
-    public void setKeys(List<String> keys)
-    {
+
+    public void setKeys(List<String> keys) {
         this.keys.clear();
         this.keys.addAll(keys);
     }
@@ -55,15 +54,25 @@ public class Document {
         return values;
     }
 
-    public void setValues(List<String> values)
-    {
+    public void setValues(List<String> values) {
         this.values.clear();
-        this.values.addAll(values);
 
+        // regardless explicit: type List<String> values it could contain byte[] due to
+        // using reflection
+        for (int i = 0; i < values.size(); i++) {
+            Object v = values.get(i);
+            if (v instanceof String) {
+                this.values.add((String) v);
+            } else if (v.getClass().getName() == "[B") {
+                byte[] x1 = (byte[]) v;
+                this.values.add(new String(x1));
+            } else {
+                throw new RuntimeException("Unexpected dataType");
+            }
+        }
     }
 
-    public Document setValues(String... values)
-    {
+    public Document setValues(String... values) {
         this.values.clear();
         stream(values)
                 .forEach(x -> this.values.add(x));
@@ -75,29 +84,29 @@ public class Document {
         return exception;
     }
 
-    public void setException(List<String> exception)
-    {
+    public void setException(List<String> exception) {
         this.exception.clear();
         this.exception.addAll(exception);
     }
 
-    public String get()
-    {
-        if(exception.isEmpty())
-        {
-            if(values.isEmpty())
-            {
+    public String get() {
+        return getVals().next();
+    }
+
+    public Iterator<String> getVals() {
+        if (exception.isEmpty()) {
+            if (values.isEmpty()) {
                 return null;
             }
-            return values.get(0);
+            return values.iterator();
         }
 
         // @todo create exec the same exception
         throw new RuntimeException(exception.get(1));
+
     }
 
-    public boolean keyEqual_to(String... keys)
-    {
+    public boolean keyEqual_to(String... keys) {
         return this.keys.equals(asList(keys));
     }
 

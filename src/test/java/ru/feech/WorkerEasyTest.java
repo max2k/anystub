@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,14 +17,25 @@ public class WorkerEasyTest {
     SourceSystem sourceSystem;
 
     @Before
-    public void createStub()
-    {
+    public void createStub() {
         Base base = new Base();
-        base.init();
         sourceSystem = new SourceSystem("http://localhost:8080") {
             @Override
             public String get() throws IOException {
-                return base.request(() -> super.get(), "root");
+
+                return base.request(() ->
+                                super.get()
+                        , getPath());
+
+            }
+
+            @Override
+            public String getPath() {
+                try {
+                    return super.getPath();
+                } catch (URISyntaxException e) {
+                    throw new RuntimeException(e.getMessage());
+                }
             }
         };
     }

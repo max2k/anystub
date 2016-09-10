@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.stream.Collectors;
@@ -38,5 +40,14 @@ public class SourceSystem {
 
     public Integer rand(int digit) {
         return digit + random++;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getPath() throws URISyntaxException {
+        URI uri = new URI(getUrl());
+        return uri.getPath();
     }
 }
