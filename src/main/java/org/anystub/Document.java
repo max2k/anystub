@@ -1,8 +1,10 @@
 package org.anystub;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -11,18 +13,11 @@ import static java.util.Arrays.stream;
  * Created by Kirill on 9/2/2016.
  */
 public class Document {
+
+    private static Logger logger = Logger.getLogger(Document.class.getName());
     private final List<String> keys = new ArrayList<>();
     private final List<String> values = new ArrayList<>();
     private final List<String> exception = new ArrayList<>();
-    private String xxx = "___++";
-
-//    public String getXxx() {
-//        return xxx;
-//    }
-
-    public void setXxx(String xxx) {
-        this.xxx = xxx;
-    }
 
     public Document() {
 
@@ -58,14 +53,23 @@ public class Document {
         this.values.clear();
 
         // regardless explicit: type List<String> values it could contain byte[] due to
-        // using reflection
+        // using reflection in Yaml-snake
         for (int i = 0; i < values.size(); i++) {
             Object v = values.get(i);
             if (v instanceof String) {
                 this.values.add((String) v);
             } else if (v.getClass().getName() == "[B") {
                 byte[] x1 = (byte[]) v;
-                this.values.add(new String(x1));
+                logger.finest(()->
+                        {
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("assign binary data:");
+                            for (int k = 0; k < x1.length; k++) {
+                                sb.append(String.format(" x%02x", x1[k]));
+                            }
+                            return sb.toString();
+                        });
+                this.values.add(new String(x1, Charset.forName("UTF-8")));
             } else {
                 throw new RuntimeException("Unexpected dataType");
             }

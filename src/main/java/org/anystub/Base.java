@@ -19,6 +19,8 @@ import java.util.logging.Logger;
  *  - rmNone  seeking in cache if failed throw {@link NoSuchElementException}
  *  - rmAll  make real request without seeking in cache (use it for logging )
  *
+ *  * most of the methods return this to cascading operations
+ *
  * Created by Kirill on 9/2/2016.
  */
 public class Base {
@@ -57,7 +59,7 @@ public class Base {
      * examples:
      *  - new Base("./stub.yml") uses file in current dir
      *  - new Base("stub.yml") uses src/test/resources/anystub/stub.yml
-     * @param filename
+     * @param filename used file name
      */
     public Base(String filename) {
         File file = new File(filename);
@@ -112,7 +114,8 @@ public class Base {
     /**
      * keeps [0..count-1] as keys, the last element as value
      *
-     * @param keysAndValue requested
+     * @param keysAndValue keys for request
+     * @return this
      */
     public Base put(String... keysAndValue) {
         return put(new Document(Arrays.copyOf(keysAndValue, keysAndValue.length - 1))
@@ -134,13 +137,13 @@ public class Base {
         return getVals(keys).next();
     }
 
-    public Iterator<String> getVals(String... keys) {
-        return getDocment(keys)
+    public Iterator<String> getVals(String... keys) throws NoSuchElementException{
+        return getDocument(keys)
                 .get()
                 .getVals();
     }
 
-    private Optional<Document> getDocment(String... keys) {
+    private Optional<Document> getDocument(String... keys) {
         return documentList.stream()
                 .filter(x -> x.keyEqual_to(keys))
                 .findFirst();
@@ -188,8 +191,8 @@ public class Base {
      * @param keys     key of object
      * @param <T>      Type of Object
      * @param <E>      thrown exception by supplier
-     * @return
-     * @throws E
+     * @return result from recovering from stub or from supplier
+     * @throws E exception from stub or from supplier
      */
     public <T, E extends Throwable> T request(Supplier<T, E> supplier,
                                               Decoder<T> decoder,
@@ -203,10 +206,10 @@ public class Base {
                 init();
             }
 
-            Optional<Document> opt = getDocment(keys);
+            Optional<Document> opt = getDocument(keys);
             if (opt.isPresent()) {
                 ArrayList<String> ar = new ArrayList<>();
-                opt.get().getVals().forEachRemaining(x -> ar.add(x));
+                opt.get().getVals().forEachRemaining(ar::add);
                 return decoder.decode(ar.toArray(new String[0]));
             }
         }
@@ -249,6 +252,7 @@ public class Base {
 
     /**
      * reload file
+     * @throws IOException due to file access error
      */
     public void load() throws IOException {
 
@@ -275,7 +279,7 @@ public class Base {
     /**
      * rewrite stub file
      *
-     * @throws IOException
+     * @throws IOException due to file access error
      */
     public void save() throws IOException {
         File file = new File(filePath);

@@ -9,9 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by Kirill on 9/3/2016.
@@ -94,13 +92,17 @@ public class BaseTest {
 
         StringBuilder stringBuilder = new StringBuilder();
         IntStream.range(0, 256).forEach(x -> stringBuilder.append((char) x));
+        assertEquals(256, stringBuilder.toString().length());
         base.request(() -> stringBuilder.toString(), "binaryData");
 
         base = new Base("", "stubBin.yml");
 
         String binaryData = base.request("binaryData");
 
-        assertEquals(stringBuilder.toString(), binaryData);
+//        binaryData.
+//        Arrays.stream(binaryData.getBytes())
+//                .ma
+        assertArrayEquals(stringBuilder.toString().getBytes(), binaryData.getBytes());
 
     }
 
