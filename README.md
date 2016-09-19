@@ -1,7 +1,7 @@
 # anystub   [![Build Status](https://travis-ci.org/feech/anystub.svg?branch=master)](https://travis-ci.org/feech/anystub) 
 record input/output for tests in java. inspired by vcr for rails
 
-Install from Maven Central (comming soon)
+Install from Maven Central 
 ===
 
 ``` xml
@@ -11,15 +11,7 @@ Install from Maven Central (comming soon)
       <version>0.0.3</version>
     </dependency>
 ```
-for now available in
-``` xml
-    <repositories>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/groups/staging</url>
-        </repository>
-    </repositories>
-```
+
 
 Example
 ===
