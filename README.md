@@ -8,7 +8,7 @@ Install from Maven Central
     <dependency>
       <groupId>org.anystub</groupId>
       <artifactId>anystub</artifactId>
-      <version>0.0.3</version>
+      <version>0.0.6</version>
     </dependency>
 ```
 
