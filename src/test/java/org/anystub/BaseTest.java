@@ -4,9 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
@@ -127,5 +125,86 @@ public class BaseTest {
         base.request("restrictionTest");
     }
 
+
+    static class Human {
+        Integer id;
+        Integer height;
+        Integer age;
+        Integer weight;
+        String name;
+
+        public Human(int id, int height, int age, int weight, String name) {
+            this.height = height;
+            this.age = age;
+            this.weight = weight;
+            this.name = name;
+            this.id = id;
+        }
+
+        public Human() {
+        }
+
+        public List<String> toList() {
+            ArrayList<String> res = new ArrayList<>();
+            res.add(id.toString());
+            res.add(height.toString());
+            res.add(age.toString());
+            res.add(weight.toString());
+            res.add(name);
+            return res;
+        }
+    }
+
+    @Test
+    public void requestComplexObject() {
+        Human h = new Human(13, 180, 30, 60, "i'm");
+
+        Base base = new Base("", "complexObject.yml");
+
+        Human human = base.request2(() -> h,
+                values -> {
+                    Iterator<String> v = values.iterator();
+                    return new Human(Integer.parseInt(v.next()),
+                            Integer.parseInt(v.next()),
+                            Integer.parseInt(v.next()),
+                            Integer.parseInt(v.next()),
+                            v.next());
+                },
+                human1 -> human1.toList()
+
+                ,
+                "13"
+        );
+
+        assertEquals(180, (int) human.height);
+        assertEquals(30, (int) human.age);
+        assertEquals(60, (int) human.weight);
+        assertEquals("i'm", human.name);
+        assertEquals(13, (int) human.id);
+
+
+        base = new Base("", "complexObject.yml");
+
+        human = base.request2(() -> {
+                    throw new NoSuchElementException();
+                },
+                values -> {
+                    Iterator<String> v = values.iterator();
+                    return new Human(Integer.parseInt(v.next()),
+                            Integer.parseInt(v.next()),
+                            Integer.parseInt(v.next()),
+                            Integer.parseInt(v.next()),
+                            v.next());
+                },
+                human1 -> human1.toList(),
+                "13"
+        );
+
+        assertEquals(180, (int) human.height);
+        assertEquals(30, (int) human.age);
+        assertEquals(60, (int) human.weight);
+        assertEquals("i'm", human.name);
+        assertEquals(13, (int) human.id);
+    }
 
 }
