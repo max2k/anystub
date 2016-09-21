@@ -5,5 +5,5 @@ package org.anystub;
  */
 @FunctionalInterface
 public interface Encoder<T extends Object> {
-    String[] encode(T t);
+    Iterable<String> encode(T t);
 }

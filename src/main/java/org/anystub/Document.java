@@ -83,6 +83,13 @@ public class Document {
 
         return this;
     }
+    public Document setValues(Iterable<String> values) {
+        this.values.clear();
+        values
+                .forEach(x -> this.values.add(x));
+
+        return this;
+    }
 
     public List<String> getException() {
         return exception;

@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 
 /**
@@ -75,13 +76,25 @@ public class BaseTest {
         assertEquals("-1594594225", rands[0]);
         assertEquals("asdqwe", rands[1]);
 
+        int val =
+                base.request2((Supplier<Integer, NoSuchElementException>) () -> {
+                            throw new NoSuchElementException();
+                        },
+                        values -> Integer.parseInt(values.iterator().next()),
+                        integer -> asList(integer.toString()),
+                        "rand", "1002"
+                );
 
-        int val = base.request(() -> {
-                    throw new RuntimeException();
-                },
-                (x) -> Integer.parseInt(x[0]),
-                integer -> new String[]{integer.toString()},
-                "rand", "1002");
+        assertEquals(-1594594225, val);
+
+        val =
+                base.request((Supplier<Integer, NoSuchElementException>) () -> {
+                            throw new NoSuchElementException();
+                        },
+                        values -> Integer.parseInt(values),
+                        integer -> integer.toString(),
+                        "rand", "1002"
+                );
 
         assertEquals(-1594594225, val);
     }
