@@ -19,17 +19,17 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    <developers>
+        <developer>
+            <id>andreev</id>
+            <name>Kirill Andreev</name>
+            <email>kirill.andreev.o@gmail.com</email>
+        </developer>
+    </developers>
 
     <scm>
         <url>https://github.com/anystub/anystub</url>
     </scm>
-
-    <!--<parent>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-parent</artifactId>-->
-        <!--<version>1.4.0.RELEASE</version>-->
-        <!--<relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
-    <!--</parent>-->
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
