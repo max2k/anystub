@@ -1,16 +1,17 @@
 # anystub   [![Build Status](https://travis-ci.org/feech/anystub.svg?branch=master)](https://travis-ci.org/feech/anystub) 
 record input/output for tests in java. inspired by vcr for rails
 
-Instal from Maven Central (comming soon)
+Install from Maven Central 
 ===
 
 ``` xml
     <dependency>
       <groupId>org.anystub</groupId>
       <artifactId>anystub</artifactId>
-      <version>0.0.2</version>
+      <version>0.0.3</version>
     </dependency>
 ```
+
 
 Example
 ===
