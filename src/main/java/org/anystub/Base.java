@@ -151,14 +151,18 @@ public class Base {
                 .findFirst();
     }
 
+    /**
+     * requests string from stub
+     *
+     * @param keys
+     * @param <E>
+     * @return
+     * @throws E
+     */
     public <E extends Exception> String request(String... keys) throws E {
-        return request(() -> {
-                    throw new NoSuchElementException();
-                },
+        return request(Base::throwNSE,
                 values -> values,
-                x -> {
-                    throw new NoSuchElementException();
-                },
+                Base::throwNSE,
                 keys);
 
     }
@@ -171,13 +175,9 @@ public class Base {
     }
 
     public <E extends Exception> String[] requestArray(String... keys) throws E {
-        return request2(() -> {
-                    throw new NoSuchElementException();
-                },
+        return request2(Base::throwNSE,
                 values -> StreamSupport.stream(values.spliterator(), false).collect(Collectors.toList()).toArray(new String[0]),
-                x -> {
-                    throw new NoSuchElementException();
-                },
+                Base::throwNSE,
                 keys);
 
     }
@@ -191,7 +191,28 @@ public class Base {
     }
 
     /**
+     * Only recover object from stub
+     *
+     * @param decoder
+     * @param keys
+     * @param <T>
+     * @param <E>
+     * @return
+     * @throws E
+     */
+    public <T, E extends Throwable> T request(DecoderSimple<T> decoder,
+                                              String... keys) throws E {
+        return request2(Base::throwNSE,
+                values -> decoder.decode(values.iterator().next()),
+                Base::throwNSE,
+                keys
+        );
+    }
+
+
+    /**
      * use the method to serialize object to one line
+     *
      * @param supplier provide real answer
      * @param decoder  create object from one line
      * @param encoder  serialize object to one line
@@ -204,8 +225,7 @@ public class Base {
     public <T, E extends Throwable> T request(Supplier<T, E> supplier,
                                               DecoderSimple<T> decoder,
                                               EncoderSimple<T> encoder,
-                                              String... keys) throws E
-    {
+                                              String... keys) throws E {
         return request2(supplier,
                 values -> decoder.decode(values.iterator().next()),
                 t -> asList(encoder.encode(t)),
@@ -215,6 +235,7 @@ public class Base {
 
     /**
      * use the method to serialize object to multi lines
+     *
      * @param supplier provide real answer
      * @param decoder  create object from values
      * @param encoder  serialize object
@@ -244,7 +265,7 @@ public class Base {
         }
 
         if (!writeInCache) {
-            throw new NoSuchElementException();
+            throwNSE();
         }
 
         // execute
@@ -333,13 +354,49 @@ public class Base {
         }
     }
 
+    /**
+     * during invoke requests correspondent file is loaded. if load is successful - isNew returns false
+     *
+     * @return true is buffer is clean, file isn't loaded and no data keeps in it
+     */
     public boolean isNew() {
         return isNew;
     }
 
+    /**
+     * clear buffer, set isNew to true
+     */
     public void clear() {
         documentList.clear();
         isNew = true;
     }
+
+    public static <T, E> T throwNSE(E e) {
+        throw new NoSuchElementException();
+    }
+
+    public static <T> T throwNSE() {
+        throw new NoSuchElementException();
+    }
+
+
+    public <T, E extends Throwable> T requestMapped(Supplier<T, E> supplier,
+                                              String... keys) throws E {
+        throw new UnsupportedOperationException();
+    }
+//
+//    private static <T> Map<String, Object> aa(Class<T> baseClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
+//        java.lang.reflect.Constructor<T> constructor = baseClass.getConstructor(baseClass);
+//        T t = constructor.newInstance();
+//        baseClass.getField("aa").getType().getMethods();
+//
+//        int []aaa = {10,20,40};
+//        String[] bbb = {"", "11"};
+//        asList().stream()
+//
+//        Iterable<Integer> it = new Integer[2];
+//
+//        return null;
+//    }
 
 }

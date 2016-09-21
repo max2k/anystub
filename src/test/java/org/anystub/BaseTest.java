@@ -53,67 +53,72 @@ public class BaseTest {
 
     }
 
+    @Test
+    public void stringRequest()
+    {
+        Base base = new Base();
+        String request = base.request(() -> "xxx", "qwe", "stringkey");
+
+        assertEquals("xxx", request);
+    }
 
     @Test
     public void request() {
         Base base = new Base();
         assertTrue(base.isNew());
 
-        String rand = base.request(() -> {
-            throw new RuntimeException();
-        }, "rand", "1002");
+        String rand = base.request("rand", "1002");
 
         assertEquals("-1594594225", rand);
 
         assertFalse(base.isNew());
 
-        String[] rands = base.requestArray(() -> {
-            throw new RuntimeException();
-        }, "rand", "1002");
+        String[] rands = base.requestArray(Base::throwNSE, "rand", "1002");
 
         assertEquals("-1594594225", rands[0]);
         assertEquals("asdqwe", rands[1]);
 
-        int val =
-                base.request2((Supplier<Integer, NoSuchElementException>) () -> {
-                            throw new NoSuchElementException();
-                        },
-                        values -> Integer.parseInt(values.iterator().next()),
-                        integer -> asList(integer.toString()),
-                        "rand", "1002"
-                );
+        int val = base.request2(Base::throwNSE,
+                values -> Integer.parseInt(values.iterator().next()),
+                integer -> asList(integer.toString()),
+                "rand", "1002"
+        );
 
         assertEquals(-1594594225, val);
 
-        val =
-                base.request((Supplier<Integer, NoSuchElementException>) () -> {
-                            throw new NoSuchElementException();
-                        },
-                        values -> Integer.parseInt(values),
-                        integer -> integer.toString(),
-                        "rand", "1002"
-                );
+        val = base.request(values -> Integer.parseInt(values),
+                "rand", "1002"
+        );
 
         assertEquals(-1594594225, val);
     }
+
 
     @Test
     public void binaryDataTest() {
         Base base = new Base("", "stubBin.yml");
 
-        StringBuilder stringBuilder = new StringBuilder();
-        IntStream.range(0, 256).forEach(x -> stringBuilder.append((char) x));
-        assertEquals(256, stringBuilder.toString().length());
-        base.request(() -> stringBuilder.toString(), "binaryData");
+        byte[] arr = new byte[256];
+        IntStream.range(0, 256).forEach(x -> arr[x] = (byte) (x));
+        base.request(() -> arr,
+                s -> Base64.getDecoder().decode(s),
+                values -> Base64.getEncoder().encodeToString(values),
+                "binaryDataB64");
+
 
         base = new Base("", "stubBin.yml");
+        byte[] arr1 = base.request(Base::throwNSE,
+                s -> Base64.getDecoder().decode(s),
+                Base::throwNSE,
+                "binaryDataB64");
 
-        String binaryData = base.request("binaryData");
 
-//        binaryData.
-//        Arrays.stream(binaryData.getBytes())
-//                .ma
-        assertArrayEquals(stringBuilder.toString().getBytes(), binaryData.getBytes());
+        assertArrayEquals(arr, arr1);
+        arr1 = base.request(s -> Base64.getDecoder().decode(s),
+                "binaryDataB64");
+
+
+        assertArrayEquals(arr, arr1);
 
     }
 
