@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Arrays.asList;
@@ -31,6 +32,7 @@ public class Base {
 
     private static Logger log = Logger.getLogger(Base.class.getName());
     private List<Document> documentList = new ArrayList<>();
+    private List<Document> requestHistory = new ArrayList<>();
     private final String filePath;
     private boolean isNew = true;
     private boolean seekInCache = true;
@@ -38,17 +40,20 @@ public class Base {
 
     public enum RequestMode {
         /**
-         * general using
+         * general using.
+         * send all requests to real system that aren't in cache
          */
         rmNew,
 
         /**
          * strict checking
+         * sending requests to real system is forbidden
          */
         rmNone,
 
         /**
          * logging
+         * all requests are sent to real system and written to file
          */
         rmAll
     }
@@ -100,7 +105,7 @@ public class Base {
                 break;
             case rmAll:
                 seekInCache = false;
-                writeInCache = false;
+                writeInCache = true;
                 break;
         }
 
@@ -250,11 +255,15 @@ public class Base {
                                                Encoder<T> encoder,
                                                String... keys) throws E {
 
-        if (seekInCache) {
+        log.finest(() -> String.format("request executing: %s", Arrays.stream(keys).collect(Collectors.joining(","))));
 
-            if (isNew()) {
-                init();
-            }
+        if (isNew()) {
+            init();
+        }
+
+        requestHistory.add(new Document(keys));
+
+        if (seekInCache) {
 
             Optional<Document> opt = getDocument(keys);
             if (opt.isPresent()) {
@@ -289,7 +298,7 @@ public class Base {
 
 
     /**
-     * load file - exceptions are suppressed
+     * reload stub-file - IOException exceptions are suppressed
      */
     private void init() {
         try {
@@ -301,13 +310,13 @@ public class Base {
 
     /**
      * reload file
+     * history and kept documents are removed
      *
      * @throws IOException due to file access error
      */
     public void load() throws IOException {
 
-        isNew = true;
-        documentList.clear();
+        clear();
         try (InputStream input = new FileInputStream(new File(filePath))) {
             Constructor constructor = new Constructor(Document.class);
             TypeDescription docDescription = new TypeDescription(Document.class);
@@ -368,6 +377,7 @@ public class Base {
      */
     public void clear() {
         documentList.clear();
+        requestHistory.clear();
         isNew = true;
     }
 
@@ -379,9 +389,55 @@ public class Base {
         throw new NoSuchElementException();
     }
 
+    public Stream<Document> history() {
+        return requestHistory.stream();
+    }
+
+    public Stream<Document> history(String... keys) {
+        return history()
+                .filter(x -> x.keyEqual_to(keys));
+    }
+
+    /**
+     * requests with given keys
+     * * if no keys then amount of all requests.
+     * * key could be skipped if you set correspondent value to null.
+     * * times(null) and times(null,null) are different, cause looking for requests with
+     * amount of keys no less then in keys array.
+     *
+     * @param keys
+     * @return
+     */
+    public Stream<Document> match(String... keys) {
+        if (keys == null || keys.length == 0) {
+            return history();
+        }
+        return history()
+                .filter(x -> x.match_to(keys));
+    }
+
+    /**
+     * amount of requests with given keys
+     * * if no keys then amount of all requests.
+     * * key could be skipped if you set correspondent value to null.
+     * * times(null) and times(null,null) are different, cause looking for requests with
+     * amount of keys no less then in keys array.
+     *
+     * @param keys
+     * @return
+     */
+    public long times(final String... keys) {
+        if (keys == null || keys.length == 0) {
+            return requestHistory.size();
+        }
+        return history()
+                .filter(x -> x.match_to(keys))
+                .count();
+    }
+
 
     public <T, E extends Throwable> T requestMapped(Supplier<T, E> supplier,
-                                              String... keys) throws E {
+                                                    String... keys) throws E {
         throw new UnsupportedOperationException();
     }
 //

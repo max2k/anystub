@@ -35,34 +35,45 @@ public class WorkerTest {
     @Autowired
     Worker worker;
 
+    @Autowired
+    Base base;
+
+
     @Test
     public void xxTest() throws IOException {
+        base.clear();
+
         assertEquals("fixed", worker.get());
+
+        assertEquals(1L, base.times());
     }
 
     @Test
     public void randTest() throws IOException {
+        base.clear();
         assertTrue("1", -1594594225 == worker.rand());
         assertTrue("2", -1594594225 == worker.rand());
+        assertEquals(2L, base.times());
+
     }
 
 
     @TestConfiguration
     static class Conf {
 
+        @Bean
+        Base base() {
+            return new Base();
+        }
 
         @Bean
-        public SourceSystem sourceSystem() {
+        public SourceSystem sourceSystem(Base base) {
 
-            Base base = new Base();
 
             return new SourceSystem("http://localhost:8080") {
                 @Override
                 public String get() throws IOException {
-                    return base.request(() ->
-                    {
-                        throw new IOException();
-                    }, "root");
+                    return base.request("root");
                 }
 
                 /**
@@ -74,10 +85,7 @@ public class WorkerTest {
                 @Override
                 public Integer rand(int digit) {
                     return Integer.valueOf(
-                            base.request(
-                                    () -> {
-                                        throw new RuntimeException();
-                                    }, "rand", Integer.toString(digit)));
+                            base.request("rand", Integer.toString(digit)));
                 }
             };
         }

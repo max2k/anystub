@@ -118,8 +118,24 @@ public class Document {
     }
 
     public boolean keyEqual_to(String... keys) {
-        return this.keys.equals(asList(keys));
+         return this.keys.equals(asList(keys));
     }
+    public boolean match_to(String... keys){
+        if(this.keys.size()<keys.length)
+        {
+            return false;
+        }
+        for(int i=0; i<keys.length; i++){
+            if(keys[i]==null){
+                continue;
+            }
+            if(!keys[i].equals(this.keys.get(i))){
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     @Override
     public boolean equals(Object other) {

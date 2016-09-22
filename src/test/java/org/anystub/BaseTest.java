@@ -212,4 +212,26 @@ public class BaseTest {
         assertEquals(13, (int) human.id);
     }
 
+    @Test
+    public void historyCheck()
+    {
+        Base base = new Base("", "historyCheck.yml");
+
+        assertEquals(0L, base.times());
+
+        base.request(()-> "okok", "2", "3", "3");
+        base.request(()-> "okok", "2", "3", "4");
+        base.request(()-> "okok", "2", "3", "4");
+        base.request(()-> "okok", "5", "3", "4");
+        base.request(()-> "okok", "5");
+
+        assertEquals(5L, base.times());
+        assertEquals(5L, base.history().count());
+        assertEquals(2L, base.times("2","3","4"));
+        assertEquals(1L, base.times("5","3","4"));
+        assertEquals(3L, base.history().filter(x->x.getKeys().get(0).equals("2")).count());
+        assertEquals(4L, base.times(null, null));
+        assertEquals(3L, base.times(null, null, "4"));
+    }
+
 }
