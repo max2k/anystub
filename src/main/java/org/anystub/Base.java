@@ -159,10 +159,10 @@ public class Base {
     /**
      * requests string from stub
      *
-     * @param keys
-     * @param <E>
-     * @return
-     * @throws E
+     * @param keys keys for searching response in stub
+     * @param <E> type of allowed Exception
+     * @return requested response
+     * @throws E allowed Exception
      */
     public <E extends Exception> String request(String... keys) throws E {
         return request(Base::throwNSE,
@@ -198,12 +198,12 @@ public class Base {
     /**
      * Only recover object from stub
      *
-     * @param decoder
-     * @param keys
-     * @param <T>
-     * @param <E>
-     * @return
-     * @throws E
+     * @param decoder recover object from strings
+     * @param keys key for creating request
+     * @param <T> type of requested object
+     * @param <E> type of thrown Exception by {@link java.util.function.Supplier}
+     * @return requested object
+     * @throws E thrown Exception by {@link java.util.function.Supplier}
      */
     public <T, E extends Throwable> T request(DecoderSimple<T> decoder,
                                               String... keys) throws E {
@@ -366,7 +366,7 @@ public class Base {
     /**
      * during invoke requests correspondent file is loaded. if load is successful - isNew returns false
      *
-     * @return true is buffer is clean, file isn't loaded and no data keeps in it
+     * @return true if buffer is clean, file isn't loaded and no data keeps in it
      */
     public boolean isNew() {
         return isNew;
@@ -381,18 +381,39 @@ public class Base {
         isNew = true;
     }
 
+    /**
+     * use it instead of {@link EncoderSimple}
+     * @param e nothing
+     * @param <T> nothing
+     * @param <E> nothing
+     * @return nothing
+     */
     public static <T, E> T throwNSE(E e) {
         throw new NoSuchElementException();
     }
 
+    /**
+     * use it instead of your {@link java.util.function.Supplier} in requests
+     * @param <T> type for matching
+     * @return nothing
+     */
     public static <T> T throwNSE() {
         throw new NoSuchElementException();
     }
 
+    /**
+     *
+     * @return stream of all requests
+     */
     public Stream<Document> history() {
         return requestHistory.stream();
     }
 
+    /**
+     * requests that exa
+     * @param keys keys for searching requests (exactly matching)
+     * @return stream of requests
+     */
     public Stream<Document> history(String... keys) {
         return history()
                 .filter(x -> x.keyEqual_to(keys));
@@ -405,8 +426,8 @@ public class Base {
      * * times(null) and times(null,null) are different, cause looking for requests with
      * amount of keys no less then in keys array.
      *
-     * @param keys
-     * @return
+     * @param keys keys for matching requests
+     * @return stream of matched requests
      */
     public Stream<Document> match(String... keys) {
         if (keys == null || keys.length == 0) {
@@ -423,36 +444,28 @@ public class Base {
      * * times(null) and times(null,null) are different, cause looking for requests with
      * amount of keys no less then in keys array.
      *
-     * @param keys
-     * @return
+     * @param keys keys for matching requests
+     * @return amount of matched requests
      */
     public long times(final String... keys) {
-        if (keys == null || keys.length == 0) {
-            return requestHistory.size();
-        }
-        return history()
-                .filter(x -> x.match_to(keys))
+        return match(keys)
                 .count();
     }
 
 
+    /**
+     * invokes request, uses reflection to serialize/deserialize object
+     * * {@link UnsupportedOperationException}
+     * @param supplier produce response (ex. query real remote system)
+     * @param keys id of request
+     * @param <T> type of produced result
+     * @param <E> type of allowed Exception
+     * @return requested object
+     * @throws E occurs in real system or created from
+     */
     public <T, E extends Throwable> T requestMapped(Supplier<T, E> supplier,
                                                     String... keys) throws E {
         throw new UnsupportedOperationException();
     }
-//
-//    private static <T> Map<String, Object> aa(Class<T> baseClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
-//        java.lang.reflect.Constructor<T> constructor = baseClass.getConstructor(baseClass);
-//        T t = constructor.newInstance();
-//        baseClass.getField("aa").getType().getMethods();
-//
-//        int []aaa = {10,20,40};
-//        String[] bbb = {"", "11"};
-//        asList().stream()
-//
-//        Iterable<Integer> it = new Integer[2];
-//
-//        return null;
-//    }
 
 }
