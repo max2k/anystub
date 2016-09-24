@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.util.Arrays.asList;
+import static org.anystub.Document.ars;
 import static org.junit.Assert.*;
 
 /**
@@ -37,10 +38,10 @@ public class BaseTest {
     public void saveMulti() throws IOException {
         Base base = new Base();
 
-        base.put(new Document("keyv1", "keyv2", "keyv3").setValues("value2", "value3"))
-                .put(new Document("keyv1.1", "keyv2", "keyv3").setValues("value2", "value3"))
-                .put(new Document("keyv1.2", "keyv2", "keyv3").setValues("value2", "value3"))
-                .put(new Document("keyv1.3", "keyv2", "keyv3").setValues("value2", "value4"));
+        base.add(new Document("keyv1", "keyv2", "keyv3").setValues("value2", "value3"))
+                .add(new Document("keyv1.1", "keyv2", "keyv3").setValues("value2", "value3"))
+                .add(new Document("keyv1.2", "keyv2", "keyv3").setValues("value2", "value3"))
+                .add(new Document("keyv1.3", "keyv2", "keyv3").setValues("value2", "value4"));
 
 
         Iterator<String> r = base.getVals("keyv1.3", "keyv2", "keyv3");
@@ -54,8 +55,7 @@ public class BaseTest {
     }
 
     @Test
-    public void stringRequest()
-    {
+    public void stringRequest() {
         Base base = new Base();
         String request = base.request(() -> "xxx", "qwe", "stringkey");
 
@@ -213,8 +213,7 @@ public class BaseTest {
     }
 
     @Test
-    public void historyCheck()
-    {
+    public void historyCheck() {
         Base base = new Base("", "historyCheck.yml");
 
         assertEquals(0L, base.times());
@@ -227,11 +226,44 @@ public class BaseTest {
 
         assertEquals(5L, base.times());
         assertEquals(5L, base.history().count());
-        assertEquals(2L, base.times("2","3","4"));
-        assertEquals(1L, base.times("5","3","4"));
-        assertEquals(3L, base.history().filter(x->x.getKeys().get(0).equals("2")).count());
+        assertEquals(2L, base.times("2", "3", "4"));
+        assertEquals(1L, base.times("5", "3", "4"));
+        assertEquals(3L, base.match("2").count());
+        assertEquals(3L, base.times("2"));
         assertEquals(4L, base.times(null, null));
         assertEquals(3L, base.times(null, null, "4"));
     }
 
+    @Test
+    public void nullMatching() {
+        Base base = new Base("", "historyCheck.yml");
+
+        assertEquals(0L, base.times());
+
+        base.request(() -> "okok", "", "3", "3");
+        base.request(() -> "okok", null, "3", "4");
+
+        assertEquals(2, base.times());
+        assertEquals(1, base.times(""));
+        assertEquals(2, base.times(null, null));
+    }
+
+    @Test
+    public void regexpMatching() {
+        Base base = new Base("", "historyCheck.yml");
+
+        base.request(() -> "okok", "2222", "3", "3");
+        base.request(() -> "okok", "2321", "3345", "4");
+        base.request(() -> "okok", "532", "3", "4");
+        base.request(() -> "okok", "5456456");
+
+        assertEquals(4, base.matchEx(ars(), ars(".*ko.*")).count());
+        assertEquals(4, base.matchEx().count());
+        assertEquals(4, base.timesEx());
+        assertEquals(3, base.matchEx(null, "3.*").count());
+        assertEquals(1, base.matchEx(".*56.*").count());
+        assertEquals(1, base.timesEx(".*56.*"));
+        assertEquals(4, base.timesEx(ars(), ars(".ko.")));
+
+    }
 }

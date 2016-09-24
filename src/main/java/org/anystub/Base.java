@@ -112,27 +112,58 @@ public class Base {
         return this;
     }
 
-    public Base put(Document document) {
-        documentList.add(document);
-        isNew = false;
+    /**
+     * keep a document
+     * use it for cascading keeping of document
+     * @param document for keeping
+     * @return this
+     */
+    public Base add(Document document){
+        put(document);
         return this;
     }
 
     /**
-     * keeps [0..count-1] as keys, the last element as value
+     * store a document
+     * clear isNew flag
+     * @param document for keeping
+     * @return inserted document
+     */
+    public Document put(Document document) {
+        documentList.add(document);
+        isNew = false;
+        return document;
+    }
+
+    /**
+     * store a new Document
+     * keeps [0..count-1] as keys, the last element as a value
      *
      * @param keysAndValue keys for request2
      * @return this
      */
-    public Base put(String... keysAndValue) {
+    public Document put(String... keysAndValue) {
         return put(new Document(Arrays.copyOf(keysAndValue, keysAndValue.length - 1))
                 .setValues(keysAndValue[keysAndValue.length - 1]));
     }
 
-    public Base put(Throwable ex, String... keys) {
+    /**
+     * create a new document and keep it
+     * @param ex exception is keeped in document
+     * @param keys key for the document
+     * @return inserted document
+     */
+    public Document put(Throwable ex, String... keys) {
         return put(new Document(ex, keys));
     }
 
+    /**
+     * @param keys for search of the document
+     * @return an Optional the 1st String of values for the first Document that fit for given keys,
+     *      or an empty Optional if the Document isn't found. if there are several documents
+     *      with the same keys returned value could be returned
+     *
+     */
     public Optional<String> getOpt(String... keys) {
         return documentList.stream()
                 .filter(x -> x.keyEqual_to(keys))
@@ -261,14 +292,13 @@ public class Base {
             init();
         }
 
-        requestHistory.add(new Document(keys));
-
         if (seekInCache) {
 
-            Optional<Document> opt = getDocument(keys);
-            if (opt.isPresent()) {
+            Optional<Document> storedDocument = getDocument(keys);
+            if (storedDocument.isPresent()) {
+                requestHistory.add(storedDocument.get());
                 ArrayList<String> ar = new ArrayList<>();
-                opt.get().getVals().forEachRemaining(ar::add);
+                storedDocument.get().getVals().forEachRemaining(ar::add);
                 return decoder.decode(ar);
             }
         }
@@ -282,12 +312,14 @@ public class Base {
         try {
             res = supplier.get();
         } catch (Throwable ex) {
-            put(ex, keys);
+            Document exceptionalDocument = put(ex, keys);
+            requestHistory.add(exceptionalDocument);
             throw ex;
         }
 
         // extract values
-        put(new Document(keys).setValues(encoder.encode(res)));
+        Document retrievedDocument = put(new Document(keys).setValues(encoder.encode(res)));
+        requestHistory.add(retrievedDocument);
         try {
             save();
         } catch (IOException ex) {
@@ -438,6 +470,29 @@ public class Base {
     }
 
     /**
+     * requests with given keys, requests match using regexp
+     * @param keys keys for matching
+     * @return stream of matched documents from history
+     */
+    public Stream<Document> matchEx(String... keys){
+        if (keys == null || keys.length == 0) {
+            return history();
+        }
+        return history()
+                .filter(x -> x.matchEx_to(keys));
+    }
+  /**
+     * requests with given keys, requests match using regexp
+     * @param keys keys for matching
+     * @param values keys for matching
+     * @return stream of matched documents from history
+     */
+    public Stream<Document> matchEx(String[] keys, String[] values){
+        return history()
+                .filter(x -> x.matchEx_to(keys, values));
+    }
+
+    /**
      * amount of requests with given keys
      * * if no keys then amount of all requests.
      * * key could be skipped if you set correspondent value to null.
@@ -449,6 +504,35 @@ public class Base {
      */
     public long times(final String... keys) {
         return match(keys)
+                .count();
+    }
+    /**
+     * amount of requests with given keys
+     * * if no keys then amount of all requests.
+     * * key could be skipped if you set correspondent value to null.
+     * * times(null) and times(null,null) are different, cause looking for requests with
+     * amount of keys no less then in keys array.
+     *
+     * @param keys keys for matching requests
+     * @return amount of matched requests
+     */
+    public long timesEx(final String... keys) {
+        return matchEx(keys)
+                .count();
+    }
+
+ /**
+     * amount of requests with given keys
+     * * if no keys then amount of all requests.
+     * * key could be skipped if you set correspondent value to null.
+     * * times(null) and times(null,null) are different, cause looking for requests with
+     * amount of keys no less then in keys array.
+     *
+     * @param keys keys for matching requests
+     * @return amount of matched requests
+     */
+    public long timesEx(final String[] keys, final String[] values) {
+        return matchEx(keys, values)
                 .count();
     }
 
