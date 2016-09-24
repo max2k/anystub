@@ -65,8 +65,8 @@ public class Base {
     /**
      * if filename holds only filename (without path) then creates file in src/test/resources/anystub/
      * examples:
-     * - new Base("./stub.yml") uses file in current dir
-     * - new Base("stub.yml") uses src/test/resources/anystub/stub.yml
+     * * new Base("./stub.yml") uses file in current dir
+     * * new Base("stub.yml") uses src/test/resources/anystub/stub.yml
      *
      * @param filename used file name
      */
@@ -314,6 +314,11 @@ public class Base {
         } catch (Throwable ex) {
             Document exceptionalDocument = put(ex, keys);
             requestHistory.add(exceptionalDocument);
+            try {
+                save();
+            } catch (IOException io_ex) {
+                log.warning("keep data failed: " + io_ex.getMessage());
+            }
             throw ex;
         }
 
@@ -349,7 +354,8 @@ public class Base {
     public void load() throws IOException {
 
         clear();
-        try (InputStream input = new FileInputStream(new File(filePath))) {
+        File file = new File(filePath);
+        try (InputStream input = new FileInputStream(file)) {
             Constructor constructor = new Constructor(Document.class);
             TypeDescription docDescription = new TypeDescription(Document.class);
             docDescription.putListPropertyType("keys", String.class);
@@ -362,7 +368,7 @@ public class Base {
 
             isNew = false;
         } catch (FileNotFoundException e) {
-            log.info("stub file not found: " + filePath);
+            log.info("stub file not found: " + file.getAbsolutePath());
         }
     }
 
@@ -384,7 +390,7 @@ public class Base {
         }
         if (!file.exists()) {
             if (file.createNewFile())
-                log.info("stub file is created");
+                log.info("stub file is created:"+file.getAbsolutePath());
             else
                 throw new RuntimeException("stub file isn't created");
         }

@@ -266,4 +266,19 @@ public class BaseTest {
         assertEquals(4, base.timesEx(ars(), ars(".ko.")));
 
     }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void exceptionTest()
+    {
+        Base base = new Base("./exceptionStub.yml");
+        boolean exceptionCaught = false;
+        try{
+            base.request(()->{throw new IndexOutOfBoundsException("for test");}, "key");
+        }catch (IndexOutOfBoundsException ex){
+            exceptionCaught = true;
+        }
+
+        assertTrue(exceptionCaught);
+        base.request(()->"okok", "key");
+    }
 }
