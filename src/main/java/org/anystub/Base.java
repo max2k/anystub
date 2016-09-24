@@ -115,10 +115,11 @@ public class Base {
     /**
      * keep a document
      * use it for cascading keeping of document
+     *
      * @param document for keeping
      * @return this
      */
-    public Base add(Document document){
+    public Base add(Document document) {
         put(document);
         return this;
     }
@@ -126,6 +127,7 @@ public class Base {
     /**
      * store a document
      * clear isNew flag
+     *
      * @param document for keeping
      * @return inserted document
      */
@@ -149,7 +151,8 @@ public class Base {
 
     /**
      * create a new document and keep it
-     * @param ex exception is keeped in document
+     *
+     * @param ex   exception is keeped in document
      * @param keys key for the document
      * @return inserted document
      */
@@ -160,9 +163,8 @@ public class Base {
     /**
      * @param keys for search of the document
      * @return an Optional the 1st String of values for the first Document that fit for given keys,
-     *      or an empty Optional if the Document isn't found. if there are several documents
-     *      with the same keys returned value could be returned
-     *
+     * or an empty Optional if the Document isn't found. if there are several documents
+     * with the same keys returned value could be returned
      */
     public Optional<String> getOpt(String... keys) {
         return documentList.stream()
@@ -191,7 +193,7 @@ public class Base {
      * requests string from stub
      *
      * @param keys keys for searching response in stub
-     * @param <E> type of allowed Exception
+     * @param <E>  type of allowed Exception
      * @return requested response
      * @throws E allowed Exception
      */
@@ -230,9 +232,9 @@ public class Base {
      * Only recover object from stub
      *
      * @param decoder recover object from strings
-     * @param keys key for creating request
-     * @param <T> type of requested object
-     * @param <E> type of thrown Exception by {@link java.util.function.Supplier}
+     * @param keys    key for creating request
+     * @param <T>     type of requested object
+     * @param <E>     type of thrown Exception by {@link java.util.function.Supplier}
      * @return requested object
      * @throws E thrown Exception by {@link java.util.function.Supplier}
      */
@@ -390,7 +392,7 @@ public class Base {
         }
         if (!file.exists()) {
             if (file.createNewFile())
-                log.info("stub file is created:"+file.getAbsolutePath());
+                log.info("stub file is created:" + file.getAbsolutePath());
             else
                 throw new RuntimeException("stub file isn't created");
         }
@@ -421,7 +423,8 @@ public class Base {
 
     /**
      * use it instead of {@link EncoderSimple}
-     * @param e nothing
+     *
+     * @param e   nothing
      * @param <T> nothing
      * @param <E> nothing
      * @return nothing
@@ -432,6 +435,7 @@ public class Base {
 
     /**
      * use it instead of your {@link java.util.function.Supplier} in requests
+     *
      * @param <T> type for matching
      * @return nothing
      */
@@ -440,7 +444,6 @@ public class Base {
     }
 
     /**
-     *
      * @return stream of all requests
      */
     public Stream<Document> history() {
@@ -449,6 +452,7 @@ public class Base {
 
     /**
      * requests that exa
+     *
      * @param keys keys for searching requests (exactly matching)
      * @return stream of requests
      */
@@ -477,23 +481,26 @@ public class Base {
 
     /**
      * requests with given keys, requests match using regexp
+     *
      * @param keys keys for matching
      * @return stream of matched documents from history
      */
-    public Stream<Document> matchEx(String... keys){
+    public Stream<Document> matchEx(String... keys) {
         if (keys == null || keys.length == 0) {
             return history();
         }
         return history()
                 .filter(x -> x.matchEx_to(keys));
     }
-  /**
+
+    /**
      * requests with given keys, requests match using regexp
-     * @param keys keys for matching
+     *
+     * @param keys   keys for matching
      * @param values keys for matching
      * @return stream of matched documents from history
      */
-    public Stream<Document> matchEx(String[] keys, String[] values){
+    public Stream<Document> matchEx(String[] keys, String[] values) {
         return history()
                 .filter(x -> x.matchEx_to(keys, values));
     }
@@ -512,6 +519,7 @@ public class Base {
         return match(keys)
                 .count();
     }
+
     /**
      * amount of requests with given keys
      * * if no keys then amount of all requests.
@@ -527,14 +535,15 @@ public class Base {
                 .count();
     }
 
- /**
+    /**
      * amount of requests with given keys
      * * if no keys then amount of all requests.
      * * key could be skipped if you set correspondent value to null.
      * * times(null) and times(null,null) are different, cause looking for requests with
      * amount of keys no less then in keys array.
      *
-     * @param keys keys for matching requests
+     * @param keys   values for matching requests by keys
+     * @param values values for matching requests by value
      * @return amount of matched requests
      */
     public long timesEx(final String[] keys, final String[] values) {
@@ -546,10 +555,11 @@ public class Base {
     /**
      * invokes request, uses reflection to serialize/deserialize object
      * * {@link UnsupportedOperationException}
+     *
      * @param supplier produce response (ex. query real remote system)
-     * @param keys id of request
-     * @param <T> type of produced result
-     * @param <E> type of allowed Exception
+     * @param keys     id of request
+     * @param <T>      type of produced result
+     * @param <E>      type of allowed Exception
      * @return requested object
      * @throws E occurs in real system or created from
      */

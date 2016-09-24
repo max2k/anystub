@@ -209,7 +209,8 @@ public class Document {
     /**
      * match documents using keys and values
      * matching uses regexp
-     * @param keys keys for matching
+     * @param keys values for matching by keys
+     * @param values values for matching by values
      * @return true if document is matched
      */
     public boolean matchEx_to(String []keys, String[] values){
