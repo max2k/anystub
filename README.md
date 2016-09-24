@@ -60,12 +60,12 @@ to make sure you tests will run everywhere you need to create stub for the Sourc
 public class WorkerEasyTest {
 
     SourceSystem sourceSystem;
+    Base base;
 
     @Before
     public void createStub()
     {
-        Base base = new Base();
-        base.init();
+        base = new Base();
         sourceSystem = new SourceSystem("http://localhost:8080") {
             @Override
             public String get() throws IOException {
@@ -75,10 +75,11 @@ public class WorkerEasyTest {
     }
 
     @Test
-    public void xTest() throws IOException {
+    public void easyTest() throws IOException {
 
         Worker worker = new Worker(sourceSystem);
         assertEquals("fixed", worker.get());
+        assertEquals(1, base.times());
     }
 
 }
