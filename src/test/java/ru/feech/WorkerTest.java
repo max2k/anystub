@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Component
 public class WorkerTest {
 
 
@@ -45,7 +47,7 @@ public class WorkerTest {
 
         assertEquals("fixed", worker.get());
 
-        assertEquals(1L, base.times());
+        assertEquals(1, base.times());
     }
 
     @Test
@@ -79,8 +81,8 @@ public class WorkerTest {
                 /**
                  * pay attention: the result of the function depends on
                  * internal state of the object, which changed by invocation of the function
-                 * @param digit
-                 * @return
+                 * @param digit should has the same mean as in super class
+                 * @return from upstream or from
                  */
                 @Override
                 public Integer rand(int digit) {

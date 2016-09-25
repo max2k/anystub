@@ -2,6 +2,7 @@ package org.anystub;
 
 import org.junit.Test;
 
+import javax.activation.UnsupportedDataTypeException;
 import java.util.NoSuchElementException;
 
 import static java.util.Arrays.asList;
@@ -9,6 +10,7 @@ import static org.anystub.Document.ars;
 import static org.junit.Assert.*;
 
 /**
+ * test for document class
  * Created by Kirill on 9/2/2016.
  */
 public class DocumentTest {
@@ -35,7 +37,6 @@ public class DocumentTest {
     @Test
     public void match_toTest(){
         assertTrue(new Document("qwe").setValues("321").match_to());
-        assertTrue(new Document("qwe").setValues("321").match_to(ars(null)));
         assertTrue(new Document("qwe").setValues("321").match_to("qwe"));
         assertFalse(new Document("qwe").setValues("321").match_to("q"));
         assertFalse(new Document("qwe").setValues("321").match_to("qwe", null));
@@ -79,5 +80,13 @@ public class DocumentTest {
         Document document = new Document("123");
         document.setException(asList("nonexistentException", "msg"));
         document.getVals();
+    }
+
+    @Test
+    public void aroTest() throws UnsupportedDataTypeException {
+        String[] aro = Document.aro("sdf", 2, "ssdf");
+        assertArrayEquals(ars("sdf",null,null, "ssdf"), aro);
+        aro = Document.aro("sdf", 0, "ssdf");
+        assertArrayEquals(ars("sdf", "ssdf"), aro);
     }
 }

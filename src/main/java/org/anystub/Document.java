@@ -1,5 +1,6 @@
 package org.anystub;
 
+import javax.activation.UnsupportedDataTypeException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
@@ -29,7 +30,7 @@ public class Document {
 
     public Document(String... keys) {
         stream(keys)
-                .forEach(x -> this.keys.add(x));
+                .forEach(this.keys::add);
 
     }
 
@@ -79,7 +80,7 @@ public class Document {
             Object v = value;
             if (v instanceof String) {
                 this.values.add((String) v);
-            } else if (v.getClass().getName() == "[B") {
+            } else if (v.getClass().getName().equals("[B")) {
                 byte[] x1 = (byte[]) v;
                 logger.finest(() ->
                 {
@@ -151,7 +152,7 @@ public class Document {
             Object o = constructor.newInstance(exception.get(1));
             throw (E) o;
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            String msg = String.format("exception class %s not found", exception.get(0));
+            String msg = String.format("exception class %s not found, RuntimeException is thrown", exception.get(0));
             logger.warning(()->msg);
             throw new RuntimeException(exception.get(1));
         }
@@ -258,6 +259,31 @@ public class Document {
             return new String[0];
         }
         return keys;
+    }
+
+    /**
+     * return array of string
+     * @param keys values for result string, strings are copied into result array, Integers are transformed to
+     *             correspondent amount of null values
+     * @return array of string
+     * @throws UnsupportedDataTypeException occurs if there is an key with type rather then String or Integer
+     */
+    public static String[] aro(Object... keys) throws UnsupportedDataTypeException {
+        if(keys==null || keys.length==0)
+        {
+            return new String[0];
+        }
+        ArrayList<String> result = new ArrayList<>();
+        for(Object o: keys){
+            if(o instanceof String){
+                result.add((String) o);
+            }else if(o instanceof Integer){
+                result.addAll(asList(new String[(Integer) o]));
+            }else{
+                throw new UnsupportedDataTypeException();
+            }
+        }
+        return result.toArray(new String[0]);
     }
 
 
