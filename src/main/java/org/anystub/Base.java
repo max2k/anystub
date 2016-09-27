@@ -241,7 +241,7 @@ public class Base {
                                               String... keys) throws E {
         return request2(Base::throwNSE,
                 values -> decoder.decode(values.iterator().next()),
-                Base::throwNSE,
+                (e) -> {throw new UnsupportedOperationException();},
                 keys
         );
     }

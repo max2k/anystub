@@ -1,13 +1,12 @@
 package org.anystub;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.IntStream;
 
-import static java.util.Arrays.asList;
+import static java.lang.Integer.parseInt;
 import static org.anystub.Document.ars;
 import static org.junit.Assert.*;
 
@@ -22,7 +21,7 @@ public class BaseTest {
 
         base.put("123", "321", "123123");
         base.put("1231", "321", "123123");
-        Assert.assertEquals("123123", base.get("123", "321"));
+        assertEquals("123123", base.get("123", "321"));
         base.save();
 
         base = new Base("", "stubSaveTest.yml");
@@ -30,7 +29,7 @@ public class BaseTest {
         assertFalse(opt.isPresent());
 
         base.load();
-        Assert.assertEquals("123123", base.get("123", "321"));
+        assertEquals("123123", base.get("123", "321"));
 
     }
 
@@ -45,12 +44,12 @@ public class BaseTest {
 
 
         Iterator<String> r = base.getVals("keyv1.3", "keyv2", "keyv3");
-        Assert.assertEquals("value2", r.next());
-        Assert.assertEquals("value4", r.next());
+        assertEquals("value2", r.next());
+        assertEquals("value4", r.next());
 
         String[] r1 = base.requestArray("keyv1.3", "keyv2", "keyv3");
-        Assert.assertEquals("value2", r1[0]);
-        Assert.assertEquals("value4", r1[1]);
+        assertEquals("value2", r1[0]);
+        assertEquals("value4", r1[1]);
 
     }
 
@@ -79,14 +78,19 @@ public class BaseTest {
         assertEquals("asdqwe", rands[1]);
 
         int val = base.request2(Base::throwNSE,
-                values -> Integer.parseInt(values.iterator().next()),
-                integer -> asList(integer.toString()),
+                values -> parseInt(values.iterator().next()),
+                new Encoder<Integer>() {
+                    @Override
+                    public Iterable<String> encode(Integer integer) {
+                        return Collections.singletonList(integer.toString());
+                    }
+                },
                 "rand", "1002"
         );
 
         assertEquals(-1594594225, val);
 
-        val = base.request(values -> Integer.parseInt(values),
+        val = base.request(Integer::parseInt,
                 "rand", "1002"
         );
 
@@ -101,8 +105,21 @@ public class BaseTest {
         byte[] arr = new byte[256];
         IntStream.range(0, 256).forEach(x -> arr[x] = (byte) (x));
         base.request(() -> arr,
-                s -> Base64.getDecoder().decode(s),
-                values -> Base64.getEncoder().encodeToString(values),
+                new DecoderSimple<byte[]>() {
+                    @Override
+                    public byte[] decode(String values) {
+                        return
+                        Base64.getDecoder().decode(values);
+                    }
+                },
+                new EncoderSimple<byte[]>() {
+                    @Override
+                    public String encode(byte[] values) {
+                        return
+                                Base64.getEncoder().encodeToString(values);
+                    }
+                }
+                ,
                 "binaryDataB64");
 
 
@@ -166,50 +183,50 @@ public class BaseTest {
 
         Base base = new Base("", "complexObject.yml");
 
-        Human human = base.request2(() -> h,
-                values -> {
-                    Iterator<String> v = values.iterator();
-                    return new Human(Integer.parseInt(v.next()),
-                            Integer.parseInt(v.next()),
-                            Integer.parseInt(v.next()),
-                            Integer.parseInt(v.next()),
-                            v.next());
-                },
-                human1 -> human1.toList()
-
-                ,
-                "13"
-        );
-
-        assertEquals(180, (int) human.height);
-        assertEquals(30, (int) human.age);
-        assertEquals(60, (int) human.weight);
-        assertEquals("i'm", human.name);
-        assertEquals(13, (int) human.id);
+//        Human human = base.request2(() -> h,
+//                values -> {
+//                    Iterator<String> v = values.iterator();
+//                    return new Human(parseInt(v.next()),
+//                            parseInt(v.next()),
+//                            parseInt(v.next()),
+//                            parseInt(v.next()),
+//                            v.next());
+//                },
+//                Human::toList
+//
+//                ,
+//                "13"
+//        );
+//
+//        assertEquals(180, (int) human.height);
+//        assertEquals(30, (int) human.age);
+//        assertEquals(60, (int) human.weight);
+//        assertEquals("i'm", human.name);
+//        assertEquals(13, (int) human.id);
 
 
         base = new Base("", "complexObject.yml");
 
-        human = base.request2(() -> {
-                    throw new NoSuchElementException();
-                },
-                values -> {
-                    Iterator<String> v = values.iterator();
-                    return new Human(Integer.parseInt(v.next()),
-                            Integer.parseInt(v.next()),
-                            Integer.parseInt(v.next()),
-                            Integer.parseInt(v.next()),
-                            v.next());
-                },
-                human1 -> human1.toList(),
-                "13"
-        );
-
-        assertEquals(180, (int) human.height);
-        assertEquals(30, (int) human.age);
-        assertEquals(60, (int) human.weight);
-        assertEquals("i'm", human.name);
-        assertEquals(13, (int) human.id);
+//        human = base.request2(() -> {
+//                    throw new NoSuchElementException();
+//                },
+//                values -> {
+//                    Iterator<String> v = values.iterator();
+//                    return new Human(parseInt(v.next()),
+//                            parseInt(v.next()),
+//                            parseInt(v.next()),
+//                            parseInt(v.next()),
+//                            v.next());
+//                },
+//                human1 -> human1.toList(),
+//                "13"
+//        );
+//
+//        assertEquals(180, (int) human.height);
+//        assertEquals(30, (int) human.age);
+//        assertEquals(60, (int) human.weight);
+//        assertEquals("i'm", human.name);
+//        assertEquals(13, (int) human.id);
     }
 
     @Test
