@@ -1,20 +1,20 @@
-!!org.anystub.Document
-exception: []
-keys: [root]
-values: [fixed]
---- !!org.anystub.Document
-exception: []
-keys: [rand, '1000']
-values: ['-1594594225']
---- !!org.anystub.Document
-exception: []
-keys: [rand, '1002']
-values: ['-1594594225', asdqwe]
---- !!org.anystub.Document
-exception: []
-keys: ['']
-values: [fixed]
---- !!org.anystub.Document
-exception: []
-keys: [qwe, stringkey]
-values: [xxx]
+request01:
+  exception: []
+  keys: [root]
+  values: [fixed]
+request02:
+  exception: []
+  keys: [rand, '1000']
+  values: ['-1594594225']
+request03:
+  exception: []
+  keys: [rand, '1002']
+  values: ['-1594594225', asdqwe]
+request04:
+  exception: []
+  keys: ['']
+  values: [fixed]
+request05:
+  exception: []
+  keys: [qwe, stringkey]
+  values: [xxx]

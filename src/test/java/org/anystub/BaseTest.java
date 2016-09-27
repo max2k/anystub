@@ -279,6 +279,16 @@ public class BaseTest {
         }
 
         assertTrue(exceptionCaught);
+
+        base = new Base("./exceptionStub.yml");
+        exceptionCaught = false;
+        try{
+            base.request(()->{throw new IndexOutOfBoundsException("for test");}, "key");
+        }catch (IndexOutOfBoundsException ex){
+            exceptionCaught = true;
+        }
+
+        assertTrue(exceptionCaught);
         base.request(()->"okok", "key");
     }
 }
