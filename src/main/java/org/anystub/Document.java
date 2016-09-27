@@ -3,10 +3,7 @@ package org.anystub;
 import javax.activation.UnsupportedDataTypeException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -41,62 +38,63 @@ public class Document {
         this.exception.add(ex.getMessage());
     }
 
-    /**
-     * for internal use
-     * @return keys
-     */
-    public List<String> getKeys() {
-        return keys;
-    }
 
     /**
-     * for internal use
-     * @param keys list of keys
-     */
-    public void setKeys(List<String> keys) {
-        this.keys.clear();
-        this.keys.addAll(keys);
-    }
-
-    /**
-     * for internal use
-     * @return list of values
-     */
-    public List<String> getValues() {
-        return values;
-    }
-
-    /**
-     * for internal use
-     * @param values list of values
-     */
-    public void setValues(List<String> values) {
-        this.values.clear();
-
-        // don't touch here
-        // regardless explicit: type List<String> values it could contain byte[] due to
-        // using reflection in Yaml-snake
-        for (String value : values) {
-            Object v = value;
-            if (v instanceof String) {
-                this.values.add((String) v);
-            } else if (v.getClass().getName().equals("[B")) {
-                byte[] x1 = (byte[]) v;
-                logger.finest(() ->
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("assign binary data:");
-                    for (byte aX1 : x1) {
-                        sb.append(String.format(" x%02x", aX1));
-                    }
-                    return sb.toString();
-                });
-                this.values.add(new String(x1, Charset.forName("UTF-8")));
-            } else {
-                throw new RuntimeException("Unexpected dataType");
-            }
-        }
-    }
+//     * for internal use
+//     * @return keys
+//     */
+//    public List<String> getKeys() {
+//        return keys;
+//    }
+//
+//    /**
+//     * for internal use
+//     * @param keys list of keys
+//     */
+//    public void setKeys(List<String> keys) {
+//        this.keys.clear();
+//        this.keys.addAll(keys);
+//    }
+//
+//    /**
+//     * for internal use
+//     * @return list of values
+//     */
+//    public List<String> getValues() {
+//        return values;
+//    }
+//
+//    /**
+//     * for internal use
+//     * @param values list of values
+//     */
+//    public void setValues(List<String> values) {
+//        this.values.clear();
+//
+//        // don't touch here
+//        // regardless explicit: type List<String> values it could contain byte[] due to
+//        // using reflection in Yaml-snake
+//        for (String value : values) {
+//            Object v = value;
+//            if (v instanceof String) {
+//                this.values.add((String) v);
+//            } else if (v.getClass().getName().equals("[B")) {
+//                byte[] x1 = (byte[]) v;
+//                logger.finest(() ->
+//                {
+//                    StringBuilder sb = new StringBuilder();
+//                    sb.append("assign binary data:");
+//                    for (byte aX1 : x1) {
+//                        sb.append(String.format(" x%02x", aX1));
+//                    }
+//                    return sb.toString();
+//                });
+//                this.values.add(new String(x1, Charset.forName("UTF-8")));
+//            } else {
+//                throw new RuntimeException("Unexpected dataType");
+//            }
+//        }
+//    }
 
     /**
      * for internal use
@@ -284,6 +282,43 @@ public class Document {
             }
         }
         return result.toArray(new String[0]);
+    }
+
+
+    public Map<String, Object> toMap(){
+        TreeMap<String, Object> res = new TreeMap<>();
+        if(keys.size()==1){
+            res.put("keys", keys.get(0));
+        }else{
+            res.put("keys", keys);
+        }
+
+        if(values.size()==1){
+            res.put("values", values.get(0));
+        }else{
+            res.put("values", values);
+        }
+
+        res.put("exception", exception);
+
+        return res;
+    }
+
+    public Document(Map<String, Object> document){
+        if(document.get("keys") instanceof Iterable){
+            ((Iterable)document.get("keys"))
+                    .forEach(x-> this.keys.add((String) x));
+        }else{
+            this.keys.add((String) document.get("keys"));
+        }
+
+        if(document.get("values") instanceof Iterable){
+            ((Iterable)document.get("values"))
+                    .forEach(x-> this.values.add((String) x));
+        }else{
+            this.values.add((String) document.get("values"));
+        }
+
     }
 
 

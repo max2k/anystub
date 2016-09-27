@@ -1,8 +1,7 @@
 package org.anystub;
 
-import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 import java.io.*;
 import java.util.*;
@@ -358,16 +357,20 @@ public class Base {
         clear();
         File file = new File(filePath);
         try (InputStream input = new FileInputStream(file)) {
-            Constructor constructor = new Constructor(Document.class);
-            TypeDescription docDescription = new TypeDescription(Document.class);
-            docDescription.putListPropertyType("keys", String.class);
-            docDescription.putListPropertyType("values", String.class);
-            docDescription.putListPropertyType("exception", String.class);
-            constructor.addTypeDescription(docDescription);
-            Yaml yaml = new Yaml(constructor);
-            yaml.loadAll(input)
-                    .forEach(x -> documentList.add((Document) x));
+            Yaml yaml = new Yaml(new SafeConstructor());
+            Object load = yaml.load(input);
 
+            if (load instanceof Map) {
+                Map<String, Object> map = (Map<String, Object>) load;
+                map.entrySet()
+                        .forEach(x -> {
+                            try {
+                                documentList.add(new Document((Map<String, Object>) x.getValue()));
+                            } catch (RuntimeException ex) {
+                                log.warning(() -> String.format("document %s isn't loaded: %s", x.getKey(), ex.getMessage()));
+                            }
+                        });
+            }
             isNew = false;
         } catch (FileNotFoundException e) {
             log.info("stub file not found: " + file.getAbsolutePath());
@@ -398,8 +401,13 @@ public class Base {
         }
 
         try (FileWriter output = new FileWriter(file)) {
-            Yaml yaml = new Yaml(new Constructor(Document.class));
-            yaml.dumpAll(documentList.iterator(), output);
+            Yaml yaml = new Yaml(new SafeConstructor());
+            Map<String, Object> saveList = new LinkedHashMap<>();
+
+            for (int i = 0; i < documentList.size(); i++) {
+                saveList.put(String.format("request%d", i), documentList.get(i).toMap());
+            }
+            yaml.dump(saveList, output);
         }
     }
 
