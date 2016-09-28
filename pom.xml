@@ -29,6 +29,7 @@
 
     <scm>
         <url>https://github.com/anystub/anystub</url>
+        <developerConnection>scm:git:https://github.com/anystub/anystub.git</developerConnection>
     </scm>
 
     <properties>
