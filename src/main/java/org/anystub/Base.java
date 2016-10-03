@@ -213,15 +213,23 @@ public class Base {
 
     public <E extends Exception> String[] requestArray(String... keys) throws E {
         return request2(Base::throwNSE,
-                values -> StreamSupport.stream(values.spliterator(), false).collect(Collectors.toList()).toArray(new String[0]),
+                values -> values == null ? null : StreamSupport.stream(values.spliterator(), false).collect(Collectors.toList()).toArray(new String[0]),
                 Base::throwNSE,
                 keys);
 
     }
 
+    /**
+     * for requesting of String Array
+     * @param supplier provide string array from system
+     * @param keys keys for request
+     * @param <E> expected exception
+     * @return string array. it could be null;
+     * @throws E expected exception
+     */
     public <E extends Exception> String[] requestArray(Supplier<String[], E> supplier, String... keys) throws E {
         return request2(supplier,
-                values -> StreamSupport.stream(values.spliterator(), false).collect(Collectors.toList()).toArray(new String[0]),
+                values -> values == null ? null : StreamSupport.stream(values.spliterator(), false).collect(Collectors.toList()).toArray(new String[0]),
                 Arrays::asList,
                 keys);
 
@@ -240,8 +248,10 @@ public class Base {
     public <T, E extends Throwable> T request(DecoderSimple<T> decoder,
                                               String... keys) throws E {
         return request2(Base::throwNSE,
-                values -> decoder.decode(values.iterator().next()),
-                (e) -> {throw new UnsupportedOperationException();},
+                values -> values == null ? null : decoder.decode(values.iterator().next()),
+                (e) -> {
+                    throw new UnsupportedOperationException();
+                },
                 keys
         );
     }
@@ -264,8 +274,8 @@ public class Base {
                                               EncoderSimple<T> encoder,
                                               String... keys) throws E {
         return request2(supplier,
-                values -> decoder.decode(values.iterator().next()),
-                t -> asList(encoder.encode(t)),
+                values -> values==null? null: decoder.decode(values.iterator().next()),
+                t -> t==null? null : asList(encoder.encode(t)),
                 keys
         );
     }
@@ -279,7 +289,7 @@ public class Base {
      * @param keys     key of object
      * @param <T>      Type of Object
      * @param <E>      thrown exception by supplier
-     * @return result from recovering from stub or from supplier
+     * @return result from recovering from stub or from supplier, it could return null if it gets null from upstream and decoded
      * @throws E exception from stub or from supplier
      */
     public <T, E extends Throwable> T request2(Supplier<T, E> supplier,
@@ -298,6 +308,9 @@ public class Base {
             Optional<Document> storedDocument = getDocument(keys);
             if (storedDocument.isPresent()) {
                 requestHistory.add(storedDocument.get());
+                if(storedDocument.get().getVals()==null){
+                    return decoder.decode(null);
+                }
                 ArrayList<String> ar = new ArrayList<>();
                 storedDocument.get().getVals().forEachRemaining(ar::add);
                 return decoder.decode(ar);
@@ -323,8 +336,15 @@ public class Base {
             throw ex;
         }
 
-        // extract values
-        Document retrievedDocument = put(new Document(keys).setValues(encoder.encode(res)));
+        // keep values
+        Document retrievedDocument = new Document(keys);
+
+        if (res == null) {
+            retrievedDocument.setNull();
+        }else{
+            retrievedDocument.setValues(encoder.encode(res));
+        }
+        put(retrievedDocument);
         requestHistory.add(retrievedDocument);
         try {
             save();

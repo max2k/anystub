@@ -182,7 +182,7 @@ public class BaseTest {
         Human h = new Human(13, 180, 30, 60, "i'm");
 
         Base base = new Base("", "complexObject.yml");
-
+//  commented due to compatibility old java version
 //        Human human = base.request2(() -> h,
 //                values -> {
 //                    Iterator<String> v = values.iterator();
@@ -307,5 +307,24 @@ public class BaseTest {
 
         assertTrue(exceptionCaught);
         base.request(()->"okok", "key");
+    }
+
+    @Test
+    public void nullReturning(){
+        Base base = new Base("./nullReturning.yml");
+
+        String[] emptyResult = base.requestArray(() ->{String[] res = null; return res;},
+                "nullKey");
+
+        assertNull(emptyResult);
+
+        emptyResult = base.requestArray(()->{throw new NoSuchElementException();},
+                "nullKey");
+        assertNull(emptyResult);
+
+        assertNull(base.request("nullKey"));
+
+
+
     }
 }

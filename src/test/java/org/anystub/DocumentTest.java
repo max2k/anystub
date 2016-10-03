@@ -3,6 +3,7 @@ package org.anystub;
 import org.junit.Test;
 
 import javax.activation.UnsupportedDataTypeException;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static java.util.Arrays.asList;
@@ -88,5 +89,25 @@ public class DocumentTest {
         assertArrayEquals(ars("sdf",null,null, "ssdf"), aro);
         aro = Document.aro("sdf", 0, "ssdf");
         assertArrayEquals(ars("sdf", "ssdf"), aro);
+    }
+
+    @Test
+    public void nullHolder(){
+        Map<String, Object> map = new Document("12").setNull().toMap();
+
+        Document document = new Document(map);
+        assertNull(document.getVals());
+    }
+
+    @Test
+    public void emptyHolder()
+    {
+        Map<String, Object> map = new Document("12").setValues(new String[]{null}).toMap();
+
+        Document document = new Document(map);
+
+        assertNull(document.get());
+        assertNull(document.getVals().next());
+
     }
 }

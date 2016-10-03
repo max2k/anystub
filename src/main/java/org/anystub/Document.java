@@ -18,8 +18,9 @@ public class Document {
 
     private static Logger logger = Logger.getLogger(Document.class.getName());
     private final List<String> keys = new ArrayList<>();
-    private final List<String> values = new ArrayList<>();
     private final List<String> exception = new ArrayList<>();
+    private final List<String> values = new ArrayList<>();
+    private boolean nullValue = false;
 
     public Document() {
 
@@ -60,6 +61,7 @@ public class Document {
     }
 
     public Document setValues(String... values) {
+        nullValue=false;
         this.values.clear();
         stream(values)
                 .forEach(this.values::add);
@@ -68,10 +70,17 @@ public class Document {
     }
 
     public Document setValues(Iterable<String> values) {
+        nullValue=false;
         this.values.clear();
         values
                 .forEach(this.values::add);
 
+        return this;
+    }
+
+    public Document setNull(){
+        nullValue=true;
+        this.values.clear();
         return this;
     }
 
@@ -81,7 +90,7 @@ public class Document {
 
     public <E extends Throwable> Iterator<String> getVals() throws E {
         if (exception.isEmpty()) {
-            if (values.isEmpty()) {
+            if(nullValue){
                 return null;
             }
             return values.iterator();
@@ -160,6 +169,10 @@ public class Document {
      * @return true if document is matched
      */
     public boolean matchEx_to(String[] keys, String[] values) {
+        if(this.nullValue){
+            return values==null;
+        }
+
         if (this.values.size() < values.length) {
             return false;
         }
@@ -239,7 +252,9 @@ public class Document {
             res.put("keys", keys);
         }
 
-        if (values.size() == 1) {
+        if(nullValue){
+            res.put("values", null);
+        }else if (values.size() == 1 && values.get(0)!=null) {
             res.put("values", values.get(0));
         } else {
             res.put("values", values);
@@ -258,7 +273,9 @@ public class Document {
             this.keys.add((String) document.get("keys"));
         }
 
-        if (document.get("values") instanceof Iterable) {
+        if(document.get("values")==null){
+            this.setNull();
+        }else if (document.get("values") instanceof Iterable) {
             ((Iterable) document.get("values"))
                     .forEach(x -> this.values.add((String) x));
         } else {
