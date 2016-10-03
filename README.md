@@ -1,3 +1,5 @@
+*MOVED TO [https://github.com/anystub/anystub](https://github.com/anystub/anystub)*
+
 # anystub   [![Build Status](https://travis-ci.org/anystub/anystub.svg?branch=master)](https://travis-ci.org/anystub/anystub)
 record input/output for tests in java. inspired by vcr for rails
 
