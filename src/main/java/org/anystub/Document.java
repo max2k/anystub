@@ -84,6 +84,10 @@ public class Document {
         return this;
     }
 
+    public boolean isNullValue(){
+        return nullValue;
+    }
+
     public String get() {
         return getVals().next();
     }

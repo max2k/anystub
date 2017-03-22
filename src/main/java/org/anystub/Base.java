@@ -308,8 +308,9 @@ public class Base {
             Optional<Document> storedDocument = getDocument(keys);
             if (storedDocument.isPresent()) {
                 requestHistory.add(storedDocument.get());
-                if(storedDocument.get().getVals()==null){
-                    return decoder.decode(null);
+                if(storedDocument.get().isNullValue()){
+                    // it's not necessarily to decode null objects
+                    return null;
                 }
                 ArrayList<String> ar = new ArrayList<>();
                 storedDocument.get().getVals().forEachRemaining(ar::add);
@@ -331,7 +332,7 @@ public class Base {
             try {
                 save();
             } catch (IOException io_ex) {
-                log.warning("keep data failed: " + io_ex.getMessage());
+                log.warning("data is not saved: " + io_ex.getMessage());
             }
             throw ex;
         }
@@ -349,7 +350,7 @@ public class Base {
         try {
             save();
         } catch (IOException ex) {
-            log.warning("keep data failed: " + ex.getMessage());
+            log.warning("data is not saved: " + ex.getMessage());
         }
         return res;
     }

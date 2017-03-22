@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.lang.Integer.parseInt;
+import static java.util.Arrays.asList;
 import static org.anystub.Document.ars;
 import static org.junit.Assert.*;
 
@@ -109,7 +110,7 @@ public class BaseTest {
                     @Override
                     public byte[] decode(String values) {
                         return
-                        Base64.getDecoder().decode(values);
+                                Base64.getDecoder().decode(values);
                     }
                 },
                 new EncoderSimple<byte[]>() {
@@ -177,56 +178,68 @@ public class BaseTest {
         }
     }
 
+
+    @Test
+    public void requestNull() {
+
+        Base base = new Base("", "NullObj.yml");
+        Human human = base.request2(() -> null,
+                values -> null,
+                x -> asList(),
+                "13"
+        );
+        assertNull(human);
+    }
+
     @Test
     public void requestComplexObject() {
         Human h = new Human(13, 180, 30, 60, "i'm");
 
         Base base = new Base("", "complexObject.yml");
-//  commented due to compatibility old java version
-//        Human human = base.request2(() -> h,
-//                values -> {
-//                    Iterator<String> v = values.iterator();
-//                    return new Human(parseInt(v.next()),
-//                            parseInt(v.next()),
-//                            parseInt(v.next()),
-//                            parseInt(v.next()),
-//                            v.next());
-//                },
-//                Human::toList
-//
-//                ,
-//                "13"
-//        );
-//
-//        assertEquals(180, (int) human.height);
-//        assertEquals(30, (int) human.age);
-//        assertEquals(60, (int) human.weight);
-//        assertEquals("i'm", human.name);
-//        assertEquals(13, (int) human.id);
+        Human human = base.request2(() -> h,
+                values -> {
+                    Iterator<String> v = values.iterator();
+                    return new Human(parseInt(v.next()),
+                            parseInt(v.next()),
+                            parseInt(v.next()),
+                            parseInt(v.next()),
+                            v.next());
+                },
+                Human::toList
+
+                ,
+                "13"
+        );
+
+        assertEquals(180, (int) human.height);
+        assertEquals(30, (int) human.age);
+        assertEquals(60, (int) human.weight);
+        assertEquals("i'm", human.name);
+        assertEquals(13, (int) human.id);
 
 
         base = new Base("", "complexObject.yml");
 
-//        human = base.request2(() -> {
-//                    throw new NoSuchElementException();
-//                },
-//                values -> {
-//                    Iterator<String> v = values.iterator();
-//                    return new Human(parseInt(v.next()),
-//                            parseInt(v.next()),
-//                            parseInt(v.next()),
-//                            parseInt(v.next()),
-//                            v.next());
-//                },
-//                human1 -> human1.toList(),
-//                "13"
-//        );
-//
-//        assertEquals(180, (int) human.height);
-//        assertEquals(30, (int) human.age);
-//        assertEquals(60, (int) human.weight);
-//        assertEquals("i'm", human.name);
-//        assertEquals(13, (int) human.id);
+        human = base.request2(() -> {
+                    throw new NoSuchElementException();
+                },
+                values -> {
+                    Iterator<String> v = values.iterator();
+                    return new Human(parseInt(v.next()),
+                            parseInt(v.next()),
+                            parseInt(v.next()),
+                            parseInt(v.next()),
+                            v.next());
+                },
+                human1 -> human1.toList(),
+                "13"
+        );
+
+        assertEquals(180, (int) human.height);
+        assertEquals(30, (int) human.age);
+        assertEquals(60, (int) human.weight);
+        assertEquals("i'm", human.name);
+        assertEquals(13, (int) human.id);
     }
 
     @Test
@@ -235,11 +248,11 @@ public class BaseTest {
 
         assertEquals(0L, base.times());
 
-        base.request(()-> "okok", "2", "3", "3");
-        base.request(()-> "okok", "2", "3", "4");
-        base.request(()-> "okok", "2", "3", "4");
-        base.request(()-> "okok", "5", "3", "4");
-        base.request(()-> "okok", "5");
+        base.request(() -> "okok", "2", "3", "3");
+        base.request(() -> "okok", "2", "3", "4");
+        base.request(() -> "okok", "2", "3", "4");
+        base.request(() -> "okok", "5", "3", "4");
+        base.request(() -> "okok", "5");
 
         assertEquals(5L, base.times());
         assertEquals(5L, base.history().count());
@@ -285,13 +298,14 @@ public class BaseTest {
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
-    public void exceptionTest()
-    {
+    public void exceptionTest() {
         Base base = new Base("./exceptionStub.yml");
         boolean exceptionCaught = false;
-        try{
-            base.request(()->{throw new IndexOutOfBoundsException("for test");}, "key");
-        }catch (IndexOutOfBoundsException ex){
+        try {
+            base.request(() -> {
+                throw new IndexOutOfBoundsException("for test");
+            }, "key");
+        } catch (IndexOutOfBoundsException ex) {
             exceptionCaught = true;
         }
 
@@ -299,31 +313,37 @@ public class BaseTest {
 
         base = new Base("./exceptionStub.yml");
         exceptionCaught = false;
-        try{
-            base.request(()->{throw new IndexOutOfBoundsException("for test");}, "key");
-        }catch (IndexOutOfBoundsException ex){
+        try {
+            base.request(() -> {
+                throw new IndexOutOfBoundsException("for test");
+            }, "key");
+        } catch (IndexOutOfBoundsException ex) {
             exceptionCaught = true;
         }
 
         assertTrue(exceptionCaught);
-        base.request(()->"okok", "key");
+        base.request(() -> "okok", "key");
     }
 
     @Test
-    public void nullReturning(){
+    public void nullReturning() {
         Base base = new Base("./nullReturning.yml");
 
-        String[] emptyResult = base.requestArray(() ->{String[] res = null; return res;},
+        String[] emptyResult = base.requestArray(() -> {
+                    String[] res = null;
+                    return res;
+                },
                 "nullKey");
 
         assertNull(emptyResult);
 
-        emptyResult = base.requestArray(()->{throw new NoSuchElementException();},
+        emptyResult = base.requestArray(() -> {
+                    throw new NoSuchElementException();
+                },
                 "nullKey");
         assertNull(emptyResult);
 
         assertNull(base.request("nullKey"));
-
 
 
     }
