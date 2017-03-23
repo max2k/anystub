@@ -10,16 +10,17 @@ Install from Maven Central
     <dependency>
       <groupId>org.anystub</groupId>
       <artifactId>anystub</artifactId>
-      <version>0.1.6</version>
+      <version>0.1.7</version>
     </dependency>
 ```
 
 
 Example
 ===
-you can find an example of using in tests folder of the repository
+you can find an example of using in tests folder of the repository. below the first scenario
 
-you have a `class SourceSystem` which access to external resources.
+
+# you have `class SourceSystem` which have access to external resources (http access).
 ``` java
 public class SourceSystem {
 
@@ -39,7 +40,8 @@ public class SourceSystem {
 }
 ```
 
-When you check the class enough you whant to go futher and tests classes that use the source system
+# You have business-class (Worker) which uses class-accessor and you want to control behaviour of this class.
+ it could include building query, processing response and handling exceptions
 
 ``` java 
 public class Worker {
@@ -56,7 +58,7 @@ public class Worker {
 }
 ```
 
-to make sure you tests will run everywhere you need to create stub for the SourceSystem and record data that is necasserily for the tests
+to make sure your tests will run everywhere you need to create stub for the SourceSystem and record data that is necessarily for the tests
 
 ``` java
 public class WorkerEasyTest {
@@ -95,3 +97,5 @@ your workflow scenario:
 - extend your sourceSystem
 - create stub on your local system and add it to the repository
 - get benefits from automatic regression testing
+
+look at [wiki|https://github.com/anystub/anystub/wiki/anystub-and-SpringBoot] to see how it works with spring-boot
