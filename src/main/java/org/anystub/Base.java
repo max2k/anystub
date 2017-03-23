@@ -340,10 +340,12 @@ public class Base {
         // keep values
         Document retrievedDocument = new Document(keys);
 
+        Iterable<String> responseData = null;
         if (res == null) {
             retrievedDocument.setNull();
         }else{
-            retrievedDocument.setValues(encoder.encode(res));
+            responseData = encoder.encode(res);
+            retrievedDocument.setValues(responseData);
         }
         put(retrievedDocument);
         requestHistory.add(retrievedDocument);
@@ -352,7 +354,11 @@ public class Base {
         } catch (IOException ex) {
             log.warning("data is not saved: " + ex.getMessage());
         }
-        return res;
+        if (responseData != null) {
+            return decoder.decode(responseData);
+        } else {
+            return null;
+        }
     }
 
 
