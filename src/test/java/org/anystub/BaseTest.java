@@ -2,7 +2,9 @@ package org.anystub;
 
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -344,7 +346,28 @@ public class BaseTest {
         assertNull(emptyResult);
 
         assertNull(base.request("nullKey"));
+    }
 
+    @Test
+    public void request_oneway_object() throws IOException {
+        Base base = new Base("./streams.yml").constrain(Base.RequestMode.rmAll);
+        base.clear();
+        base.save();
+
+
+        BufferedReader v1 = base.request(
+                (Supplier<BufferedReader, IOException>) () -> new BufferedReader(new StringReader("test")),
+                values -> new BufferedReader(new StringReader(values)),
+                bufferedReader -> {
+                    try {
+                        return bufferedReader.readLine();
+                    } catch (IOException e) {
+                        throw new RuntimeException("");
+                    }
+                },
+                "21");
+
+        assertEquals("test", v1.readLine());
 
     }
 }

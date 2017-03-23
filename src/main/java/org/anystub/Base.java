@@ -19,9 +19,9 @@ import static java.util.Arrays.asList;
  * methods request* allow get/keep data in file
  * <p>
  * you can control case of using file-cache by constrain:
- * - rmNew  first seeking in cache if failed make real request
- * - rmNone  seeking in cache if failed throw {@link NoSuchElementException}
- * - rmAll  make real request without seeking in cache (use it for logging )
+ * - rmNew  first seek in cache if failed make real request
+ * - rmNone  first seek in cache if failed throw {@link NoSuchElementException}
+ * - rmAll  makes real request without seeking in cache (use it for logging), keep all requests in the stub
  * <p>
  * * most of the methods return this to cascading operations
  * <p>
@@ -221,9 +221,10 @@ public class Base {
 
     /**
      * for requesting of String Array
+     *
      * @param supplier provide string array from system
-     * @param keys keys for request
-     * @param <E> expected exception
+     * @param keys     keys for request
+     * @param <E>      expected exception
      * @return string array. it could be null;
      * @throws E expected exception
      */
@@ -274,8 +275,8 @@ public class Base {
                                               EncoderSimple<T> encoder,
                                               String... keys) throws E {
         return request2(supplier,
-                values -> values==null? null: decoder.decode(values.iterator().next()),
-                t -> t==null? null : asList(encoder.encode(t)),
+                values -> values == null ? null : decoder.decode(values.iterator().next()),
+                t -> t == null ? null : asList(encoder.encode(t)),
                 keys
         );
     }
@@ -308,7 +309,7 @@ public class Base {
             Optional<Document> storedDocument = getDocument(keys);
             if (storedDocument.isPresent()) {
                 requestHistory.add(storedDocument.get());
-                if(storedDocument.get().isNullValue()){
+                if (storedDocument.get().isNullValue()) {
                     // it's not necessarily to decode null objects
                     return null;
                 }
@@ -340,10 +341,11 @@ public class Base {
         // keep values
         Document retrievedDocument = new Document(keys);
 
-        Iterable<String> responseData = null;
+        Iterable<String> responseData;
         if (res == null) {
+            responseData = null;
             retrievedDocument.setNull();
-        }else{
+        } else {
             responseData = encoder.encode(res);
             retrievedDocument.setValues(responseData);
         }
@@ -354,11 +356,10 @@ public class Base {
         } catch (IOException ex) {
             log.warning("data is not saved: " + ex.getMessage());
         }
-        if (responseData != null) {
-            return decoder.decode(responseData);
-        } else {
+        if (responseData == null) {
             return null;
         }
+        return decoder.decode(responseData);
     }
 
 
