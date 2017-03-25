@@ -1,6 +1,6 @@
 language: java
 before_script:
-  - echo "MAVEN_OPTS='-Dgpg.skip=true" > ~/.mavenrc
+  - export MAVEN_OPTS="-Dgpg.skip=true:$MAVEN_OPTS"
 jdk:
   - oraclejdk8
 sudo: required
