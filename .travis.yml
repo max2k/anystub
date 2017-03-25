@@ -1,4 +1,6 @@
 language: java
+before_script:
+  - echo "MAVEN_OPTS='-Dgpg.skip=true" > ~/.mavenrc
 jdk:
   - oraclejdk8
 sudo: required
