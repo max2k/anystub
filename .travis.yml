@@ -1,7 +1,7 @@
 language: java
-#before_script:
-#  - export MAVEN_OPTS=-Dgpg.skip=true:$MAVEN_OPTS
-script: mvn install -DskipTests=true -Dmaven.javadoc.skip=true Dgpg.skip=true -B -V
+before_script:
+  - export MAVEN_OPTS="-Dgpg.skip=true:$MAVEN_OPTS"
+script: mvn -DskipTests=true -Dmaven.javadoc.skip=true Dgpg.skip=true -install B -V
 jdk:
   - oraclejdk8
 sudo: required
