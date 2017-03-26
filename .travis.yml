@@ -1,10 +1,10 @@
 language: java
 #  - echo "MAVEN_OPTS='-Dgpg.skip=true -DskipTests=true -Dmaven.javadoc.skip=true'" > ~/.mavenrc
-before_script:
-  - export MAVEN_OPTS="-Dgpg.skip=true $MAVEN_OPTS"
+before_install:
+  - export MAVEN_OPTS="-Dgpg.skip=true"
   - echo $MAVEN_OPTS
   - echo '+++ end of before_script'
-script: mvn install -B -V
+#script: mvn install -B -V
 jdk:
   - oraclejdk8
 sudo: required
