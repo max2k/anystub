@@ -23,7 +23,7 @@ public class Document {
     private boolean nullValue = false;
 
     public Document() {
-
+        // just explicit declaration. to be consistent
     }
 
     public Document(String... keys) {
