@@ -208,6 +208,10 @@ public class Document {
         return keys.equals(that.keys);
     }
 
+    @Override
+    public int hashCode() {
+        return keys.hashCode();
+    }
 
     /**
      * return an array of strings
