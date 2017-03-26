@@ -1,6 +1,6 @@
 *MOVED TO [https://github.com/anystub/anystub](https://github.com/anystub/anystub)*
 
-# anystub   [![Build Status](https://travis-ci.org/anystub/anystub.svg?branch=master)](https://travis-ci.org/anystub/anystub)
+# anystub   [![Build Status](https://travis-ci.org/anystub/anystub.svg?branch=master)](https://travis-ci.org/anystub/anystub)[![quality](https://sonarqube.com/api/badges/gate?key=org.anystub:anystub)](https://sonarqube.com/api/badges/gate?key=org.anystub:anystub)
 record input/output for tests in java. inspired by vcr for rails
 
 Install from Maven Central 
