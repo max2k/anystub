@@ -250,7 +250,7 @@ public class Base {
                                               String... keys) throws E {
         return request2(Base::throwNSE,
                 values -> values == null ? null : decoder.decode(values.iterator().next()),
-                (e) -> {
+                e -> {
                     throw new UnsupportedOperationException();
                 },
                 keys
@@ -324,6 +324,7 @@ public class Base {
         }
 
         // execute
+        // it could raise any exception so need to catch Throwable
         T res;
         try {
             res = supplier.get();
@@ -333,7 +334,7 @@ public class Base {
             try {
                 save();
             } catch (IOException io_ex) {
-                log.warning("data is not saved: " + io_ex.getMessage());
+                log.warning(()->"exception information is not saved into stub: " + io_ex.getMessage());
             }
             throw ex;
         }
@@ -354,7 +355,7 @@ public class Base {
         try {
             save();
         } catch (IOException ex) {
-            log.warning("data is not saved: " + ex.getMessage());
+            log.warning(()->"exception information is not saved into stub: " + ex.getMessage());
         }
         if (responseData == null) {
             return null;
@@ -370,7 +371,7 @@ public class Base {
         try {
             load();
         } catch (IOException e) {
-            log.info("init: loading failed");
+            log.info(()->"init: loading failed");
         }
     }
 
@@ -401,7 +402,7 @@ public class Base {
             }
             isNew = false;
         } catch (FileNotFoundException e) {
-            log.info("stub file not found: " + file.getAbsolutePath());
+            log.info(()->"stub file not found: " + file.getAbsolutePath());
         }
     }
 
@@ -417,15 +418,15 @@ public class Base {
 
         if (path != null && !path.exists()) {
             if (path.mkdirs())
-                log.info("dirs created");
+                log.info(()->"dirs created");
             else
-                throw new RuntimeException("dirs for stub isn't created");
+                throw new IOException("dirs for stub isn't created");
         }
         if (!file.exists()) {
             if (file.createNewFile())
-                log.info("stub file is created:" + file.getAbsolutePath());
+                log.info(()->"stub file is created:" + file.getAbsolutePath());
             else
-                throw new RuntimeException("stub file isn't created");
+                throw new IOException("stub file isn't created");
         }
 
         try (FileWriter output = new FileWriter(file)) {
