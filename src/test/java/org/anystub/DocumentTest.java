@@ -3,6 +3,7 @@ package org.anystub;
 import org.junit.Test;
 
 import javax.activation.UnsupportedDataTypeException;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -63,7 +64,10 @@ public class DocumentTest {
 
     @Test(expected = NoSuchElementException.class)
     public void exceptionTest(){
-        new Document(new NoSuchElementException("aaaa"), "123").getVals();
+        Document doc = new Document(new NoSuchElementException("aaaa"), "123");
+        List<String> exception = doc.getException();
+        assertEquals(2, exception.size());
+        doc.getVals();
     }
 
     @Test(expected = IndexOutOfBoundsException.class)

@@ -33,10 +33,15 @@ public class Document {
     }
 
     public Document(Throwable ex, String... keys) {
-        this.keys.addAll(asList(keys));
+        stream(keys)
+                .forEach(this.keys::add);
 
         this.exception.add(ex.getClass().getCanonicalName());
         this.exception.add(ex.getMessage());
+    }
+
+    public Document(Map<String, Object> document) {
+        this.assign(document);
     }
 
     /**
@@ -61,7 +66,7 @@ public class Document {
     }
 
     public Document setValues(String... values) {
-        nullValue=false;
+        nullValue = false;
         this.values.clear();
         stream(values)
                 .forEach(this.values::add);
@@ -70,7 +75,7 @@ public class Document {
     }
 
     public Document setValues(Iterable<String> values) {
-        nullValue=false;
+        nullValue = false;
         this.values.clear();
         values
                 .forEach(this.values::add);
@@ -78,13 +83,13 @@ public class Document {
         return this;
     }
 
-    public Document setNull(){
-        nullValue=true;
+    public Document setNull() {
+        nullValue = true;
         this.values.clear();
         return this;
     }
 
-    public boolean isNullValue(){
+    public boolean isNullValue() {
         return nullValue;
     }
 
@@ -94,7 +99,7 @@ public class Document {
 
     public <E extends Throwable> Iterator<String> getVals() throws E {
         if (exception.isEmpty()) {
-            if(nullValue){
+            if (nullValue) {
                 return null;
             }
             return values.iterator();
@@ -109,7 +114,7 @@ public class Document {
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             String msg = String.format("exception class %s not found, RuntimeException is thrown", exception.get(0));
             logger.warning(() -> msg);
-            throw new RuntimeException(exception.get(1));
+            throw new RuntimeException(exception.get(1), e);
         }
 
     }
@@ -173,8 +178,8 @@ public class Document {
      * @return true if document is matched
      */
     public boolean matchEx_to(String[] keys, String[] values) {
-        if(this.nullValue){
-            return values==null;
+        if (this.nullValue) {
+            return values == null;
         }
 
         if (this.values.size() < values.length) {
@@ -260,9 +265,9 @@ public class Document {
             res.put("keys", keys);
         }
 
-        if(nullValue){
+        if (nullValue) {
             res.put("values", null);
-        }else if (values.size() == 1 && values.get(0)!=null) {
+        } else if (values.size() == 1 && values.get(0) != null) {
             res.put("values", values.get(0));
         } else {
             res.put("values", values);
@@ -273,7 +278,8 @@ public class Document {
         return res;
     }
 
-    public Document(Map<String, Object> document) {
+
+    private void assign(Map<String, Object> document) {
         if (document.get("keys") instanceof Iterable) {
             ((Iterable) document.get("keys"))
                     .forEach(x -> this.keys.add((String) x));
@@ -281,9 +287,9 @@ public class Document {
             this.keys.add((String) document.get("keys"));
         }
 
-        if(document.get("values")==null){
+        if (document.get("values") == null) {
             this.setNull();
-        }else if (document.get("values") instanceof Iterable) {
+        } else if (document.get("values") instanceof Iterable) {
             ((Iterable) document.get("values"))
                     .forEach(x -> this.values.add((String) x));
         } else {
