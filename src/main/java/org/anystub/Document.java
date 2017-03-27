@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 
 /**
  * Document for keeping requests/response
@@ -26,7 +27,8 @@ public class Document {
     }
 
     public Document(String... keys) {
-        this.keys.addAll(asList(keys));
+        stream(keys)
+                .forEach(this.keys::add);
 
     }
 
@@ -61,7 +63,8 @@ public class Document {
     public Document setValues(String... values) {
         nullValue=false;
         this.values.clear();
-        this.values.addAll(Arrays.asList(values));
+        stream(values)
+                .forEach(this.values::add);
 
         return this;
     }
@@ -69,7 +72,8 @@ public class Document {
     public Document setValues(Iterable<String> values) {
         nullValue=false;
         this.values.clear();
-        this.values.addAll(this.values);
+        values
+                .forEach(this.values::add);
 
         return this;
     }
