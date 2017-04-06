@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -124,9 +125,13 @@ public class Document {
     }
 
     /**
-     * exact matching
+     * exact matching the document to given key.
+     * the document is not matched to 'keys' if:
+     * - it has less values in key then argument array
+     * - it has at least one value in its key that's not equal to correspondent non-null value in argument array
+     * * null values in argument array aren't used for matching
      *
-     * @param keys keys for matching
+     * @param keys keys for matching (null values are skipped from matching but length of key is compared)
      * @return true if document is matched
      */
     public boolean match_to(String... keys) {
@@ -197,6 +202,83 @@ public class Document {
             }
         }
         return true;
+    }
+
+    public void assert_to(String... keys) {
+        if (!match_to(keys)) {
+            fail(keys);
+        }
+    }
+    public void assertEx_to(String... keys) {
+        if (!matchEx_to(keys)) {
+            fail(keys);
+        }
+    }
+    public void assertEx_to(String[] keys, String[] values) {
+        if (!matchEx_to(keys,values)) {
+            if(!matchEx_to(keys)){
+                fail(keys);
+            }else {
+                fail_value(values);
+            }
+        }
+    }
+
+    private void fail(String... keys) {
+        String msg;
+
+        if (this.keys.size() < keys.length) {
+            msg = "number values in key expected: "
+                    + keys.length + " and more"
+                    + " but was: "
+                    + this.keys.size();
+        } else {
+            msg = "expected: "
+                    + key_to_string(keys)
+                    + " but was: "
+                    + key_to_string();
+        }
+        throw new AssertionError(msg);
+    }
+
+    private void fail_value(String... values) {
+        String msg;
+
+        if (this.keys.size() < values.length) {
+            msg = "number values in value expected: "
+                    + values.length + " and more"
+                    + " but was: "
+                    + this.keys.size();
+        } else {
+            msg = "expected value: "
+                    + key_to_string(values)
+                    + " but was: "
+                    + key_to_string();
+        }
+        throw new AssertionError(msg);
+    }
+
+    public String key_to_string() {
+        if (nullValue) {
+            return "null";
+        }
+        return key_to_string(keys.toArray(new String[0]));
+    }
+
+    public static String key_to_string(String... keys) {
+        if (keys == null) {
+            return "null";
+        } else if (keys.length == 0) {
+            return "[]";
+        } else if (keys.length == 1) {
+            return keys[0];
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("[");
+        stringBuilder.append(stream(keys).collect(Collectors.joining(", ")));
+        stringBuilder.append("]");
+        return stringBuilder.toString();
     }
 
 
