@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.lang.Integer.parseInt;
-import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.anystub.Document.ars;
 import static org.junit.Assert.*;
 
@@ -166,9 +166,6 @@ public class BaseTest {
             this.id = id;
         }
 
-        public Human() {
-        }
-
         public List<String> toList() {
             ArrayList<String> res = new ArrayList<>();
             res.add(id.toString());
@@ -187,7 +184,7 @@ public class BaseTest {
         Base base = new Base("", "NullObj.yml");
         Human human = base.request2(() -> null,
                 values -> null,
-                x -> asList(),
+                x -> emptyList(),
                 "13"
         );
         assertNull(human);
@@ -233,7 +230,7 @@ public class BaseTest {
                             parseInt(v.next()),
                             v.next());
                 },
-                human1 -> human1.toList(),
+                Human::toList,
                 "13"
         );
 
@@ -258,6 +255,7 @@ public class BaseTest {
 
         assertEquals(5L, base.times());
         assertEquals(5L, base.history().count());
+        assertEquals(1L, base.history("5").count());
         assertEquals(2L, base.times("2", "3", "4"));
         assertEquals(1L, base.times("5", "3", "4"));
         assertEquals(3L, base.match("2").count());
@@ -268,7 +266,8 @@ public class BaseTest {
 
     @Test
     public void nullMatching() {
-        Base base = new Base("", "historyCheck.yml");
+        Base base = new Base("", "historyCheck.yml")
+                .constrain(Base.RequestMode.rmNew);
 
         assertEquals(0L, base.times());
 
@@ -296,6 +295,8 @@ public class BaseTest {
         assertEquals(1, base.matchEx(".*56.*").count());
         assertEquals(1, base.timesEx(".*56.*"));
         assertEquals(4, base.timesEx(ars(), ars(".ko.")));
+
+        assertEquals(4, base.history().count());
 
     }
 
@@ -331,10 +332,7 @@ public class BaseTest {
     public void nullReturning() {
         Base base = new Base("./nullReturning.yml");
 
-        String[] emptyResult = base.requestArray(() -> {
-                    String[] res = null;
-                    return res;
-                },
+        String[] emptyResult = base.requestArray(() -> null,
                 "nullKey");
 
         assertNull(emptyResult);

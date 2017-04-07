@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 /**
@@ -251,9 +250,7 @@ public class Base {
                                               String... keys) throws E {
         return request2(Base::throwNSE,
                 values -> values == null ? null : decoder.decode(values.iterator().next()),
-                e -> {
-                    throw new UnsupportedOperationException();
-                },
+                null,
                 keys
         );
     }
@@ -392,18 +389,18 @@ public class Base {
 
             if (load instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) load;
-                map.entrySet()
-                        .forEach(x -> {
+                map
+                        .forEach((k,v) -> {
                             try {
-                                documentList.add(new Document((Map<String, Object>) x.getValue()));
+                                documentList.add(new Document((Map<String, Object>) v));
                             } catch (RuntimeException ex) {
-                                log.warning(() -> String.format("document %s isn't loaded: %s, %s", x.getKey(), ex.toString()));
+                                log.warning(() -> String.format("document %s isn't loaded: %s", k, ex));
                             }
                         });
             }
             isNew = false;
         } catch (FileNotFoundException e) {
-            log.info(()->String.format("stub file not found: %s, %s", file.getAbsolutePath(), e.toString()));
+            log.info(()->String.format("stub file %s not found: %s", file.getAbsolutePath(), e));
         }
     }
 
@@ -468,7 +465,7 @@ public class Base {
      * @return nothing
      */
     public static <T, E> T throwNSE(E e) {
-        throw new NoSuchElementException();
+        throw new NoSuchElementException(e.toString());
     }
 
     /**
