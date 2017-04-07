@@ -392,18 +392,18 @@ public class Base {
 
             if (load instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) load;
-                map.entrySet()
-                        .forEach(x -> {
+                map
+                        .forEach((k,v) -> {
                             try {
-                                documentList.add(new Document((Map<String, Object>) x.getValue()));
+                                documentList.add(new Document((Map<String, Object>) v));
                             } catch (RuntimeException ex) {
-                                log.warning(() -> String.format("document %s isn't loaded: %s, %s", x.getKey(), ex.toString()));
+                                log.warning(() -> String.format("document %s isn't loaded: %s", k, ex));
                             }
                         });
             }
             isNew = false;
         } catch (FileNotFoundException e) {
-            log.info(()->String.format("stub file not found: %s, %s", file.getAbsolutePath(), e.toString()));
+            log.info(()->String.format("stub file %s not found: %s", file.getAbsolutePath(), e));
         }
     }
 

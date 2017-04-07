@@ -297,6 +297,8 @@ public class BaseTest {
         assertEquals(1, base.timesEx(".*56.*"));
         assertEquals(4, base.timesEx(ars(), ars(".ko.")));
 
+        assertEquals(4, base.history().count());
+
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
