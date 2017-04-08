@@ -39,20 +39,21 @@ public class Base {
 
     public enum RequestMode {
         /**
-         * general using.
-         * send all requests to real system that aren't in cache
+         * Use case: general using of cache.
+         * request is sent to real system if it is not found in cache
          */
         rmNew,
 
         /**
-         * strict checking
-         * sending requests to real system is forbidden
+         * Use case: strict checking.
+         * sending requests to real system is forbidden.
+         * cache is loaded immediately. if request is not found in cache then exception is thrown
          */
         rmNone,
 
         /**
-         * logging
-         * all requests are sent to real system and written to file
+         * Use case: cache logging from upstream.
+         * all requests are sent to real system. all responses recorded to cache
          */
         rmAll
     }
@@ -111,21 +112,10 @@ public class Base {
         return this;
     }
 
-    /**
-     * keep a document
-     * use it for cascading keeping of document
-     *
-     * @param document for keeping
-     * @return this
-     */
-    public Base add(Document document) {
-        put(document);
-        return this;
-    }
 
     /**
-     * store a document
-     * clear isNew flag
+     * Keeps a document in cache.
+     * initialize cache
      *
      * @param document for keeping
      * @return inserted document
@@ -137,11 +127,11 @@ public class Base {
     }
 
     /**
-     * store a new Document
-     * keeps [0..count-1] as keys, the last element as a value
+     * Creates and keeps a new Document in cache.
+     * considers keysAndValue[0..count-1] as keys of new Document, the last element as a value
      *
      * @param keysAndValue keys for request2
-     * @return this
+     * @return new Document
      */
     public Document put(String... keysAndValue) {
         return put(new Document(Arrays.copyOf(keysAndValue, keysAndValue.length - 1))
@@ -149,9 +139,10 @@ public class Base {
     }
 
     /**
-     * create a new document and keep it
+     * Creates and keeps a new Document in cache.
+     * Document includes request and exception as  a response
      *
-     * @param ex   exception is keeped in document
+     * @param ex   exception is kept in document
      * @param keys key for the document
      * @return inserted document
      */
@@ -160,10 +151,11 @@ public class Base {
     }
 
     /**
+     * Finds document with given keys. if document is found then returns the 1st value from it's response.
+     * If document is not found then returns empty Optional. If found document contains exception the exception will be
+     * raised.
      * @param keys for search of the document
-     * @return an Optional the 1st String of values for the first Document that fit for given keys,
-     * or an empty Optional if the Document isn't found. if there are several documents
-     * with the same keys returned value could be returned
+     * @return first value from document's response or empty
      */
     public Optional<String> getOpt(String... keys) {
         return documentList.stream()
@@ -176,6 +168,13 @@ public class Base {
         return getVals(keys).next();
     }
 
+    /**
+     * Finds document with given key. If document found then returns iterator to values from the document
+     *
+     * @param keys for search document
+     * @return
+     * @throws NoSuchElementException
+     */
     public Iterator<String> getVals(String... keys) throws NoSuchElementException {
         return getDocument(keys)
                 .orElseThrow(NoSuchElementException::new)
@@ -189,12 +188,13 @@ public class Base {
     }
 
     /**
-     * requests string from stub
+     * Requests string from stub.
+     * If this document is absent in cache throws {@link NoSuchElementException}
      *
      * @param keys keys for searching response in stub
      * @param <E>  type of allowed Exception
      * @return requested response
-     * @throws E allowed Exception
+     * @throws NoSuchElementException if document if not found in cache
      */
     public <E extends Exception> String request(String... keys) throws E {
         return request(Base::throwNSE,
@@ -204,6 +204,15 @@ public class Base {
 
     }
 
+    /**
+     * Requests string. looking Document in cache. If it is not found then gets value using supplier.
+     * Use supplier to request real system. Use this method if response just a {@link String}
+
+     * @param supplier - method to obtain response
+     * @param keys - keys for document and parameters for request real system
+     * @return response from real system
+     * @throws E expected exception from real system
+     */
     public <E extends Exception> String request(Supplier<String, E> supplier, String... keys) throws E {
         return request(supplier,
                 values -> values,
@@ -211,6 +220,15 @@ public class Base {
                 keys);
     }
 
+    /**
+     * Requests array of string from stub.
+     * If this document is absent in cache throws {@link NoSuchElementException}
+     *
+     * @param keys keys for searching response in stub
+     * @param <E>  type of allowed Exception
+     * @return requested response
+     * @throws NoSuchElementException if document if not found in cache
+     */
     public <E extends Exception> String[] requestArray(String... keys) throws E {
         return request2(Base::throwNSE,
                 values -> values == null ? null : StreamSupport.stream(values.spliterator(), false).collect(Collectors.toList()).toArray(new String[0]),
@@ -220,7 +238,8 @@ public class Base {
     }
 
     /**
-     * for requesting of String Array
+     * Requests array of string. looking Document in cache. If it is not found then gets value using supplier.
+     * Use supplier to request real system. Use this method if response String[]
      *
      * @param supplier provide string array from system
      * @param keys     keys for request
@@ -237,7 +256,9 @@ public class Base {
     }
 
     /**
-     * Only recover object from stub
+     * Requests from stub.
+     * If Document is found uses {@link DecoderSimple} to build result. It could build object of any class
+     * If this document is absent in cache throws {@link NoSuchElementException}
      *
      * @param decoder recover object from strings
      * @param keys    key for creating request
@@ -280,7 +301,7 @@ public class Base {
     }
 
     /**
-     * use the method to serialize object to multi lines
+     * use the method to request real system and serialize/deserialize object to multi values
      *
      * @param supplier provide real answer
      * @param decoder  create object from values
@@ -331,8 +352,8 @@ public class Base {
             requestHistory.add(exceptionalDocument);
             try {
                 save();
-            } catch (IOException io_ex) {
-                log.warning(()->"exception information is not saved into stub: " + io_ex);
+            } catch (IOException ioEx) {
+                log.warning(()->"exception information is not saved into stub: " + ioEx);
             }
             throw ex;
         }
@@ -369,18 +390,15 @@ public class Base {
         try {
             load();
         } catch (IOException e) {
-            log.info(()->"loading failed during loading: " + e);
+            log.warning(()->"loading failed during loading: " + e);
         }
     }
 
     /**
-     * reload file
-     * history and kept documents are removed
-     *
+     * cleans history, reloads stub-file
      * @throws IOException due to file access error
      */
-    public void load() throws IOException {
-
+    private void load() throws IOException {
         clear();
         File file = new File(filePath);
         try (InputStream input = new FileInputStream(file)) {
@@ -389,24 +407,18 @@ public class Base {
 
             if (load instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) load;
-                map
-                        .forEach((k,v) -> {
-                            try {
-                                documentList.add(new Document((Map<String, Object>) v));
-                            } catch (RuntimeException ex) {
-                                log.warning(() -> String.format("document %s isn't loaded: %s", k, ex));
-                            }
-                        });
+                map.forEach((k,v)-> documentList
+                        .add(new Document((Map<String, Object>) v)));
             }
             isNew = false;
-        } catch (FileNotFoundException e) {
-            log.info(()->String.format("stub file %s not found: %s", file.getAbsolutePath(), e));
+        }catch (FileNotFoundException e) {
+            log.info(()->String.format("stub file %s is not found: %s", file.getAbsolutePath(), e));
         }
     }
 
 
     /**
-     * rewrite stub file
+     * rewrite stub-file
      *
      * @throws IOException due to file access error
      */
@@ -474,7 +486,7 @@ public class Base {
      * @param <T> type for matching
      * @return nothing
      */
-    public static <T> T throwNSE() {
+    public static <T> T throwNSE() throws NoSuchElementException {
         throw new NoSuchElementException();
     }
 

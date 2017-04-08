@@ -31,30 +31,17 @@ public class BaseTest {
         Optional<String> opt = base.getOpt("123", "321");
         assertFalse(opt.isPresent());
 
-        base.load();
-        assertEquals("123123", base.get("123", "321"));
+        String request = base.request("123", "321");
+        assertEquals("123123", request);
+        opt = base.getOpt("123", "321");
+        assertTrue(opt.isPresent());
 
+        base = new Base("", "stubSaveTest.yml")
+                .constrain(Base.RequestMode.rmNone);
+        opt = base.getOpt("123", "321");
+        assertTrue(opt.isPresent());
     }
 
-    @Test
-    public void saveMulti() throws IOException {
-        Base base = new Base();
-
-        base.add(new Document("keyv1", "keyv2", "keyv3").setValues("value2", "value3"))
-                .add(new Document("keyv1.1", "keyv2", "keyv3").setValues("value2", "value3"))
-                .add(new Document("keyv1.2", "keyv2", "keyv3").setValues("value2", "value3"))
-                .add(new Document("keyv1.3", "keyv2", "keyv3").setValues("value2", "value4"));
-
-
-        Iterator<String> r = base.getVals("keyv1.3", "keyv2", "keyv3");
-        assertEquals("value2", r.next());
-        assertEquals("value4", r.next());
-
-        String[] r1 = base.requestArray("keyv1.3", "keyv2", "keyv3");
-        assertEquals("value2", r1[0]);
-        assertEquals("value4", r1[1]);
-
-    }
 
     @Test
     public void stringRequest() {
@@ -100,6 +87,13 @@ public class BaseTest {
         assertEquals(-1594594225, val);
     }
 
+    @Test(expected = NoSuchElementException.class)
+    public void requestException() {
+        Base base = new Base();
+        assertTrue(base.isNew());
+
+        base.request("rand", "1002", "notakey");
+    }
 
     @Test
     public void binaryDataTest() {
@@ -360,7 +354,7 @@ public class BaseTest {
                     try {
                         return bufferedReader.readLine();
                     } catch (IOException e) {
-                        throw new RuntimeException("");
+                        throw new RuntimeException("", e);
                     }
                 },
                 "21");
