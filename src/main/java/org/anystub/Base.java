@@ -220,6 +220,13 @@ public class Base {
                 keys);
     }
 
+    public <T extends Serializable, E extends Exception> T requestSerializable(Supplier<T, E> supplier, String... keys) throws E {
+        return request(supplier,
+                Base::decode,
+                Base::encode,
+                keys);
+    }
+
     /**
      * Requests array of string from stub.
      * If this document is absent in cache throws {@link NoSuchElementException}
@@ -613,6 +620,28 @@ public class Base {
     public <T, E extends Throwable> T requestMapped(Supplier<T, E> supplier,
                                                     String... keys) throws E {
         throw new UnsupportedOperationException();
+    }
+
+
+    public static String encode(Serializable s) {
+        try (ByteArrayOutputStream of = new ByteArrayOutputStream();
+             ObjectOutputStream so = new ObjectOutputStream(of)) {
+            so.writeObject(s);
+            so.flush();
+            return Base64.getEncoder().encodeToString(of.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T extends Serializable> T decode(String s){
+        byte[] decode = Base64.getDecoder().decode(s);
+        try(ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
+            ObjectInputStream si = new ObjectInputStream(byteArrayInputStream)){
+            return (T) si.readObject();
+        } catch (ClassNotFoundException| IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

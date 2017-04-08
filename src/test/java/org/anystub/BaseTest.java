@@ -2,9 +2,7 @@ package org.anystub;
 
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -362,4 +360,22 @@ public class BaseTest {
         assertEquals("test", v1.readLine());
 
     }
+
+    static class AAA implements Serializable {
+        int aaa = 1;
+        Integer s = 15;
+    }
+
+    @Test
+    public void requestSerializableTest() throws IOException {
+        Base base = new Base("./serialize.yml");
+
+        AAA aaa = base.requestSerializable(() -> new AAA(), "123");
+        assertEquals(1, aaa.aaa);
+        assertEquals(Integer.valueOf(15), aaa.s);
+        aaa = base.requestSerializable(() -> null, "123");
+        assertEquals(1, aaa.aaa);
+        assertEquals(Integer.valueOf(15), aaa.s);
+    }
+
 }
