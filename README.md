@@ -4,6 +4,8 @@
 
 [![Build Status](https://travis-ci.org/anystub/anystub.svg?branch=master)](https://travis-ci.org/anystub/anystub) [![quality](https://sonarqube.com/api/badges/gate?key=org.anystub:anystub)](https://sonarqube.com/dashboard?id=org.anystub:anystub) [![gitter.im/anystub-java](https://badges.gitter.im/anystub-java.svg)](https://gitter.im/anystub-java)
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.anystub/anystub/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.anystub/anystub)
+
 record input/output for tests in java. inspired by vcr for rails
 
 Install from Maven Central 
