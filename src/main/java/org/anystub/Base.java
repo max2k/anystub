@@ -177,8 +177,8 @@ public class Base {
      * Finds document with given key. If document found then returns iterator to values from the document
      *
      * @param keys for search document
-     * @return
-     * @throws NoSuchElementException
+     * @return values of requested document
+     * @throws NoSuchElementException throws when document is not found
      */
     public Iterator<String> getVals(String... keys) throws NoSuchElementException {
         return getDocument(keys)
@@ -197,11 +197,10 @@ public class Base {
      * If this document is absent in cache throws {@link NoSuchElementException}
      *
      * @param keys keys for searching response in stub
-     * @param <E>  type of allowed Exception
      * @return requested response
      * @throws NoSuchElementException if document if not found in cache
      */
-    public <E extends Exception> String request(String... keys) throws E {
+    public String request(String... keys) throws NoSuchElementException {
         return request(Base::throwNSE,
                 values -> values,
                 Base::throwNSE,
@@ -213,10 +212,11 @@ public class Base {
      * Requests string. looking Document in cache. If it is not found then gets value using supplier.
      * Use supplier to request real system. Use this method if response just a {@link String}
 
-     * @param supplier - method to obtain response
-     * @param keys - keys for document and parameters for request real system
+     * @param supplier method to obtain response
+     * @param keys keys for document and parameters for request real system
+     * @param <E> some
      * @return response from real system
-     * @throws E expected exception from real system
+     * @throws E type of expected exception
      */
     public <E extends Exception> String request(Supplier<String, E> supplier, String... keys) throws E {
         return request(supplier,
@@ -225,6 +225,15 @@ public class Base {
                 keys);
     }
 
+    /**
+     * requests serializable object
+     * @param supplier provides requested object
+     * @param keys keys for document and parameters for request real system
+     * @param <T> expected type for requested object
+     * @param <E> expected exception
+     * @return recovered object
+     * @throws E expected exception
+     */
     public <T extends Serializable, E extends Exception> T requestSerializable(Supplier<T, E> supplier, String... keys) throws E {
         return request(supplier,
                 Base::decode,
@@ -239,7 +248,7 @@ public class Base {
      * @param keys keys for searching response in stub
      * @param <E>  type of allowed Exception
      * @return requested response
-     * @throws NoSuchElementException if document if not found in cache
+     * @throws E if document if not found in cache
      */
     public <E extends Exception> String[] requestArray(String... keys) throws E {
         return request2(Base::throwNSE,
