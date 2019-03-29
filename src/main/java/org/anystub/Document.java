@@ -27,8 +27,7 @@ public class Document {
     }
 
     public Document(String... keys) {
-        stream(keys)
-                .forEach(this.keys::add);
+        this.keys.addAll(asList(keys));
 
     }
 
