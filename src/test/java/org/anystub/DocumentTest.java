@@ -2,7 +2,6 @@ package org.anystub;
 
 import org.junit.Test;
 
-import javax.activation.UnsupportedDataTypeException;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -110,7 +109,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void aroTest() throws UnsupportedDataTypeException {
+    public void aroTest()  {
         String[] aro = Document.aro("sdf", 2, "ssdf");
         assertArrayEquals(ars("sdf", null, null, "ssdf"), aro);
         aro = Document.aro("sdf", 0, "ssdf");

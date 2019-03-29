@@ -378,4 +378,11 @@ public class BaseTest {
         assertEquals(Integer.valueOf(15), aaa.s);
     }
 
+    @Test
+    public void r1() {
+        Base base = new Base("in-res.yml");
+
+        base.request(()->"xxx", "test");
+    }
+
 }

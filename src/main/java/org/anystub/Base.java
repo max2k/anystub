@@ -72,13 +72,18 @@ public class Base {
      */
     public Base(String filename) {
         File file = new File(filename);
-        if (!file.getParentFile().getName().isEmpty()) {
-            this.filePath = file.getPath();
+        if (file.getParentFile()==null || file.getParent().isEmpty()) {
+            this.filePath = "src/test/resources/anystub/" + file.getName();
         } else {
-            this.filePath = new File("src/test/resources/anystub") + file.getName();
+            this.filePath = file.getPath();
         }
     }
 
+    /**
+     * new Base("", "stub.yml") equal to new Base("./stub.yml")
+     * @param path dir
+     * @param filename file
+     */
     public Base(String path, String filename) {
         this.filePath = new File(path).getPath() + new File(filename).getPath();
     }

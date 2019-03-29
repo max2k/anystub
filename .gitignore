@@ -1,1 +1,5 @@
 target
+.idea
+*.iml
+/*.yml
+src/test/resources/anystub/in-res.yml
