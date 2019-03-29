@@ -1,6 +1,5 @@
 package org.anystub;
 
-import javax.activation.UnsupportedDataTypeException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -319,9 +318,9 @@ public class Document {
      * @param keys values for result string, strings are copied into result array, Integers are transformed to
      *             correspondent amount of null values
      * @return array of string
-     * @throws UnsupportedDataTypeException occurs if there is an key with type rather then String or Integer
+     * @throws UnsupportedOperationException occurs if there is an key with type rather then String or Integer
      */
-    public static String[] aro(Object... keys) throws UnsupportedDataTypeException {
+    public static String[] aro(Object... keys) throws UnsupportedOperationException {
         if (keys == null || keys.length == 0) {
             return new String[0];
         }
@@ -332,7 +331,7 @@ public class Document {
             } else if (o instanceof Integer) {
                 result.addAll(asList(new String[(Integer) o]));
             } else {
-                throw new UnsupportedDataTypeException();
+                throw new UnsupportedOperationException();
             }
         }
         return result.toArray(new String[0]);
