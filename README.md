@@ -22,10 +22,10 @@ Install from Maven Central
 
 Example
 ===
-you can find an example of using in tests folder of the repository. below the first scenario
+you can find the example in test folder of the repository. below the first scenario.
 
+you have `class SourceSystem` which has access to external resources (http access).
 
-# you have `class SourceSystem` which have access to external resources (http access).
 ``` java
 public class SourceSystem {
 
@@ -45,8 +45,7 @@ public class SourceSystem {
 }
 ```
 
-# You have business-class (Worker) which uses class-accessor and you want to control behaviour of this class.
- it could include building query, processing response and handling exceptions
+You have class Worker which uses SourceSystem to get data from external data source.
 
 ``` java 
 public class Worker {
@@ -63,7 +62,10 @@ public class Worker {
 }
 ```
 
-to make sure your tests will run everywhere you need to create stub for the SourceSystem and record data that is necessarily for the tests
+You want to test the Worker. In your tests you can create a mock for SourceSystem and put some data in the mock. The things become complex when you have several layers between your 'worker' class and your 'source system' and methods for the source system have multiple parameters. 
+After you created the mock of SourceSystem the main task is to collect relavant data and set up right behaviour for it.
+
+Creating mocks is based on extending existing classes/interfaces. You have to create mocks for every important methods of the class to track parameters and results.
 
 ``` java
 public class WorkerEasyTest {
@@ -94,13 +96,23 @@ public class WorkerEasyTest {
 }
 ```
 
-By default your data is kept in src/test/resources/anystub/stub.yml. base.request(Supplier<>, String keys..) looks for stored data in the file. In case the search is successful the found result is returned to the client. In other way your supplier would be invoced, produced value will be keep in the file the it will be provided for clients.
+The class Base keeps key parameters and return values in stub-files. If input parameters exists in the stub it recovers response from the stub-file and omits calling the real external system.
+By default your data is kept in src/test/resources/anystub/stub.yml. 
+`base.request(Supplier<>, String keys..)` looks for stored data in the file. In case the search is successful the found result is returned to the client. In other case Base invokes `super.get()`. After the call Base keeps parameters and returned value in stub-file then returns recovered value.
+Base could keep returned values or exceptions if the call ended up with exception.
+Stub-files allow you to define the behaviour you need manually. The files are yml-files with simple syntax. So you can create it if you do not have access to the external system.
+
+Base has methods match*() and times*() to analyze data-flow in your tests.
 
 **Recap**
 
 your workflow scenario:
-- extend your sourceSystem
-- create stub on your local system and add it to the repository
-- get benefits from automatic regression testing
+- create Base object - to set up your stub-file.
+- extend your 'sourceSystem' to trace all calls for the important methods.
 
 look at [wiki|https://github.com/anystub/anystub/wiki/anystub-and-SpringBoot] to see how it works with spring-boot
+
+
+Above we created a stub for the method `String get()` which has no parameters and returns String. When methods have parameters of non-trivial types you need to extract key-data from parameters as String and write convertors to transform the result value to strings and recover it from strings.
+
+There is support for Serializable types for return values. The support could be added quite easy to any data class.
