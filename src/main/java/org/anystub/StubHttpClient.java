@@ -258,4 +258,6 @@ public class StubHttpClient implements HttpClient {
 
         return basicHttpResponse;
     }
+
+
 }

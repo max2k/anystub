@@ -9,4 +9,5 @@ public class StubHttpClientTest {
     @Test
     public void execute() {
     }
+
 }
