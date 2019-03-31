@@ -37,7 +37,7 @@ public class StubHttpClient implements HttpClient {
     private final Base base;
     private final HttpClient httpClient;
 
-    // TODO: plain vs base64 selector - requests body/response body matching/ default-auto-selector(on keys, on content)
+    // TODO: plain vs base64 selector - requests body/response body matching/ default-auto-selector(on keys)
 
     // TODO: opt-out keys (protocol/host/port/url/headers/entity)
 
@@ -59,13 +59,23 @@ public class StubHttpClient implements HttpClient {
 
     @Override
     public HttpResponse execute(HttpUriRequest httpUriRequest) throws IOException, ClientProtocolException {
-        return null;
+        return execute(httpUriRequest,  (HttpContext) null);
     }
 
     @Override
     public HttpResponse execute(HttpUriRequest httpUriRequest, HttpContext httpContext) throws IOException, ClientProtocolException {
+        return execute(null, httpUriRequest, httpContext);
+    }
+
+    @Override
+    public HttpResponse execute(HttpHost httpHost, HttpRequest httpRequest) throws IOException, ClientProtocolException {
+        return execute(httpHost, httpRequest, (HttpContext) null);
+    }
+
+    @Override
+    public HttpResponse execute(HttpHost httpHost, HttpRequest httpRequest, HttpContext httpContext) throws IOException, ClientProtocolException {
         LOGGER.info("execute(HttpUriRequest httpUriRequest, HttpContext httpContext)");
-        LOGGER.info(String.format("input parameters: %s, %s", httpUriRequest, httpContext));
+        LOGGER.info(String.format("input parameters: %s, %s", httpRequest, httpContext));
 
         boolean plainContent = true;
 //        if (httpUriRequest.getURI().getHost().startsWith("idad")) {
@@ -77,8 +87,8 @@ public class StubHttpClient implements HttpClient {
                 base.request2(new Supplier<HttpResponse, IOException>() {
                                   @Override
                                   public HttpResponse get() throws IOException {
-                                      HttpResponse execute = httpClient.execute(httpUriRequest, httpContext);
-                                      LOGGER.info("response: "+ execute);
+                                      HttpResponse execute = httpClient.execute(httpHost, httpRequest, httpContext);
+                                      LOGGER.info("response: " + execute);
                                       return execute;
                                   }
                               },
@@ -92,57 +102,53 @@ public class StubHttpClient implements HttpClient {
                             @Override
                             public Iterable<String> encode(HttpResponse httpResponse) {
                                 ArrayList<String> keys = keys(httpResponse, true);
-                                LOGGER.info("response keys "+ keys);
+                                LOGGER.info("response keys " + keys);
                                 return keys;
                             }
                         },
-                        keys(httpUriRequest, plainContent).toArray(new String[0]));
+                        keys(httpRequest, null, plainContent).toArray(new String[0]));
 
         return execute;
     }
 
     @Override
-    public HttpResponse execute(HttpHost httpHost, HttpRequest httpRequest) throws IOException, ClientProtocolException {
-        return null;
-    }
-
-    @Override
-    public HttpResponse execute(HttpHost httpHost, HttpRequest httpRequest, HttpContext httpContext) throws IOException, ClientProtocolException {
-        return null;
-    }
-
-    @Override
     public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<? extends T> responseHandler) throws IOException, ClientProtocolException {
-        return null;
+        return execute(httpUriRequest, responseHandler, null);
     }
 
     @Override
     public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<? extends T> responseHandler, HttpContext httpContext) throws IOException, ClientProtocolException {
-        return null;
+        return execute(null, httpUriRequest, responseHandler, httpContext);
     }
 
     @Override
     public <T> T execute(HttpHost httpHost, HttpRequest httpRequest, ResponseHandler<? extends T> responseHandler) throws IOException, ClientProtocolException {
-        return null;
+        return execute(httpHost, httpRequest, responseHandler, null);
     }
 
     @Override
     public <T> T execute(HttpHost httpHost, HttpRequest httpRequest, ResponseHandler<? extends T> responseHandler, HttpContext httpContext) throws IOException, ClientProtocolException {
-        return null;
+        HttpResponse execute = execute(httpHost, httpRequest, httpContext);
+        return responseHandler.handleResponse(execute);
     }
 
-    private ArrayList<String> keys(HttpUriRequest httpUriRequest, boolean plainContent) {
+    private ArrayList<String> keys(HttpRequest httpRequest, HttpHost httpHost, boolean plainContent) {
         ArrayList<String> strings = new ArrayList<>();
 
-        strings.add(httpUriRequest.getMethod());
-        strings.add(httpUriRequest.getURI().toASCIIString());
+        strings.add(httpRequest.getRequestLine().getMethod());
+        strings.add(httpRequest.getRequestLine().getProtocolVersion().toString());
+        strings.add(httpRequest.getRequestLine().getUri());
+
+        if(httpHost != null && !httpRequest.getRequestLine().getUri().contains(httpHost.toString())) {
+            strings.add(httpHost.toString());
+        }
 
 //        for (Header h : httpUriRequest.getAllHeaders()) {
 //            LOGGER.info("Header: {} - {}", h.getName(), h.getValue());
 //        }
 
-        if (httpUriRequest instanceof HttpEntityEnclosingRequest) {
-            HttpEntityEnclosingRequest httpEntityEnclosingRequest = (HttpEntityEnclosingRequest) httpUriRequest;
+        if (httpRequest instanceof HttpEntityEnclosingRequest) {
+            HttpEntityEnclosingRequest httpEntityEnclosingRequest = (HttpEntityEnclosingRequest) httpRequest;
             HttpEntity entity = httpEntityEnclosingRequest.getEntity();
 
             strings.addAll(keys(entity, plainContent));
@@ -193,7 +199,7 @@ public class StubHttpClient implements HttpClient {
                     byteArrayEntity.writeTo(byteArray);
                     bytes = byteArray.toByteArray();
                 }
-            }else if (entity instanceof HttpEntityWrapper) {
+            } else if (entity instanceof HttpEntityWrapper) {
                 HttpEntityWrapper entityWrapper = (HttpEntityWrapper) entity;
                 try (ByteArrayOutputStream byteArray = new ByteArrayOutputStream()) {
                     entityWrapper.writeTo(byteArray);
@@ -204,7 +210,7 @@ public class StubHttpClient implements HttpClient {
             }
 
             if (bytes != null) {
-                if (plainContent) {
+                if (plainContent && Base.isText(new String(bytes, StandardCharsets.UTF_8))) {
                     strings.add("TEXT " + new String(bytes, StandardCharsets.UTF_8));
                 } else {
                     String encode = Base64.getEncoder().encodeToString(bytes);
@@ -239,23 +245,23 @@ public class StubHttpClient implements HttpClient {
             }
 
             int i = header.indexOf(": ");
-            basicHttpResponse.setHeader(header.substring(0,i), header.substring(i+2));
+            basicHttpResponse.setHeader(header.substring(0, i), header.substring(i + 2));
         }
 
-        if (postHeader!=null){
+        if (postHeader != null) {
             BasicHttpEntity httpEntity = new BasicHttpEntity();
 
             if (postHeader.startsWith("TEXT ")) {
                 String textEntity = postHeader.substring(5);
                 httpEntity.setContentLength(textEntity.length());
                 httpEntity.setContent(new ByteArrayInputStream(textEntity.getBytes()));
-            }else if (postHeader.startsWith("BASE64 ")) {
+            } else if (postHeader.startsWith("BASE64 ")) {
                 String base64Entity = postHeader.substring(7);
                 byte[] decode = Base64.getDecoder().decode(base64Entity);
                 httpEntity.setContentLength(decode.length);
                 httpEntity.setContent(new ByteArrayInputStream(decode));
             } else {
-                LOGGER.severe("Failed to recover httpEntity: "+postHeader.substring(0,5)+"...");
+                LOGGER.severe("Failed to recover httpEntity: " + postHeader.substring(0, 5) + "...");
             }
             basicHttpResponse.setEntity(httpEntity);
         }
