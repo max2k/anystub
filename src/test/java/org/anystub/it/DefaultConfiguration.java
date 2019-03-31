@@ -1,4 +1,4 @@
-package org.anystub.IT;
+package org.anystub.it;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

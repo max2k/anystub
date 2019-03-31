@@ -1,4 +1,4 @@
-package org.anystub.IT;
+package org.anystub.it;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
