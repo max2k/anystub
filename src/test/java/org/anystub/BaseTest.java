@@ -367,7 +367,7 @@ public class BaseTest {
     }
 
     @Test
-    public void requestSerializableTest() throws IOException {
+    public void requestSerializableTest() {
         Base base = new Base("./serialize.yml");
 
         AAA aaa = base.requestSerializable(() -> new AAA(), "123");
@@ -379,10 +379,28 @@ public class BaseTest {
     }
 
     @Test
-    public void r1() {
+    public void fileInResourcesTest() {
         Base base = new Base("in-res.yml");
 
         base.request(()->"xxx", "test");
+    }
+
+    @Test
+    public void punctuationInStub() {
+
+        Base base = new Base("./punctuation.yml");
+
+        String request = base.request(() -> "[][!\"#$%&'()*+,./:;<=>?@\\^_`{|}~-]", "[][!\"#$%&'()*+,./:;<=>?@\\^_`{|}~-]");
+
+        assertEquals("[][!\"#$%&'()*+,./:;<=>?@\\^_`{|}~-]", request);
+    }
+
+
+    @Test
+    public void isTextTest() {
+        assertTrue(Base.isText("thisistextline"));
+        assertTrue(Base.isText("{\"this is\": \'text' }; line"));
+        assertFalse(Base.isText("thisistextline"+ (char) 0x03));
     }
 
 }
