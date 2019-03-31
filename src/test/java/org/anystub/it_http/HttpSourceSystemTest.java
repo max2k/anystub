@@ -10,12 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest()
 public class HttpSourceSystemTest {
 
     @Autowired
@@ -50,6 +53,19 @@ public class HttpSourceSystemTest {
 
             return result;
 
+        }
+
+        @Bean
+        public ClientHttpRequestFactory requestFactory(HttpClient httpClient) {
+            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+            requestFactory.setHttpClient(httpClient);
+            return requestFactory;
+        }
+
+        @Bean
+        public RestTemplate restTemplate(ClientHttpRequestFactory requestFactory) {
+
+            return new RestTemplate(requestFactory);
         }
     }
 }
