@@ -25,7 +25,6 @@ import static java.util.Collections.singletonList;
  * <p>
  * * most of the methods return this to cascading operations
  * <p>
- * Created by Kirill on 9/2/2016.
  */
 public class Base {
 

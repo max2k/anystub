@@ -12,7 +12,6 @@ import static java.util.Arrays.stream;
 
 /**
  * Document for keeping requests/response
- * Created by Kirill on 9/2/2016.
  */
 public class Document {
 
@@ -23,7 +22,7 @@ public class Document {
     private boolean nullValue = false;
 
     public Document() {
-        // just explicit declaration. to be consistent
+        // just an explicit declaration. to be consistent
     }
 
     public Document(String... keys) {

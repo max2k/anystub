@@ -26,6 +26,10 @@ import java.util.logging.Logger;
 
 import static java.lang.Integer.parseInt;
 
+
+/**
+ * implementation of HttpClient to stub http-traffic
+ */
 public class StubHttpClient implements HttpClient {
 
     private static final Logger LOGGER = Logger.getLogger(StubHttpClient.class.getName());

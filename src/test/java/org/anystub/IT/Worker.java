@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 /**
- * Created by Kirill on 9/3/2016.
  */
 @Component
 public class Worker {

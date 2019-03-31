@@ -1,7 +1,7 @@
 package org.anystub;
 
 /**
- * Created by Kirill on 9/10/2016.
+ * functional interface
  */
 @FunctionalInterface
 public interface EncoderSimple<T extends Object> {
