@@ -44,7 +44,7 @@ public class StubConnection implements Connection {
 
     @Override
     public CallableStatement prepareCall(String s) throws SQLException {
-        return null;
+        return spy(new StubCallableStatement(this, s));
     }
 
     @Override

@@ -16,10 +16,10 @@ import java.util.Calendar;
 public class StubPreparedStatement extends StubStatement implements PreparedStatement {
 
     private PreparedStatement realPreparedStatement = null;
-    private String sql = null;
+    protected String sql = null;
 
-    protected StubPreparedStatement(boolean noRealRequired, StubConnection stubConnection) {
-        super(noRealRequired, stubConnection);
+    protected StubPreparedStatement(StubConnection stubConnection) {
+        super(true, stubConnection);
     }
 
     public StubPreparedStatement(StubConnection stubConnection, String sql) throws SQLException {

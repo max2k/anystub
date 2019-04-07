@@ -4,7 +4,6 @@ import org.anystub.Base;
 import org.anystub.Decoder;
 import org.anystub.Encoder;
 import org.anystub.Supplier;
-import org.h2.jdbc.JdbcResultSet;
 
 import java.sql.*;
 import java.util.Arrays;

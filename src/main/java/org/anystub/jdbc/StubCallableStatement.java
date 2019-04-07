@@ -1,5 +1,7 @@
 package org.anystub.jdbc;
 
+import org.anystub.Supplier;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -9,9 +11,21 @@ import java.util.Calendar;
 import java.util.Map;
 
 public class StubCallableStatement extends StubPreparedStatement implements CallableStatement {
-    public StubCallableStatement(StubConnection stubConnection) {
-        super(true, stubConnection);
+    private CallableStatement realCallableStatement = null;
+
+    protected StubCallableStatement(StubConnection stubConnection) {
+        super(stubConnection);
     }
+
+    public StubCallableStatement(StubConnection stubConnection, String sql) throws SQLException {
+        super(stubConnection);
+        this.sql = sql;
+
+        stubConnection.add(() -> {
+            realCallableStatement = stubConnection.getRealConnection().prepareCall(sql);
+        });
+    }
+
 
     @Override
     public void registerOutParameter(int i, int i1) throws SQLException {
@@ -25,17 +39,49 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public boolean wasNull() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realCallableStatement.wasNull();
+                              }
+                          },
+                        useKeys());
     }
 
     @Override
     public String getString(int i) throws SQLException {
-        return null;
+        addKeys(String.valueOf(i));
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realCallableStatement.getString(i);
+                             }
+                         },
+                        useKeys());
     }
 
     @Override
     public boolean getBoolean(int i) throws SQLException {
-        return false;
+        addKeys(String.valueOf(i));
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realCallableStatement.getBoolean(i);
+                              }
+                          },
+                        useKeys());
     }
 
     @Override
@@ -50,7 +96,18 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public int getInt(int i) throws SQLException {
-        return 0;
+        addKeys(String.valueOf(i));
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realCallableStatement.getInt(i);
+                              }
+                          },
+                        useKeys());
     }
 
     @Override
@@ -175,42 +232,58 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public void setNull(String s, int i) throws SQLException {
-
+        stubConnection.add(() -> {
+            realCallableStatement.setNull(s, i);
+        });
     }
 
     @Override
     public void setBoolean(String s, boolean b) throws SQLException {
-
+        stubConnection.add(() -> {
+            realCallableStatement.setBoolean(s, b);
+        });
     }
 
     @Override
     public void setByte(String s, byte b) throws SQLException {
-
+        stubConnection.add(() -> {
+            realCallableStatement.setByte(s, b);
+        });
     }
 
     @Override
     public void setShort(String s, short i) throws SQLException {
-
+        stubConnection.add(() -> {
+            realCallableStatement.setShort(s, i);
+        });
     }
 
     @Override
     public void setInt(String s, int i) throws SQLException {
-
+        stubConnection.add(() -> {
+            realCallableStatement.setInt(s, i);
+        });
     }
 
     @Override
     public void setLong(String s, long l) throws SQLException {
-
+        stubConnection.add(() -> {
+            realCallableStatement.setLong(s, l);
+        });
     }
 
     @Override
     public void setFloat(String s, float v) throws SQLException {
-
+        stubConnection.add(() -> {
+            realCallableStatement.setFloat(s, v);
+        });
     }
 
     @Override
     public void setDouble(String s, double v) throws SQLException {
-
+        stubConnection.add(() -> {
+            realCallableStatement.setDouble(s, v);
+        });
     }
 
     @Override
@@ -220,7 +293,10 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public void setString(String s, String s1) throws SQLException {
-
+        addKeys(s, s1);
+        stubConnection.add(()->{
+            realCallableStatement.setString(s, s1);
+        });
     }
 
     @Override
@@ -295,27 +371,77 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public String getString(String s) throws SQLException {
-        return null;
+        addKeys(s);
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                    @Override
+                    public String get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getString(s);
+                    }
+                }, useKeys());
     }
 
     @Override
     public boolean getBoolean(String s) throws SQLException {
-        return false;
+        addKeys(s);
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getBoolean(s);
+                    }
+                }, useKeys());
     }
 
     @Override
     public byte getByte(String s) throws SQLException {
-        return 0;
+        addKeys(s);
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return (int)getRealStatement().getByte(s);
+                    }
+                }, useKeys()).byteValue();
     }
 
     @Override
     public short getShort(String s) throws SQLException {
-        return 0;
+        addKeys(s);
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return (int)getRealStatement().getShort(s);
+                    }
+                }, useKeys()).shortValue();
     }
 
     @Override
     public int getInt(String s) throws SQLException {
-        return 0;
+        addKeys(s);
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return (int)getRealStatement().getInt(s);
+                    }
+                }, useKeys());
     }
 
     @Override
@@ -576,5 +702,10 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
     @Override
     public <T> T getObject(String s, Class<T> aClass) throws SQLException {
         return null;
+    }
+
+    @Override
+    public CallableStatement getRealStatement() {
+        return realCallableStatement;
     }
 }
