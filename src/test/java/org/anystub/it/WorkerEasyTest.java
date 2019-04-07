@@ -1,4 +1,4 @@
-package org.anystub.IT;
+package org.anystub.it;
 
 import org.anystub.Base;
 import org.junit.Before;
