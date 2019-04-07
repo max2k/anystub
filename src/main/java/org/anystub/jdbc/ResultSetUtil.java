@@ -6,7 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class ResultSetUtil {
 
@@ -36,49 +39,33 @@ public class ResultSetUtil {
         return res;
     }
 
-    public static List<String> encode(ResultSet resultSet) throws SQLException {
-        LinkedList<String> res = new LinkedList<>();
-        if (!resultSet.next()) {
-            return res;
-        }
-
-        int columnCount = 0;
+    public static List<String> encode(ResultSet resultSet, ResultSetMetaData resultSetMetaData) {
+        List<String> res;
         try {
-            while (true) {
-                resultSet.getString(columnCount);
-                columnCount++;
-            }
+            res = encodeHeader(resultSetMetaData);
+            res.addAll(encodeData(resultSet, resultSetMetaData.getColumnCount()));
         } catch (SQLException e) {
-            res.addFirst(Integer.toString(-columnCount));
+            throw new NoSuchElementException(e.getMessage());
         }
-
-        while (resultSet.next()) {
-            for (int i = 1; i <= columnCount; i++) {
-                res.add(resultSet.getString(i));
-            }
-        }
-
         return res;
     }
 
-
-    public static List<String> encode(ResultSet resultSet, ResultSetMetaData resultSetMetaData) throws SQLException {
-        List<String> res = encodeHeader(resultSetMetaData);
-        res.addAll(encodeData(resultSet, resultSetMetaData.getColumnCount()));
-        return res;
+    public static List<String> encode(ResultSet resultSet) {
+        try {
+            return encode(resultSet, resultSet.getMetaData());
+        } catch (SQLException e) {
+            throw new UnsupportedOperationException("failed extract ResultSetMetaData");
+        }
     }
 
     public static List<String> encode(PreparedStatement preparedStatement, ResultSet resultSet) {
         List<String> encode;
+        ResultSetMetaData metaData;
         try {
-            ResultSetMetaData metaData = preparedStatement.getMetaData();
+            metaData = preparedStatement.getMetaData();
             encode = ResultSetUtil.encode(resultSet, metaData);
         } catch (SQLException e) {
-            try {
-                encode = ResultSetUtil.encode(resultSet);
-            } catch (SQLException e1) {
-                throw new NoSuchElementException("Unable to stringify the result set");
-            }
+            encode = encode(resultSet);
         }
         return encode;
     }
@@ -96,10 +83,7 @@ public class ResultSetUtil {
                 int cScale = Integer.parseInt(it.next());
                 simpleResultSet.addColumn(cName, cType, cTypeName, cPrecision, cScale);
             }
-            if (columnCount < 0) {
-                columnCount = -columnCount;
-            }
-            while (it.hasNext()) {
+            while (it.hasNext() && columnCount > 0) {
                 Object[] row = new String[columnCount];
                 for (int i = 0; i < columnCount; i++) {
                     row[i] = it.next();

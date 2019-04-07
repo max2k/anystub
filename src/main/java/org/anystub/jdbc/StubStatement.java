@@ -4,6 +4,7 @@ import org.anystub.Base;
 import org.anystub.Decoder;
 import org.anystub.Encoder;
 import org.anystub.Supplier;
+import org.h2.jdbc.JdbcResultSet;
 
 import java.sql.*;
 import java.util.Arrays;
@@ -33,12 +34,44 @@ public class StubStatement implements Statement {
 
     @Override
     public ResultSet executeQuery(String s) throws SQLException {
-        return null;
+        addKeys(s);
+        Base base = stubConnection.getStubDataSource().getBase();
+
+        return base.request2(new Supplier<ResultSet, SQLException>() {
+                                 @Override
+                                 public ResultSet get() throws SQLException {
+                                     stubConnection.runSql();
+                                     return getRealStatement().executeQuery(s);
+                                 }
+                             },
+                new Decoder<ResultSet>() {
+                    @Override
+                    public ResultSet decode(Iterable<String> values) {
+                        return ResultSetUtil.decode(values);
+                    }
+                }, new Encoder<ResultSet>() {
+                    @Override
+                    public Iterable<String> encode(ResultSet resultSet) {
+                        return ResultSetUtil.encode(resultSet);
+                    }
+                },
+
+                useKeys());
     }
 
     @Override
     public int executeUpdate(String s) throws SQLException {
-        return 0;
+        addKeys(s);
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().executeUpdate(s);
+                    }
+                }, useKeys());
     }
 
     @Override
@@ -47,7 +80,6 @@ public class StubStatement implements Statement {
         if (getRealStatement() != null) {
             stubConnection.runSql();
             getRealStatement().close();
-//            realStatement = null;
         }
     }
 

@@ -21,3 +21,20 @@ request4:
     Josh]
   values: ['3', ID, INTEGER, '4', '10', '0', FIRST_NAME, VARCHAR, '12', '255', '0',
     LAST_NAME, VARCHAR, '12', '255', '0', '3', Josh, Bloch, '4', Josh, Long]
+request5:
+  exception: []
+  keys: DROP ALIAS SP_HELLO if Exists
+  values: 'false'
+request6:
+  exception: []
+  keys: |-
+    CREATE ALIAS SP_HELLO AS $$
+    String spHello(String value) {
+        return "HELLO: "+value;
+    }
+    $$;
+  values: 'false'
+request7:
+  exception: []
+  keys: call SP_HELLO('XX');
+  values: ['1', PUBLIC.SP_HELLO('XX'), VARCHAR, '12', '2147483647', '0', 'HELLO: XX']

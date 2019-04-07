@@ -3,6 +3,8 @@ package org.anystub.it_jdbc;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.anystub.Base;
+import org.anystub.jdbc.Spier;
+import org.anystub.jdbc.SpierProvider;
 import org.anystub.jdbc.StubDataSource;
 import org.h2.jdbcx.JdbcDataSource;
 import org.h2.tools.SimpleResultSet;
@@ -13,15 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.CallableStatementCreator;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -40,13 +42,16 @@ public class JdbcSourceSystemTest {
     @Autowired
     private DataSource dataSource;
 
+    @Test
+    public void injectedDSTest() {
+
+        assertEquals(dataSource, jdbcTemplate.getDataSource());
+    }
 
     @Test
     public void someTest() {
 
         try {
-
-            assertEquals(dataSource, jdbcTemplate.getDataSource());
 
             log.info("Creating tables");
 
@@ -81,6 +86,32 @@ public class JdbcSourceSystemTest {
         }
     }
 
+
+    @Test
+    public void storeProcedureTest() {
+        try {
+
+            jdbcTemplate.execute("DROP ALIAS SP_HELLO if Exists");
+            jdbcTemplate.execute("CREATE ALIAS SP_HELLO AS $$\n" +
+                    "String spHello(String value) {\n" +
+                    "    return \"HELLO: \"+value;\n" +
+                    "}\n" +
+                    "$$;");
+
+            List<String> query = jdbcTemplate.query("call SP_HELLO('XX');", new RowMapper<String>() {
+                @Override
+                public String mapRow(ResultSet resultSet, int i) throws SQLException {
+                    return resultSet.getString(1);
+                }
+
+            });
+
+            assertEquals(1, query.size());
+            assertEquals("HELLO: XX", query.get(0));
+        } finally {
+            after();
+        }
+    }
 
     private static List<Connection> connections = Collections.synchronizedList(new ArrayList<>());
     private static List<Statement> statements = Collections.synchronizedList(new ArrayList<>());
@@ -192,7 +223,7 @@ public class JdbcSourceSystemTest {
     }
 
 
-    //    @Test
+    @Test
     public void sirs() throws SQLException {
         SimpleResultSet rs = new SimpleResultSet();
         rs.addColumn("ID", Types.INTEGER, 10, 0);
@@ -201,6 +232,7 @@ public class JdbcSourceSystemTest {
         rs.addRow(1, "World");
 
         rs.next();
+        assertEquals(2, rs.getLong(1));
         assertEquals(2, rs.getLong("ID"));
         rs.next();
         assertEquals(1, rs.getLong("ID"));
