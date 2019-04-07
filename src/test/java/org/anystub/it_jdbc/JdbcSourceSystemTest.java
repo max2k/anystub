@@ -1,8 +1,8 @@
 package org.anystub.it_jdbc;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.anystub.Base;
-import org.anystub.jdbc.Spier;
-import org.anystub.jdbc.SpierProvider;
 import org.anystub.jdbc.StubDataSource;
 import org.h2.jdbcx.JdbcDataSource;
 import org.h2.tools.SimpleResultSet;
@@ -171,9 +171,9 @@ public class JdbcSourceSystemTest {
 
 
     public static class Customer {
-        private final long id;
-        private final String first_name;
-        private final String last_name;
+        final long id;
+        final String first_name;
+        final String last_name;
 
         Customer(long id, String first_name, String last_name) {
             this.id = id;
@@ -192,7 +192,7 @@ public class JdbcSourceSystemTest {
     }
 
 
-//    @Test
+    //    @Test
     public void sirs() throws SQLException {
         SimpleResultSet rs = new SimpleResultSet();
         rs.addColumn("ID", Types.INTEGER, 10, 0);
@@ -206,7 +206,6 @@ public class JdbcSourceSystemTest {
         assertEquals(1, rs.getLong("ID"));
 
     }
-
 
 
 }
