@@ -14,17 +14,17 @@ import static java.util.Collections.singletonList;
 
 /**
  * provide basic access to stub-file
- * <p>
+ *
  * methods put/get* allow work with in-memory cache
  * methods request* allow get/keep data in file
- * <p>
+ *
  * you can control case of using file-cache by constrain:
  * - rmNew  first seek in cache if failed make real request
  * - rmNone  first seek in cache if failed throw {@link NoSuchElementException}
  * - rmAll  makes real request without seeking in cache (use it for logging), keep all requests in the stub
- * <p>
+ *
  * * most of the methods return this to cascading operations
- * <p>
+ *
  */
 public class Base {
 
@@ -221,6 +221,20 @@ public class Base {
         return request(supplier,
                 values -> values,
                 s -> s,
+                keys);
+    }
+
+    public <E extends Exception> Boolean requestB(Supplier<Boolean, E> supplier, String... keys) throws E {
+        return request(supplier,
+                Boolean::parseBoolean,
+                String::valueOf,
+                keys);
+    }
+
+    public <E extends Exception> Integer requestI(Supplier<Integer, E> supplier, String... keys) throws E {
+        return request(supplier,
+                Integer::parseInt,
+                String::valueOf,
                 keys);
     }
 

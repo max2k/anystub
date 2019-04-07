@@ -37,7 +37,7 @@ public class StubHttpClient implements HttpClient {
     private final Base base;
     private final HttpClient httpClient;
 
-    // TODO: plain vs base64 selector - requests body/response body matching/ default-auto-selector(on keys)
+    // TODO: plain vs base64 encoding selector - requests body/response body matching/ default-auto-selector(on keys)
 
     // TODO: opt-out keys (protocol/host/port/url/headers/entity)
 
