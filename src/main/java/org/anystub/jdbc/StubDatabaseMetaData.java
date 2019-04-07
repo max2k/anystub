@@ -10,10 +10,10 @@ import java.sql.*;
 // each call on real object updates the records in stubfile
 
 public class StubDatabaseMetaData implements DatabaseMetaData {
-    private StubConnection stubConnection;
+    final private StubConnection stubConnection;
     private DatabaseMetaData realDatabaseMetaData = null;
 
-    public StubDatabaseMetaData(StubConnection stubConnection) {
+    public StubDatabaseMetaData(StubConnection stubConnection) throws SQLException {
 
         this.stubConnection = stubConnection;
         stubConnection.add(()-> {

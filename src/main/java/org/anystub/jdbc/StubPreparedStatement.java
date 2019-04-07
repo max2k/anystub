@@ -5,8 +5,6 @@ import org.anystub.Decoder;
 import org.anystub.Encoder;
 import org.anystub.Supplier;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -14,7 +12,6 @@ import java.net.URL;
 import java.sql.*;
 import java.util.Base64;
 import java.util.Calendar;
-import java.util.stream.StreamSupport;
 
 public class StubPreparedStatement extends StubStatement implements PreparedStatement {
 
@@ -25,7 +22,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
         super(noRealRequired, stubConnection);
     }
 
-    public StubPreparedStatement(StubConnection stubConnection, String sql) {
+    public StubPreparedStatement(StubConnection stubConnection, String sql) throws SQLException {
         super(true, stubConnection);
 
         this.sql = sql;
@@ -81,7 +78,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setNull(int i, int i1) throws SQLException {
         addKeys("setNull", String.valueOf(i), String.valueOf(i1));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setNull(i, i1);
         });
     }
@@ -90,7 +87,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setBoolean(int i, boolean b) throws SQLException {
         addKeys(String.valueOf(i), String.valueOf(b));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setBoolean(i, b);
         });
     }
@@ -99,7 +96,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setByte(int i, byte b) throws SQLException {
         addKeys(String.valueOf(i), Integer.toHexString(b));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setByte(i, b);
         });
     }
@@ -108,7 +105,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setShort(int i, short i1) throws SQLException {
         addKeys(String.valueOf(i), String.valueOf(i1));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setShort(i, i1);
         });
     }
@@ -117,7 +114,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setInt(int i, int i1) throws SQLException {
         addKeys(String.valueOf(i), String.valueOf(i1));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setInt(i, i1);
         });
     }
@@ -126,7 +123,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setLong(int i, long l) throws SQLException {
         addKeys(String.valueOf(i), Long.toString(l));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setLong(i, l);
         });
     }
@@ -135,7 +132,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setFloat(int i, float v) throws SQLException {
         addKeys(String.valueOf(i), String.valueOf(v));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setFloat(i, v);
         });
     }
@@ -144,7 +141,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setDouble(int i, double v) throws SQLException {
         addKeys(String.valueOf(i), String.valueOf(v));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setDouble(i, v);
         });
     }
@@ -153,7 +150,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setBigDecimal(int i, BigDecimal bigDecimal) throws SQLException {
         addKeys(String.valueOf(i), bigDecimal.toPlainString());
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setBigDecimal(i, bigDecimal);
         });
     }
@@ -171,7 +168,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setBytes(int i, byte[] bytes) throws SQLException {
         addKeys(String.valueOf(i), Base64.getEncoder().encodeToString(bytes));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setBytes(i, bytes);
         });
     }
@@ -180,7 +177,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setDate(int i, Date date) throws SQLException {
         addKeys(String.valueOf(i), date.toString());
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setDate(i, date);
         });
     }
@@ -189,7 +186,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setTime(int i, Time time) throws SQLException {
         addKeys(String.valueOf(i), time.toString());
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setTime(i, time);
         });
     }
@@ -198,7 +195,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setTimestamp(int i, Timestamp timestamp) throws SQLException {
         addKeys(String.valueOf(i), timestamp.toString());
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setTimestamp(i, timestamp);
         });
     }
@@ -208,7 +205,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
 
         addKeys("setAsciiStream", String.valueOf(i), String.valueOf(i1));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setAsciiStream(i, inputStream, i1);
         });
     }
@@ -222,7 +219,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setBinaryStream(int i, InputStream inputStream, int i1) throws SQLException {
         addKeys("setBinaryStream", String.valueOf(i), String.valueOf(i1));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setBinaryStream(i, inputStream, i1);
         });
     }
@@ -236,18 +233,18 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     public void setObject(int i, Object o, int i1) throws SQLException {
         // todo: if the object overrides hashcode - put it here
         // https://stackoverflow.com/questions/22031489/how-to-check-if-a-class-has-overridden-equals-and-hashcode
-        addKeys("setObject", String.valueOf(i), String.valueOf(i1) );
+        addKeys("setObject", String.valueOf(i), String.valueOf(i1));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setObject(i, o, i1);
         });
     }
 
     @Override
     public void setObject(int i, Object o) throws SQLException {
-        addKeys("setObject", String.valueOf(i) );
+        addKeys("setObject", String.valueOf(i));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setObject(i, o);
         });
     }
@@ -279,7 +276,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
 
         addKeys("setCharacterStream", String.valueOf(i), String.valueOf(i1));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setCharacterStream(i, reader, i1);
         });
     }
@@ -289,7 +286,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
 
         addKeys("setRef", String.valueOf(i));
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setRef(i, ref);
         });
     }
@@ -301,252 +298,256 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
         addKeys("setBlob", String.valueOf(i), String.valueOf(blob.length()));
 
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setBlob(i, blob);
         });
     }
 
     @Override
     public void setClob(int i, Clob clob) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        // TODO: add check sum
+        addKeys("setClob", String.valueOf(i), String.valueOf(clob.length()));
+
+        stubConnection.add(() -> {
+            getRealStatement().setClob(i, clob);
         });
     }
 
     @Override
     public void setArray(int i, Array array) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        // TODO: investigate
+        addKeys("setArray", String.valueOf(i), array.getBaseTypeName());
+
+        stubConnection.add(() -> {
+            getRealStatement().setArray(i, array);
         });
     }
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return null;
+        return new StubResultSetMetaData(stubConnection, this);
     }
 
     @Override
     public void setDate(int i, Date date, Calendar calendar) throws SQLException {
         addKeys(String.valueOf(i), date.toString());
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             getRealStatement().setDate(i, date);
         });
     }
 
     @Override
     public void setTime(int i, Time time, Calendar calendar) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys(String.valueOf(i), time.toString(), calendar.toString());
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setTime(i, time, calendar);
         });
     }
 
     @Override
     public void setTimestamp(int i, Timestamp timestamp, Calendar calendar) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys(String.valueOf(i), timestamp.toString(), calendar.toString());
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setTimestamp(i, timestamp, calendar);
         });
     }
 
     @Override
     public void setNull(int i, int i1, String s) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys(String.valueOf(i), String.valueOf(i1), s);
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setNull(i, i1, s);
         });
     }
 
     @Override
     public void setURL(int i, URL url) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys(String.valueOf(i), url.toString());
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setURL(i, url);
         });
     }
 
     @Override
     public ParameterMetaData getParameterMetaData() throws SQLException {
-        return null;
+        return new StubParameterMetaData(stubConnection, this);
     }
 
     @Override
     public void setRowId(int i, RowId rowId) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys(String.valueOf(i), rowId.toString());
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setRowId(i, rowId);
         });
     }
 
     @Override
     public void setNString(int i, String s) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys(String.valueOf(i), s);
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setNString(i, s);
         });
     }
 
     @Override
     public void setNCharacterStream(int i, Reader reader, long l) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setNCharacterStream", String.valueOf(i), String.valueOf(l));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setNCharacterStream(i, reader, l);
         });
     }
 
     @Override
     public void setNClob(int i, NClob nClob) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setNClob", String.valueOf(i), String.valueOf(nClob.length()));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setNClob(i, nClob);
         });
     }
 
     @Override
     public void setClob(int i, Reader reader, long l) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("senClob", String.valueOf(i), String.valueOf(l));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setClob(i, reader, l);
         });
     }
 
     @Override
     public void setBlob(int i, InputStream inputStream, long l) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setBlob", String.valueOf(i), String.valueOf(l));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setBlob(i, inputStream, l);
         });
     }
 
     @Override
     public void setNClob(int i, Reader reader, long l) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setNClob", String.valueOf(i), String.valueOf(l));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setNClob(i, reader, l);
         });
     }
 
     @Override
     public void setSQLXML(int i, SQLXML sqlxml) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys(String.valueOf(i), sqlxml.getString());
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setSQLXML(i, sqlxml);
         });
     }
 
     @Override
     public void setObject(int i, Object o, int i1, int i2) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setObject", String.valueOf(i), String.valueOf(i1), String.valueOf(i2));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setObject(i, 0, i1, i2);
         });
     }
 
     @Override
     public void setAsciiStream(int i, InputStream inputStream, long l) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setAsciiStream", String.valueOf(i), String.valueOf(l));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setAsciiStream(i, inputStream, l);
         });
     }
 
     @Override
     public void setBinaryStream(int i, InputStream inputStream, long l) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setBinaryStream", String.valueOf(i), String.valueOf(l));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setBinaryStream(i, inputStream, l);
         });
     }
 
     @Override
     public void setCharacterStream(int i, Reader reader, long l) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setCharacterStream", String.valueOf(i), String.valueOf(l));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setCharacterStream(i, reader, l);
         });
     }
 
     @Override
     public void setAsciiStream(int i, InputStream inputStream) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setAsciiStream", String.valueOf(i));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setAsciiStream(i, inputStream);
         });
     }
 
     @Override
     public void setBinaryStream(int i, InputStream inputStream) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setBinaryStream", String.valueOf(i));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setBinaryStream(i, inputStream);
         });
     }
 
     @Override
     public void setCharacterStream(int i, Reader reader) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setCharacterStream", String.valueOf(i));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setCharacterStream(i, reader);
         });
     }
 
     @Override
     public void setNCharacterStream(int i, Reader reader) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setNCharacterStream", String.valueOf(i));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setNCharacterStream(i, reader);
         });
     }
 
     @Override
     public void setClob(int i, Reader reader) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setClob", String.valueOf(i));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setClob(i, reader);
         });
     }
 
     @Override
     public void setBlob(int i, InputStream inputStream) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setBlob", String.valueOf(i));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setBlob(i, inputStream);
         });
     }
 
     @Override
     public void setNClob(int i, Reader reader) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys("setNClob", String.valueOf(i));
 
-        stubConnection.add(()->{
-            getRealStatement().setDate(i, date);
+        stubConnection.add(() -> {
+            getRealStatement().setNClob(i, reader);
         });
     }
 
@@ -569,5 +570,9 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
         keys1[0] = sql;
         System.arraycopy(keys, 0, keys1, 1, keys.length);
         return keys1;
+    }
+
+    public String getSql() {
+        return sql;
     }
 }

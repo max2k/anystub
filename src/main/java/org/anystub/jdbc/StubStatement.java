@@ -18,7 +18,7 @@ public class StubStatement implements Statement {
     private List<String> keys = new LinkedList<>();
 
 
-    public StubStatement(StubConnection stubConnection) {
+    public StubStatement(StubConnection stubConnection) throws SQLException {
 
         this.stubConnection = stubConnection;
         stubConnection.add(() -> {

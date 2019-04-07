@@ -16,7 +16,7 @@ public class StubConnection implements Connection {
     private Connection realConnection = null;
     private LinkedList<Step> postponeTasks = new LinkedList<>();
 
-    public StubConnection(StubDataSource stubDataSource) {
+    public StubConnection(StubDataSource stubDataSource) throws SQLException {
 
         this.stubDataSource = stubDataSource;
 
@@ -25,7 +25,7 @@ public class StubConnection implements Connection {
         });
     }
 
-    public StubConnection(String username, String password, StubDataSource stubDataSource) {
+    public StubConnection(String username, String password, StubDataSource stubDataSource) throws SQLException {
         this.stubDataSource = stubDataSource;
         add(() -> {
             realConnection = stubDataSource.getRealDataSource().getConnection(username, password);
@@ -325,7 +325,7 @@ public class StubConnection implements Connection {
         return realConnection;
     }
 
-    public void add(Step runnable) {
+    public void add(Step runnable) throws SQLException {
         postponeTasks.add(runnable);
     }
 
