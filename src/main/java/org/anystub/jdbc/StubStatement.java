@@ -5,7 +5,11 @@ import org.anystub.Decoder;
 import org.anystub.Encoder;
 import org.anystub.Supplier;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,28 +38,20 @@ public class StubStatement implements Statement {
     @Override
     public ResultSet executeQuery(String s) throws SQLException {
         addKeys(s);
-        Base base = stubConnection.getStubDataSource().getBase();
 
-        return base.request2(new Supplier<ResultSet, SQLException>() {
-                                 @Override
-                                 public ResultSet get() throws SQLException {
-                                     stubConnection.runSql();
-                                     return getRealStatement().executeQuery(s);
-                                 }
-                             },
-                new Decoder<ResultSet>() {
-                    @Override
-                    public ResultSet decode(Iterable<String> values) {
-                        return ResultSetUtil.decode(values);
-                    }
-                }, new Encoder<ResultSet>() {
-                    @Override
-                    public Iterable<String> encode(ResultSet resultSet) {
-                        return ResultSetUtil.encode(resultSet);
-                    }
-                },
-
-                useKeys());
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<ResultSet, SQLException>() {
+                              @Override
+                              public ResultSet get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().executeQuery(s);
+                              }
+                          },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+                        useKeys());
     }
 
     @Override
@@ -142,30 +138,68 @@ public class StubStatement implements Statement {
 
     @Override
     public boolean execute(String s) throws SQLException {
-        Base base = stubConnection.getStubDataSource().getBase();
-
-        return base.requestB(new Supplier<Boolean, SQLException>() {
-            @Override
-            public Boolean get() throws SQLException {
-                stubConnection.runSql();
-                return getRealStatement().execute(s);
-            }
-        }, s);
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().execute(s);
+                    }
+                }, s);
     }
+
+    private int getResultSet = 0;
 
     @Override
     public ResultSet getResultSet() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<ResultSet, SQLException>() {
+                              @Override
+                              public ResultSet get() throws SQLException {
+                                  stubConnection.runSql();
+                                  ResultSet resultSet = getRealStatement().getResultSet();
+                                  return resultSet;
+                              }
+                          },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+                        useKeys("getResultSet", getResultSet++));
     }
+
+    private int getUpdateCount = 0;
 
     @Override
     public int getUpdateCount() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getUpdateCount();
+                    }
+                }, useKeys("getUpdateCount", getUpdateCount++));
     }
+
+    private int getMoreResults = 0;
 
     @Override
     public boolean getMoreResults() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getMoreResults();
+                    }
+                }, useKeys("getMoreResults", getMoreResults++));
     }
 
     @Override
@@ -260,7 +294,19 @@ public class StubStatement implements Statement {
 
     @Override
     public ResultSet getGeneratedKeys() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<ResultSet, SQLException>() {
+                              @Override
+                              public ResultSet get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getGeneratedKeys();
+                              }
+                          },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+                        useKeys("getGeneratedKeys"));
     }
 
     @Override
@@ -344,6 +390,16 @@ public class StubStatement implements Statement {
         String[] requestsKeys = keys.toArray(new String[0]);
         keys.clear();
         return requestsKeys;
+    }
+
+    protected String[] useKeys(String endKey) {
+        keys.add(endKey);
+        return useKeys();
+    }
+
+    protected String[] useKeys(String endKey, int endKey2) {
+        keys.add(String.format("%s#%d", endKey, endKey2));
+        return useKeys();
     }
 
     protected Statement getRealStatement() {

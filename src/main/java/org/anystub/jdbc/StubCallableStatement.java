@@ -6,7 +6,18 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.*;
+import java.sql.Array;
+import java.sql.Blob;
+import java.sql.CallableStatement;
+import java.sql.Clob;
+import java.sql.Date;
+import java.sql.NClob;
+import java.sql.Ref;
+import java.sql.RowId;
+import java.sql.SQLException;
+import java.sql.SQLXML;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Map;
 
@@ -28,12 +39,18 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
 
     @Override
-    public void registerOutParameter(int i, int i1) throws SQLException {
+    public void registerOutParameter(int parameterIndex, int sqlType) throws SQLException {
+        stubConnection.add(()-> {
+            realCallableStatement.registerOutParameter(parameterIndex, sqlType);
+        });
 
     }
 
     @Override
-    public void registerOutParameter(int i, int i1, int i2) throws SQLException {
+    public void registerOutParameter(int parameterIndex, int sqlType, int scale) throws SQLException {
+        stubConnection.add(()-> {
+            realCallableStatement.registerOutParameter(parameterIndex, sqlType, scale);
+        });
 
     }
 
@@ -201,23 +218,31 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
     }
 
     @Override
-    public void registerOutParameter(int i, int i1, String s) throws SQLException {
-
+    public void registerOutParameter(int parameterIndex, int sqlType, String typeName) throws SQLException {
+        stubConnection.add(()->{
+            getRealStatement().registerOutParameter(parameterIndex, sqlType, typeName);
+        });
     }
 
     @Override
-    public void registerOutParameter(String s, int i) throws SQLException {
-
+    public void registerOutParameter(String parameterName, int sqlType) throws SQLException {
+        stubConnection.add(()->{
+            getRealStatement().registerOutParameter(parameterName, sqlType);
+        });
     }
 
     @Override
-    public void registerOutParameter(String s, int i, int i1) throws SQLException {
-
+    public void registerOutParameter(String parameterName, int sqlType, int scale) throws SQLException {
+        stubConnection.add(()->{
+            getRealStatement().registerOutParameter(parameterName, sqlType, scale);
+        });
     }
 
     @Override
-    public void registerOutParameter(String s, int i, String s1) throws SQLException {
-
+    public void registerOutParameter(String parameterName, int sqlType, String typeName) throws SQLException {
+        stubConnection.add(()->{
+            getRealStatement().registerOutParameter(parameterName, sqlType, typeName);
+        });
     }
 
     @Override

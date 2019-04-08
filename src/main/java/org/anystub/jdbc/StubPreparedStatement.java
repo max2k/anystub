@@ -9,7 +9,22 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.*;
+import java.sql.Array;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Date;
+import java.sql.NClob;
+import java.sql.ParameterMetaData;
+import java.sql.PreparedStatement;
+import java.sql.Ref;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.RowId;
+import java.sql.SQLException;
+import java.sql.SQLXML;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Calendar;
 
@@ -75,11 +90,11 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
     @Override
-    public void setNull(int i, int i1) throws SQLException {
-        addKeys("setNull", String.valueOf(i), String.valueOf(i1));
+    public void setNull(int parameterIndex, int sqlType) throws SQLException {
+        addKeys("setNull", String.valueOf(parameterIndex));
 
         stubConnection.add(() -> {
-            getRealStatement().setNull(i, i1);
+            getRealStatement().setNull(parameterIndex, sqlType);
         });
     }
 
@@ -156,11 +171,11 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
     @Override
-    public void setString(int i, String s) throws SQLException {
-        addKeys(String.valueOf(i), s);
+    public void setString(int parameterIndex, String s) throws SQLException {
+        addKeys(String.valueOf(parameterIndex), s);
 
         stubConnection.add(() -> {
-            getRealStatement().setString(i, s);
+            getRealStatement().setString(parameterIndex, s);
         });
     }
 
@@ -230,22 +245,22 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
     @Override
-    public void setObject(int i, Object o, int i1) throws SQLException {
+    public void setObject(int parameterIndex, Object o, int targetSqlType) throws SQLException {
         // todo: if the object overrides hashcode - put it here
         // https://stackoverflow.com/questions/22031489/how-to-check-if-a-class-has-overridden-equals-and-hashcode
-        addKeys("setObject", String.valueOf(i), String.valueOf(i1));
+        addKeys("setObject", String.valueOf(parameterIndex), String.valueOf(targetSqlType));
 
         stubConnection.add(() -> {
-            getRealStatement().setObject(i, o, i1);
+            getRealStatement().setObject(parameterIndex, o, targetSqlType);
         });
     }
 
     @Override
-    public void setObject(int i, Object o) throws SQLException {
-        addKeys("setObject", String.valueOf(i));
+    public void setObject(int parameterIndex, Object o) throws SQLException {
+        addKeys("setObject", String.valueOf(parameterIndex));
 
         stubConnection.add(() -> {
-            getRealStatement().setObject(i, o);
+            getRealStatement().setObject(parameterIndex, o);
         });
     }
 
@@ -315,13 +330,13 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
     @Override
-    public void setArray(int i, Array array) throws SQLException {
+    public void setArray(int parameterIndex, Array array) throws SQLException {
 
         // TODO: investigate
-        addKeys("setArray", String.valueOf(i), array.getBaseTypeName());
+        addKeys("setArray", String.valueOf(parameterIndex), array.getBaseTypeName());
 
         stubConnection.add(() -> {
-            getRealStatement().setArray(i, array);
+            getRealStatement().setArray(parameterIndex, array);
         });
     }
 
@@ -332,7 +347,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
 
     @Override
     public void setDate(int i, Date date, Calendar calendar) throws SQLException {
-        addKeys(String.valueOf(i), date.toString());
+        addKeys(String.valueOf(i), new SimpleDateFormat().format(date));
 
         stubConnection.add(() -> {
             getRealStatement().setDate(i, date);
@@ -341,7 +356,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
 
     @Override
     public void setTime(int i, Time time, Calendar calendar) throws SQLException {
-        addKeys(String.valueOf(i), time.toString(), calendar.toString());
+        addKeys(String.valueOf(i), new SimpleDateFormat().format(time));
 
         stubConnection.add(() -> {
             getRealStatement().setTime(i, time, calendar);
@@ -358,11 +373,11 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
     @Override
-    public void setNull(int i, int i1, String s) throws SQLException {
-        addKeys(String.valueOf(i), String.valueOf(i1), s);
+    public void setNull(int parameterIndex, int sqlType, String typeName) throws SQLException {
+        addKeys("setNull", String.valueOf(parameterIndex));
 
         stubConnection.add(() -> {
-            getRealStatement().setNull(i, i1, s);
+            getRealStatement().setNull(parameterIndex, sqlType, typeName);
         });
     }
 
@@ -381,20 +396,20 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
     @Override
-    public void setRowId(int i, RowId rowId) throws SQLException {
-        addKeys(String.valueOf(i), rowId.toString());
+    public void setRowId(int parameterIndex, RowId rowId) throws SQLException {
+        addKeys(String.valueOf(parameterIndex), rowId.toString());
 
         stubConnection.add(() -> {
-            getRealStatement().setRowId(i, rowId);
+            getRealStatement().setRowId(parameterIndex, rowId);
         });
     }
 
     @Override
-    public void setNString(int i, String s) throws SQLException {
-        addKeys(String.valueOf(i), s);
+    public void setNString(int parameterIndex, String s) throws SQLException {
+        addKeys(String.valueOf(parameterIndex), s);
 
         stubConnection.add(() -> {
-            getRealStatement().setNString(i, s);
+            getRealStatement().setNString(parameterIndex, s);
         });
     }
 
@@ -408,11 +423,11 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
     @Override
-    public void setNClob(int i, NClob nClob) throws SQLException {
-        addKeys("setNClob", String.valueOf(i), String.valueOf(nClob.length()));
+    public void setNClob(int parameterIndex, NClob nClob) throws SQLException {
+        addKeys("setNClob", String.valueOf(parameterIndex), String.valueOf(nClob.length()));
 
         stubConnection.add(() -> {
-            getRealStatement().setNClob(i, nClob);
+            getRealStatement().setNClob(parameterIndex, nClob);
         });
     }
 
@@ -435,11 +450,11 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
     @Override
-    public void setNClob(int i, Reader reader, long l) throws SQLException {
-        addKeys("setNClob", String.valueOf(i), String.valueOf(l));
+    public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException {
+        addKeys("setNClob", String.valueOf(parameterIndex), String.valueOf(length));
 
         stubConnection.add(() -> {
-            getRealStatement().setNClob(i, reader, l);
+            getRealStatement().setNClob(parameterIndex, reader, length);
         });
     }
 
@@ -453,11 +468,11 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
     @Override
-    public void setObject(int i, Object o, int i1, int i2) throws SQLException {
-        addKeys("setObject", String.valueOf(i), String.valueOf(i1), String.valueOf(i2));
+    public void setObject(int parameterIndex, Object o, int targetSqlType, int scaleOrLength) throws SQLException {
+        addKeys("setObject", String.valueOf(parameterIndex), String.valueOf(targetSqlType), String.valueOf(scaleOrLength));
 
         stubConnection.add(() -> {
-            getRealStatement().setObject(i, 0, i1, i2);
+            getRealStatement().setObject(parameterIndex, 0, targetSqlType, scaleOrLength);
         });
     }
 
@@ -543,11 +558,11 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
     @Override
-    public void setNClob(int i, Reader reader) throws SQLException {
-        addKeys("setNClob", String.valueOf(i));
+    public void setNClob(int parameterIndex, Reader reader) throws SQLException {
+        addKeys("setNClob", String.valueOf(parameterIndex));
 
         stubConnection.add(() -> {
-            getRealStatement().setNClob(i, reader);
+            getRealStatement().setNClob(parameterIndex, reader);
         });
     }
 
@@ -562,12 +577,12 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     protected String[] useKeys() {
         String[] keys = super.useKeys();
 
-        if (sql == null) {
+        if (getSql() == null) {
             return keys;
         }
 
         String[] keys1 = new String[keys.length + 1];
-        keys1[0] = sql;
+        keys1[0] = getSql();
         System.arraycopy(keys, 0, keys1, 1, keys.length);
         return keys1;
     }
