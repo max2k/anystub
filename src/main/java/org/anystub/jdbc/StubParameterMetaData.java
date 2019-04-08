@@ -15,7 +15,7 @@ public class StubParameterMetaData implements ParameterMetaData {
         this.stubConnection = stubConnection;
         this.stubPreparedStatement = stubPreparedStatement;
 
-        stubConnection.add(()->{
+        stubConnection.add(() -> {
             realParameterMetaData = stubPreparedStatement.getRealStatement().getParameterMetaData();
         });
     }
@@ -31,7 +31,7 @@ public class StubParameterMetaData implements ParameterMetaData {
                         stubConnection.runSql();
                         return realParameterMetaData.getParameterCount();
                     }
-                }, stubPreparedStatement.getSql()+":getParameterCount");
+                }, stubPreparedStatement.getSql(), "#getParameterCount");
     }
 
     @Override
@@ -56,12 +56,30 @@ public class StubParameterMetaData implements ParameterMetaData {
 
     @Override
     public int getParameterType(int i) throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return realParameterMetaData.getParameterType(i);
+                    }
+                }, useKeys("getParameterType", i));
     }
 
     @Override
     public String getParameterTypeName(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                    @Override
+                    public String get() throws SQLException {
+                        stubConnection.runSql();
+                        return realParameterMetaData.getParameterTypeName(i);
+                    }
+                }, useKeys("getParameterTypeName", i));
     }
 
     @Override
@@ -82,5 +100,9 @@ public class StubParameterMetaData implements ParameterMetaData {
     @Override
     public boolean isWrapperFor(Class<?> aClass) throws SQLException {
         return false;
+    }
+
+    private String[] useKeys(String name, int i) {
+        return new String[]{stubPreparedStatement.getSql(), "#", name, String.valueOf(i)};
     }
 }
