@@ -1,7 +1,13 @@
 package org.anystub;
 
 
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -59,7 +65,7 @@ public class StubHttpClient implements HttpClient {
 
     @Override
     public HttpResponse execute(HttpUriRequest httpUriRequest) throws IOException, ClientProtocolException {
-        return execute(httpUriRequest,  (HttpContext) null);
+        return execute(httpUriRequest, (HttpContext) null);
     }
 
     @Override
@@ -139,7 +145,7 @@ public class StubHttpClient implements HttpClient {
         strings.add(httpRequest.getRequestLine().getProtocolVersion().toString());
         strings.add(httpRequest.getRequestLine().getUri());
 
-        if(httpHost != null && !httpRequest.getRequestLine().getUri().contains(httpHost.toString())) {
+        if (httpHost != null && !httpRequest.getRequestLine().getUri().contains(httpHost.toString())) {
             strings.add(httpHost.toString());
         }
 
@@ -268,6 +274,4 @@ public class StubHttpClient implements HttpClient {
 
         return basicHttpResponse;
     }
-
-
 }
