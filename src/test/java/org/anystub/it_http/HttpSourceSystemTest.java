@@ -1,7 +1,7 @@
 package org.anystub.it_http;
 
 import org.anystub.Base;
-import org.anystub.StubHttpClient;
+import org.anystub.http.StubHttpClient;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Test;

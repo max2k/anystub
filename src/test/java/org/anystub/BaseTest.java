@@ -382,7 +382,8 @@ public class BaseTest {
     public void fileInResourcesTest() {
         Base base = new Base("in-res.yml");
 
-        base.request(()->"xxx", "test");
+        String test = base.request(() -> "xxx", "test");
+        assertEquals("xxx", test);
     }
 
     @Test
