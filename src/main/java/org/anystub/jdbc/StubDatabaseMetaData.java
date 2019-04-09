@@ -68,7 +68,17 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public String getDatabaseProductName() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                    @Override
+                    public String get() throws SQLException {
+                        stubConnection.runSql();
+                        return realDatabaseMetaData == null ? null
+                                : realDatabaseMetaData.getDatabaseProductName();
+                    }
+                }, "@getDatabaseProductName");
     }
 
     @Override
