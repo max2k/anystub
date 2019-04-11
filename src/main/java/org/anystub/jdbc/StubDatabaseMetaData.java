@@ -61,13 +61,13 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                 .getStubDataSource()
                 .getBase()
                 .request(new Supplier<String, SQLException>() {
-                              @Override
-                              public String get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return realDatabaseMetaData == null ? null :
-                                          realDatabaseMetaData.getURL();
-                              }
-                          },
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.getURL();
+                             }
+                         },
                         "DatabaseMetaData:getUrl");
 
     }
@@ -179,13 +179,13 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                 .getStubDataSource()
                 .getBase()
                 .request(new Supplier<String, SQLException>() {
-                              @Override
-                              public String get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return realDatabaseMetaData == null ? null :
-                                          realDatabaseMetaData.getDatabaseProductName();
-                              }
-                          },
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.getDatabaseProductName();
+                             }
+                         },
                         "DatabaseMetaData:getDatabaseProductName");
 
     }
@@ -216,10 +216,10 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData.getDriverName();
                              }
                          },
-                        "DatabaseMetaData:getDatabaseProductName");
+                        "DatabaseMetaData:getDriverName");
     }
 
     @Override
@@ -232,70 +232,210 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData.getDriverVersion();
                              }
                          },
-                        "DatabaseMetaData:getDatabaseProductName");
+                        "DatabaseMetaData:getDriverVersion");
     }
 
     @Override
     public int getDriverMajorVersion() {
-        return 0;
+        try {
+            return stubConnection
+                    .getStubDataSource()
+                    .getBase()
+                    .requestI(new Supplier<Integer, SQLException>() {
+                                  @Override
+                                  public Integer get() throws SQLException {
+                                      stubConnection.runSql();
+                                      return realDatabaseMetaData == null ? 0 :
+                                              realDatabaseMetaData.getDriverMajorVersion();
+                                  }
+                              },
+                            "DatabaseMetaData:getDriverMajorVersion");
+        } catch (SQLException e) {
+            return 0;
+        }
     }
 
     @Override
     public int getDriverMinorVersion() {
-        return 0;
+        try {
+            return stubConnection
+                    .getStubDataSource()
+                    .getBase()
+                    .requestI(new Supplier<Integer, SQLException>() {
+                                  @Override
+                                  public Integer get() throws SQLException {
+                                      stubConnection.runSql();
+                                      return realDatabaseMetaData == null ? 0 :
+                                              realDatabaseMetaData.getDriverMinorVersion();
+                                  }
+                              },
+                            "DatabaseMetaData:getDriverMinorVersion");
+        } catch (SQLException e) {
+            return 0;
+        }
     }
 
     @Override
     public boolean usesLocalFiles() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData.usesLocalFiles();
+                              }
+                          },
+                        "DatabaseMetaData:usesLocalFiles");
     }
 
     @Override
     public boolean usesLocalFilePerTable() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData.usesLocalFilePerTable();
+                              }
+                          },
+                        "DatabaseMetaData:usesLocalFilePerTable");
     }
 
     @Override
     public boolean supportsMixedCaseIdentifiers() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean storesUpperCaseIdentifiers() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean storesLowerCaseIdentifiers() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean storesMixedCaseIdentifiers() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean storesUpperCaseQuotedIdentifiers() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean storesLowerCaseQuotedIdentifiers() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -308,7 +448,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:getDatabaseProductName");
@@ -324,7 +464,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:getDatabaseProductName");
@@ -340,7 +480,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:");
@@ -356,7 +496,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:");
@@ -372,7 +512,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:");
@@ -388,7 +528,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:");
@@ -404,7 +544,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:");
@@ -420,7 +560,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:");
@@ -428,137 +568,434 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean supportsAlterTableWithAddColumn() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsAlterTableWithDropColumn() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsColumnAliasing() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean nullPlusNonNullIsNull() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsConvert() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsConvert(int i, int i1) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsTableCorrelationNames() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsDifferentTableCorrelationNames() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsExpressionsInOrderBy() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsOrderByUnrelated() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsGroupBy() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsGroupByUnrelated() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsGroupByBeyondSelect() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsLikeEscapeClause() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsMultipleResultSets() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsMultipleTransactions() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsNonNullableColumns() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsMinimumSQLGrammar() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsCoreSQLGrammar() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsExtendedSQLGrammar() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsANSI92EntryLevelSQL() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsANSI92IntermediateSQL() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsANSI92FullSQL() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsIntegrityEnhancementFacility() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsOuterJoins() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsFullOuterJoins() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsLimitedOuterJoins() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -571,7 +1008,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:");
@@ -587,7 +1024,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:");
@@ -603,7 +1040,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:");
@@ -611,7 +1048,18 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean isCatalogAtStart() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -624,7 +1072,7 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                              public String get() throws SQLException {
                                  stubConnection.runSql();
                                  return realDatabaseMetaData == null ? null :
-                                         realDatabaseMetaData.();
+                                         realDatabaseMetaData. ();
                              }
                          },
                         "DatabaseMetaData:");
@@ -632,267 +1080,850 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean supportsSchemasInDataManipulation() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsSchemasInProcedureCalls() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsSchemasInTableDefinitions() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsSchemasInIndexDefinitions() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsCatalogsInDataManipulation() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsCatalogsInProcedureCalls() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsCatalogsInTableDefinitions() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsCatalogsInIndexDefinitions() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsPositionedDelete() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsPositionedUpdate() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsSelectForUpdate() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsStoredProcedures() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsSubqueriesInComparisons() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsSubqueriesInExists() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsSubqueriesInIns() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsSubqueriesInQuantifieds() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsCorrelatedSubqueries() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsUnion() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsUnionAll() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsOpenCursorsAcrossCommit() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsOpenCursorsAcrossRollback() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsOpenStatementsAcrossCommit() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsOpenStatementsAcrossRollback() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxBinaryLiteralLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxCharLiteralLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxColumnNameLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxColumnsInGroupBy() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxColumnsInIndex() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxColumnsInOrderBy() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxColumnsInSelect() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxColumnsInTable() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxConnections() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxCursorNameLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxIndexLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxSchemaNameLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxProcedureNameLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxCatalogNameLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxRowSize() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean doesMaxRowSizeIncludeBlobs() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxStatementLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxStatements() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxTableNameLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxTablesInSelect() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getMaxUserNameLength() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getDefaultTransactionIsolation() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsTransactions() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsTransactionIsolationLevel(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsDataDefinitionAndDataManipulationTransactions() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsDataManipulationTransactionsOnly() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean dataDefinitionCausesTransactionCommit() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean dataDefinitionIgnoredInTransactions() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -982,57 +2013,178 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean supportsResultSetType(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsResultSetConcurrency(int i, int i1) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean ownUpdatesAreVisible(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean ownDeletesAreVisible(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean ownInsertsAreVisible(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean othersUpdatesAreVisible(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean othersDeletesAreVisible(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean othersInsertsAreVisible(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean updatesAreDetected(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean deletesAreDetected(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean insertsAreDetected(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -1063,22 +2215,66 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean supportsSavepoints() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsNamedParameters() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsMultipleOpenResults() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsGetGeneratedKeys() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -1098,47 +2294,146 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean supportsResultSetHoldability(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getResultSetHoldability() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getDatabaseMajorVersion() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getDatabaseMinorVersion() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getJDBCMajorVersion() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getJDBCMinorVersion() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public int getSQLStateType() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? 0 :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean locatorsUpdateCopy() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean supportsStatementPooling() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -1153,12 +2448,34 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -1183,7 +2500,18 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean generatedKeyAlwaysReturned() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData. ();
+                              }
+                          },
+                        "DatabaseMetaData:");
     }
 
     @Override
