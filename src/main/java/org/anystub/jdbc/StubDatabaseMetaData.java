@@ -1922,17 +1922,8 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getProcedures(s, s1, s2);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
                         "DatabaseMetaData:getProcedures", s, s1, s2);
     }
 
@@ -1949,17 +1940,8 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getProcedureColumns(s, s1, s2, s3);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
                         "DatabaseMetaData:getProcedureColumns", s, s1, s2, s3);
     }
 
@@ -1976,17 +1958,8 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getTables(s, s1, s2, strings);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
                         "DatabaseMetaData:getTables", s, s1, s2, Arrays.toString(strings));
     }
 
@@ -2003,17 +1976,8 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getSchemas();
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
                         "DatabaseMetaData:getSchemas");
     }
 
@@ -2030,17 +1994,8 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getCatalogs();
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
                         "DatabaseMetaData:getCatalogs");
     }
 
@@ -2057,17 +2012,8 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getTableTypes();
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
                         "DatabaseMetaData:getTableTypes");
     }
 
@@ -2084,17 +2030,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getColumns(s, s1, s2, s3);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getColumns", s, s1, s2, s3);
     }
 
@@ -2111,17 +2049,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getColumnPrivileges(s, s1, s2, s3);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getColumnPrivileges", s, s1, s2, s3);
     }
 
@@ -2138,17 +2068,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getTablePrivileges(s, s1, s2);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getTablePrivileges", s, s1, s2);
     }
 
@@ -2165,17 +2087,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getBestRowIdentifier(s, s1, s2, i, b);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getBestRowIdentifier", s, s1, s2, String.valueOf(i), String.valueOf(b));
     }
 
@@ -2192,17 +2106,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getVersionColumns(s, s1, s2);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getVersionColumns", s, s1, s2);
     }
 
@@ -2219,17 +2125,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getPrimaryKeys(s, s1, s2);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getPrimaryKeys", s, s1, s2);
     }
 
@@ -2246,17 +2144,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getImportedKeys(s, s1, s2);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getImportedKeys", s, s1, s2);
     }
 
@@ -2273,17 +2163,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getExportedKeys(s, s1, s2);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getExportedKeys", s, s1, s2);
     }
 
@@ -2300,17 +2182,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getCrossReference(s, s1, s2, s3, s4, s5);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getCrossReference", s, s1, s2, s3, s4, s5);
     }
 
@@ -2629,17 +2503,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getSuperTypes(s, s1, s2);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getSuperTypes", s, s1, s2);
 
     }
@@ -2657,17 +2523,8 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getSuperTables(s, s1, s2);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
                         "DatabaseMetaData:getSuperTables", s, s1, s2);
     }
 
@@ -2684,17 +2541,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getAttributes(catalog, schemaPattern, typeNamePattern, attributeNamePattern);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:", catalog, schemaPattern, typeNamePattern, attributeNamePattern);
     }
 
@@ -2878,17 +2727,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getSchemas(s, s1);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getSchemas", s, s1);
     }
 
@@ -2937,17 +2778,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getClientInfoProperties();
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getClientInfoProperties");
     }
 
@@ -2964,17 +2797,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getFunctions(s, s1, s2);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getFunctions", s, s1, s2);
     }
 
@@ -2991,17 +2816,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getFunctionColumns(s, s1, s2, s3);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getFunctionColumns", s, s1, s2, s3);
     }
 
@@ -3018,17 +2835,9 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
                                           : realDatabaseMetaData.getPseudoColumns(s, s1, s2, s3);
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(resultSet);
-                            }
-                        },
+                        new DecoderResultSet(),
+                        new EncoderResultSet(),
+
                         "DatabaseMetaData:getPseudoColumns", s1, s2, s3);
     }
 

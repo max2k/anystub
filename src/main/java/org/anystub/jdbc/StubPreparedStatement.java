@@ -59,12 +59,8 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
                                   return getRealStatement().executeQuery();
                               }
                           },
-                        new Decoder<ResultSet>() {
-                            @Override
-                            public ResultSet decode(Iterable<String> values) {
-                                return ResultSetUtil.decode(values);
-                            }
-                        }, new Encoder<ResultSet>() {
+                        new DecoderResultSet(),
+                        new Encoder<ResultSet>() {
                             @Override
                             public Iterable<String> encode(ResultSet resultSet) {
                                 return ResultSetUtil.encode(getRealStatement(), resultSet);
