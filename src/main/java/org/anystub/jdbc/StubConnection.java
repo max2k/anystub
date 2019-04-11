@@ -96,11 +96,11 @@ public class StubConnection implements Connection {
     public boolean isClosed() throws SQLException {
         return getStubDataSource()
                 .getBase()
-                .request(new Supplier<String, SQLException>() {
+                .requestB(new Supplier<Boolean, SQLException>() {
                              @Override
-                             public String get() throws SQLException {
+                             public Boolean get() throws SQLException {
                                  runSql();
-                                 return getRealConnection().nativeSQL(s);
+                                 return getRealConnection().isClosed();
                              }
                          },
                         "isClosed");
