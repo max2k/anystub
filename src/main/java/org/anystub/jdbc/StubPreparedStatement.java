@@ -241,7 +241,9 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
 
     @Override
     public void clearParameters() throws SQLException {
-        throw new UnsupportedOperationException();
+        stubConnection.add(() -> {
+            getRealStatement().clearParameters();
+        });
     }
 
     @Override
@@ -587,7 +589,12 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
         return keys1;
     }
 
-    public String getSql() {
+    protected String getSql() {
         return sql;
+    }
+
+    @Override
+    protected String[] id(){
+        return new String[]{getSql()};
     }
 }

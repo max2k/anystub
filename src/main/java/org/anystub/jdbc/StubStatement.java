@@ -11,8 +11,11 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -30,15 +33,16 @@ public class StubStatement implements Statement {
         });
     }
 
-    protected StubStatement(boolean noRealRequred, StubConnection stubConnection) {
+    protected StubStatement(boolean noRealRequired, StubConnection stubConnection) {
 
+        if (!noRealRequired) {
+            throw new UnsupportedOperationException();
+        }
         this.stubConnection = stubConnection;
     }
 
     @Override
     public ResultSet executeQuery(String s) throws SQLException {
-        addKeys(s);
-
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -51,7 +55,7 @@ public class StubStatement implements Statement {
                           },
                         new DecoderResultSet(),
                         new EncoderResultSet(),
-                        useKeys());
+                        s);
     }
 
     @Override
@@ -71,7 +75,7 @@ public class StubStatement implements Statement {
 
     @Override
     public void close() throws SQLException {
-        // if there is a real connection - need to call it
+        // if a real connection exists we need to close it
         if (getRealStatement() != null) {
             stubConnection.runSql();
             getRealStatement().close();
@@ -80,52 +84,91 @@ public class StubStatement implements Statement {
 
     @Override
     public int getMaxFieldSize() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getMaxFieldSize();
+                    }
+                }, callKey("getMaxFieldsSize"));
     }
 
     @Override
     public void setMaxFieldSize(int i) throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().setMaxFieldSize(i);
+        });
     }
 
     @Override
     public int getMaxRows() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getMaxRows();
+                    }
+                }, callKey("getMaxRows"));
     }
 
     @Override
     public void setMaxRows(int i) throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().setMaxRows(i);
+        });
     }
 
     @Override
     public void setEscapeProcessing(boolean b) throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().setEscapeProcessing(b);
+        });
     }
 
     @Override
     public int getQueryTimeout() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getQueryTimeout();
+                    }
+                }, callKey("getQueryTimeout"));
     }
 
     @Override
     public void setQueryTimeout(int i) throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().setQueryTimeout(i);
+        });
     }
 
     @Override
     public void cancel() throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().cancel();
+        });
     }
 
     @Override
     public SQLWarning getWarnings() throws SQLException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void clearWarnings() throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().clearWarnings();
+        });
     }
 
     @Override
@@ -150,8 +193,6 @@ public class StubStatement implements Statement {
                 }, s);
     }
 
-    private int getResultSet = 0;
-
     @Override
     public ResultSet getResultSet() throws SQLException {
         return stubConnection
@@ -167,10 +208,8 @@ public class StubStatement implements Statement {
                           },
                         new DecoderResultSet(),
                         new EncoderResultSet(),
-                        useKeys("getResultSet", getResultSet++));
+                        callKey("getResultSet"));
     }
-
-    private int getUpdateCount = 0;
 
     @Override
     public int getUpdateCount() throws SQLException {
@@ -183,10 +222,8 @@ public class StubStatement implements Statement {
                         stubConnection.runSql();
                         return getRealStatement().getUpdateCount();
                     }
-                }, useKeys("getUpdateCount", getUpdateCount++));
+                }, callKey("getUpdateCount"));
     }
-
-    private int getMoreResults = 0;
 
     @Override
     public boolean getMoreResults() throws SQLException {
@@ -199,47 +236,91 @@ public class StubStatement implements Statement {
                         stubConnection.runSql();
                         return getRealStatement().getMoreResults();
                     }
-                }, useKeys("getMoreResults", getMoreResults++));
+                }, callKey("getMoreResults"));
     }
 
     @Override
     public void setFetchDirection(int i) throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().setFetchDirection(i);
+        });
     }
 
     @Override
     public int getFetchDirection() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getFetchDirection();
+                    }
+                }, callKey("getFetchDirection"));
     }
 
     @Override
     public void setFetchSize(int i) throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().setFetchDirection(i);
+        });
     }
 
     @Override
     public int getFetchSize() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getFetchSize();
+                    }
+                }, callKey("getFetchSize"));
     }
 
     @Override
     public int getResultSetConcurrency() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getResultSetConcurrency();
+                    }
+                }, callKey("getResultSetConcurrency"));
     }
 
     @Override
     public int getResultSetType() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getResultSetType();
+                    }
+                }, callKey("getResultSetType"));
     }
 
     @Override
     public void addBatch(String s) throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().addBatch(s);
+        });
     }
 
     @Override
     public void clearBatch() throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().clearBatch();
+        });
     }
 
     @Override
@@ -289,7 +370,16 @@ public class StubStatement implements Statement {
 
     @Override
     public boolean getMoreResults(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getMoreResults();
+                    }
+                }, callKey("getQueryTimeout", i));
     }
 
     @Override
@@ -306,84 +396,187 @@ public class StubStatement implements Statement {
                           },
                         new DecoderResultSet(),
                         new EncoderResultSet(),
-                        useKeys("getGeneratedKeys"));
+                        callKey("getGeneratedKeys"));
     }
 
     @Override
     public int executeUpdate(String s, int i) throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().executeUpdate(s, i);
+                    }
+                }, s, String.valueOf(i));
     }
 
     @Override
     public int executeUpdate(String s, int[] ints) throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().executeUpdate(s, ints);
+                    }
+                }, s, Arrays.toString(ints));
     }
 
     @Override
     public int executeUpdate(String s, String[] strings) throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().executeUpdate(s, strings);
+                    }
+                }, s, Arrays.toString(strings));
     }
 
     @Override
     public boolean execute(String s, int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().execute(s, i);
+                    }
+                }, s, String.valueOf(i));
     }
 
     @Override
     public boolean execute(String s, int[] ints) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().execute(s, ints);
+                    }
+                }, s, Arrays.toString(ints));
     }
 
     @Override
     public boolean execute(String s, String[] strings) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().execute(s, strings);
+                    }
+                }, s, Arrays.toString(strings));
+
     }
 
     @Override
     public int getResultSetHoldability() throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().getResultSetHoldability();
+                    }
+                }, callKey("getResultSetHoldability"));
     }
 
     @Override
     public boolean isClosed() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().isClosed();
+                    }
+                }, callKey("isClosed"));
     }
 
     @Override
     public void setPoolable(boolean b) throws SQLException {
+        stubConnection.add(() -> {
+            getRealStatement().setPoolable(b);
+        });
 
     }
 
     @Override
     public boolean isPoolable() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().isPoolable();
+                    }
+                }, callKey("isPoolable"));
     }
 
     @Override
     public void closeOnCompletion() throws SQLException {
-
+        stubConnection.add(() -> {
+            getRealStatement().closeOnCompletion();
+        });
     }
 
     @Override
     public boolean isCloseOnCompletion() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().isCloseOnCompletion();
+                    }
+                }, callKey("isCloseOnCompletion"));
     }
 
     @Override
     public <T> T unwrap(Class<T> aClass) throws SQLException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isWrapperFor(Class<?> aClass) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return getRealStatement().isWrapperFor(aClass);
+                    }
+                }, callKey("isCloseOnCompletion"));
     }
 
 
     protected void addKeys(String... keys) {
-        for (int i = 0; i < keys.length; i++) {
-            this.keys.add(keys[i]);
-        }
+        this.keys.addAll(Arrays.asList(keys));
     }
 
     protected String[] useKeys() {
@@ -392,14 +585,31 @@ public class StubStatement implements Statement {
         return requestsKeys;
     }
 
-    protected String[] useKeys(String endKey) {
-        keys.add(endKey);
-        return useKeys();
+
+    protected String[] id() {
+        return keys.toArray(new String[0]);
     }
 
-    protected String[] useKeys(String endKey, int endKey2) {
-        keys.add(String.format("%s#%d", endKey, endKey2));
-        return useKeys();
+    private Map<String, Integer> callCounters = new HashMap<>();
+
+    protected String[] callKey(String callName, Integer... a) {
+        Integer orDefault = callCounters.getOrDefault(callName, 0);
+        callCounters.put(callName, orDefault + 1);
+        String[] id = id();
+        String[] strings = new String[id.length + 1];
+        System.arraycopy(strings, 0, id, 0, id.length);
+        strings[strings.length - 1] = String.format("%s%s#%d", callName, Arrays.toString(a), orDefault);
+        return strings;
+    }
+
+    protected String[] callKey(String callName, String a) {
+        Integer orDefault = callCounters.getOrDefault(callName, 0);
+        callCounters.put(callName, orDefault + 1);
+        String[] id = id();
+        String[] strings = new String[id.length + 1];
+        System.arraycopy(strings, 0, id, 0, id.length);
+        strings[strings.length - 1] = String.format("%s%s#%d", callName, a, orDefault);
+        return strings;
     }
 
     protected Statement getRealStatement() {

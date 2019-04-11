@@ -1,5 +1,7 @@
 package org.anystub.jdbc;
 
+import org.anystub.Supplier;
+
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.Map;
@@ -49,7 +51,16 @@ public class StubConnection implements Connection {
 
     @Override
     public String nativeSQL(String s) throws SQLException {
-        return null;
+        return getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 runSql();
+                                 return getRealConnection().nativeSQL(s);
+                             }
+                         },
+                        s);
     }
 
     @Override
@@ -64,12 +75,12 @@ public class StubConnection implements Connection {
 
     @Override
     public void commit() throws SQLException {
-
+        add(() -> getRealConnection().commit());
     }
 
     @Override
     public void rollback() throws SQLException {
-
+        add(() -> getRealConnection().rollback());
     }
 
     @Override
@@ -83,7 +94,16 @@ public class StubConnection implements Connection {
 
     @Override
     public boolean isClosed() throws SQLException {
-        return false;
+        return getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 runSql();
+                                 return getRealConnection().nativeSQL(s);
+                             }
+                         },
+                        "isClosed");
     }
 
     @Override
@@ -329,17 +349,6 @@ public class StubConnection implements Connection {
         postponeTasks.add(runnable);
     }
 
-//    public <E extends Exception> void run(E allowedError) throws E {
-//        while (!postponeTasks.isEmpty()) {
-//
-//            try {
-//                Objects.requireNonNull(postponeTasks.pollFirst()).call();
-//            } catch (Exception e) {
-//                allowedError.initCause(e);
-//                throw allowedError;
-//            }
-//        }
-//    }
 
     public void runSql() throws SQLException {
         while (!postponeTasks.isEmpty()) {
