@@ -16,74 +16,226 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
     public StubDatabaseMetaData(StubConnection stubConnection) throws SQLException {
 
         this.stubConnection = stubConnection;
-        stubConnection.add(()-> {
+        stubConnection.add(() -> {
             realDatabaseMetaData = stubConnection.getRealConnection().getMetaData();
         });
     }
 
     @Override
     public boolean allProceduresAreCallable() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData.allProceduresAreCallable();
+                              }
+                          },
+                        "DatabaseMetaData:allProceduresAreCallable");
+
     }
 
     @Override
     public boolean allTablesAreSelectable() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData.allTablesAreSelectable();
+                              }
+                          },
+                        "DatabaseMetaData:allTablesAreSelectable");
+
     }
 
     @Override
     public String getURL() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                              @Override
+                              public String get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? null :
+                                          realDatabaseMetaData.getURL();
+                              }
+                          },
+                        "DatabaseMetaData:getUrl");
+
     }
 
     @Override
     public String getUserName() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.getUserName();
+                             }
+                         },
+                        "DatabaseMetaData:getUserName");
     }
 
     @Override
     public boolean isReadOnly() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData.isReadOnly();
+                              }
+                          },
+                        "DatabaseMetaData:isReadOnly");
+
     }
 
     @Override
     public boolean nullsAreSortedHigh() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData.nullsAreSortedHigh();
+                              }
+                          },
+                        "DatabaseMetaData:nullsAreSortedHigh");
+
     }
 
     @Override
     public boolean nullsAreSortedLow() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData.nullsAreSortedLow();
+                              }
+                          },
+                        "DatabaseMetaData:nullsAreSortedLow");
+
     }
 
     @Override
     public boolean nullsAreSortedAtStart() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData.nullsAreSortedAtStart();
+                              }
+                          },
+                        "DatabaseMetaData:nullsAreSortedAtStart");
+
     }
 
     @Override
     public boolean nullsAreSortedAtEnd() throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData.nullsAreSortedAtEnd();
+                              }
+                          },
+                        "DatabaseMetaData:nullsAreSortedAtEnd");
+
     }
 
     @Override
     public String getDatabaseProductName() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                              @Override
+                              public String get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? null :
+                                          realDatabaseMetaData.getDatabaseProductName();
+                              }
+                          },
+                        "DatabaseMetaData:getDatabaseProductName");
+
     }
 
     @Override
     public String getDatabaseProductVersion() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.getDatabaseProductVersion();
+                             }
+                         },
+                        "DatabaseMetaData:getDatabaseProductVersion");
     }
 
     @Override
     public String getDriverName() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:getDatabaseProductName");
     }
 
     @Override
     public String getDriverVersion() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:getDatabaseProductName");
     }
 
     @Override
@@ -148,42 +300,130 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public String getIdentifierQuoteString() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:getDatabaseProductName");
     }
 
     @Override
     public String getSQLKeywords() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:getDatabaseProductName");
     }
 
     @Override
     public String getNumericFunctions() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public String getStringFunctions() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public String getSystemFunctions() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public String getTimeDateFunctions() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public String getSearchStringEscape() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public String getExtraNameCharacters() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -323,17 +563,50 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public String getSchemaTerm() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public String getProcedureTerm() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:");
     }
 
     @Override
     public String getCatalogTerm() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -343,7 +616,18 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public String getCatalogSeparator() throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realDatabaseMetaData == null ? null :
+                                         realDatabaseMetaData.();
+                             }
+                         },
+                        "DatabaseMetaData:");
     }
 
     @Override
@@ -753,16 +1037,18 @@ public class StubDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean supportsBatchUpdates() throws SQLException {
-        Base base = stubConnection.getStubDataSource().getBase();
-        return base.requestB(new Supplier<Boolean, SQLException>() {
-                         @Override
-                         public Boolean get() throws SQLException {
-                             stubConnection.runSql();
-                             return realDatabaseMetaData==null? false :
-                                realDatabaseMetaData.supportsBatchUpdates();
-                         }
-                     },
-                "DatabaseMetaData:supportsBatchUpdates");
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                              @Override
+                              public Boolean get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realDatabaseMetaData == null ? false :
+                                          realDatabaseMetaData.supportsBatchUpdates();
+                              }
+                          },
+                        "DatabaseMetaData:supportsBatchUpdates");
     }
 
     @Override
