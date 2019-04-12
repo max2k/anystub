@@ -2,6 +2,7 @@ package org.anystub.jdbc;
 
 import org.h2.tools.SimpleResultSet;
 
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -118,4 +119,5 @@ public class ResultSetUtil {
         }
         return simpleResultSet;
     }
+
 }

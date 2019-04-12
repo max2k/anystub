@@ -49,6 +49,15 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
         });
     }
 
+    public StubCallableStatement(StubConnection stubConnection, int i, int i1) throws SQLException {
+        super(stubConnection);
+        this.sql = sql;
+
+        stubConnection.add(() -> {
+            realCallableStatement = stubConnection.getRealConnection().prepareCall(sql, i, i1);
+        });
+    }
+
 
     @Override
     public void registerOutParameter(int parameterIndex, int sqlType) throws SQLException {
@@ -900,12 +909,12 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                 .getStubDataSource()
                 .getBase()
                 .request(new Supplier<String, SQLException>() {
-                              @Override
-                              public String get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return realCallableStatement.getNString(i);
-                              }
-                          },
+                             @Override
+                             public String get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realCallableStatement.getNString(i);
+                             }
+                         },
                         callKey("getNString", i));
     }
 
@@ -954,57 +963,90 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public void setClob(String s, Clob clob) throws SQLException {
-
+        addKeys("setClob", s, String.valueOf(clob.length()));
+        stubConnection.add(() -> {
+            getRealStatement().setClob(s, clob);
+        });
     }
 
     @Override
     public void setAsciiStream(String s, InputStream inputStream, long l) throws SQLException {
-
+        addKeys("setAsciiStream", s, String.valueOf(l));
+        stubConnection.add(() -> {
+            getRealStatement().setAsciiStream(s, inputStream, l);
+        });
     }
 
     @Override
     public void setBinaryStream(String s, InputStream inputStream, long l) throws SQLException {
-
+        addKeys("setBinaryStream", s, String.valueOf(l));
+        stubConnection.add(() -> {
+            getRealStatement().setBinaryStream(s, inputStream, l);
+        });
     }
 
     @Override
     public void setCharacterStream(String s, Reader reader, long l) throws SQLException {
-
+        addKeys("setCharacterStream", s, String.valueOf(l));
+        stubConnection.add(() -> {
+            getRealStatement().setCharacterStream(s, reader, l);
+        });
     }
 
     @Override
     public void setAsciiStream(String s, InputStream inputStream) throws SQLException {
-
+        addKeys("setAsciiStream", s);
+        stubConnection.add(() -> {
+            getRealStatement().setAsciiStream(s, inputStream);
+        });
     }
 
     @Override
     public void setBinaryStream(String s, InputStream inputStream) throws SQLException {
-
+        addKeys("setBinaryStream", s);
+        stubConnection.add(() -> {
+            getRealStatement().setBinaryStream(s, inputStream);
+        });
     }
 
     @Override
     public void setCharacterStream(String s, Reader reader) throws SQLException {
-
+        addKeys("setCharacterStream", s);
+        stubConnection.add(() -> {
+            getRealStatement().setCharacterStream(s, reader);
+        });
     }
 
     @Override
     public void setNCharacterStream(String s, Reader reader) throws SQLException {
-
+        addKeys("setNCharacterStream", s);
+        stubConnection.add(() -> {
+            getRealStatement().setNCharacterStream(s, reader);
+        });
     }
 
     @Override
     public void setClob(String s, Reader reader) throws SQLException {
-
+        addKeys("setClob", s);
+        stubConnection.add(() -> {
+            getRealStatement().setClob(s, reader);
+        });
     }
 
     @Override
     public void setBlob(String s, InputStream inputStream) throws SQLException {
-
+        addKeys("setBlob", s);
+        stubConnection.add(() -> {
+            getRealStatement().setBlob(s, inputStream);
+        });
     }
 
     @Override
     public void setNClob(String s, Reader reader) throws SQLException {
-
+        addKeys("setNClob", s);
+        stubConnection.add(() -> {
+            getRealStatement().setNClob(s,reader);
+        });
     }
 
     @Override
