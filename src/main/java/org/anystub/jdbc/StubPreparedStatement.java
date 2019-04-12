@@ -47,6 +47,15 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
         });
     }
 
+    public StubPreparedStatement(StubConnection stubConnection, String sql, int i, int i1) throws SQLException {
+        super(true, stubConnection);
+        this.sql = sql;
+        stubConnection.add(() ->
+        {
+            realPreparedStatement = this.stubConnection.getRealConnection().prepareStatement(sql, i, i1);
+        });
+    }
+
     @Override
     public ResultSet executeQuery() throws SQLException {
         return stubConnection

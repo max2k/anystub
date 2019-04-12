@@ -41,6 +41,16 @@ public class StubStatement implements Statement {
         this.stubConnection = stubConnection;
     }
 
+    public StubStatement(StubConnection stubConnection, int resultSetType, int resultSetConcurrency) throws SQLException {
+        this.stubConnection = stubConnection;
+        stubConnection.add(() -> {
+            realStatement = this
+                    .stubConnection
+                    .getRealConnection()
+                    .createStatement(resultSetType, resultSetConcurrency);
+        });
+    }
+
     @Override
     public ResultSet executeQuery(String s) throws SQLException {
         return stubConnection
@@ -590,26 +600,13 @@ public class StubStatement implements Statement {
         return keys.toArray(new String[0]);
     }
 
-    private Map<String, Integer> callCounters = new HashMap<>();
+
 
     protected String[] callKey(String callName, Integer... a) {
-        Integer orDefault = callCounters.getOrDefault(callName, 0);
-        callCounters.put(callName, orDefault + 1);
-        String[] id = id();
-        String[] strings = new String[id.length + 1];
-        System.arraycopy(strings, 0, id, 0, id.length);
-        strings[strings.length - 1] = String.format("%s%s#%d", callName, Arrays.toString(a), orDefault);
-        return strings;
+        return stubConnection.callKey(callName, Arrays.toString(a), id());
     }
-
     protected String[] callKey(String callName, String a) {
-        Integer orDefault = callCounters.getOrDefault(callName, 0);
-        callCounters.put(callName, orDefault + 1);
-        String[] id = id();
-        String[] strings = new String[id.length + 1];
-        System.arraycopy(strings, 0, id, 0, id.length);
-        strings[strings.length - 1] = String.format("%s%s#%d", callName, a, orDefault);
-        return strings;
+       return stubConnection.callKey(callName, a, id());
     }
 
     protected Statement getRealStatement() {
