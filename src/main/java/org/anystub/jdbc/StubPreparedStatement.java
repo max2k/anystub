@@ -56,6 +56,42 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
         });
     }
 
+    public StubPreparedStatement(StubConnection stubConnection, String sql, int i, int i1, int i2) throws SQLException {
+        super(true, stubConnection);
+        this.sql = sql;
+        stubConnection.add(() ->
+        {
+            realPreparedStatement = this.stubConnection.getRealConnection().prepareStatement(sql, i, i1, i2);
+        });
+    }
+
+    public StubPreparedStatement(StubConnection stubConnection, String s, int i) throws SQLException {
+        super(true, stubConnection);
+        this.sql = sql;
+        stubConnection.add(() ->
+        {
+            realPreparedStatement = this.stubConnection.getRealConnection().prepareStatement(sql, i);
+        });
+    }
+
+    public StubPreparedStatement(StubConnection stubConnection, String sql, int[] ints) throws SQLException {
+        super(true, stubConnection);
+        this.sql = sql;
+        stubConnection.add(() ->
+        {
+            realPreparedStatement = this.stubConnection.getRealConnection().prepareStatement(sql, ints);
+        });
+    }
+
+    public StubPreparedStatement(StubConnection stubConnection, String sql, String[] strings) throws SQLException {
+        super(true, stubConnection);
+        this.sql = sql;
+        stubConnection.add(() ->
+        {
+            realPreparedStatement = this.stubConnection.getRealConnection().prepareStatement(sql, strings);
+        });
+    }
+
     @Override
     public ResultSet executeQuery() throws SQLException {
         return stubConnection

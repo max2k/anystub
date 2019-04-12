@@ -51,6 +51,16 @@ public class StubStatement implements Statement {
         });
     }
 
+    public StubStatement(StubConnection stubConnection, int i, int i1, int i2) throws SQLException {
+        this.stubConnection = stubConnection;
+        stubConnection.add(() -> {
+            realStatement = this
+                    .stubConnection
+                    .getRealConnection()
+                    .createStatement(i, i1, i2);
+        });
+    }
+
     @Override
     public ResultSet executeQuery(String s) throws SQLException {
         return stubConnection
@@ -601,12 +611,12 @@ public class StubStatement implements Statement {
     }
 
 
-
     protected String[] callKey(String callName, Integer... a) {
         return stubConnection.callKey(callName, Arrays.toString(a), id());
     }
+
     protected String[] callKey(String callName, String a) {
-       return stubConnection.callKey(callName, a, id());
+        return stubConnection.callKey(callName, a, id());
     }
 
     protected Statement getRealStatement() {

@@ -36,22 +36,58 @@ public class StubParameterMetaData implements ParameterMetaData {
 
     @Override
     public int isNullable(int i) throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return realParameterMetaData.isNullable(i);
+                    }
+                }, useKeys("isNullable", i));
     }
 
     @Override
     public boolean isSigned(int i) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return realParameterMetaData.isSigned(i);
+                    }
+                }, useKeys("isSigned", i));
     }
 
     @Override
     public int getPrecision(int i) throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return realParameterMetaData.getPrecision(i);
+                    }
+                }, useKeys("getPrecision", i));
     }
 
     @Override
     public int getScale(int i) throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return realParameterMetaData.getScale(i);
+                    }
+                }, useKeys("getScale", i));
     }
 
     @Override
@@ -84,12 +120,30 @@ public class StubParameterMetaData implements ParameterMetaData {
 
     @Override
     public String getParameterClassName(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                    @Override
+                    public String get() throws SQLException {
+                        stubConnection.runSql();
+                        return realParameterMetaData.getParameterClassName(i);
+                    }
+                }, useKeys("getParameterClassName", i));
     }
 
     @Override
     public int getParameterMode(int i) throws SQLException {
-        return 0;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                    @Override
+                    public Integer get() throws SQLException {
+                        stubConnection.runSql();
+                        return realParameterMetaData.getParameterMode(i);
+                    }
+                }, useKeys("#getParameterMode", i));
     }
 
     @Override
@@ -99,7 +153,16 @@ public class StubParameterMetaData implements ParameterMetaData {
 
     @Override
     public boolean isWrapperFor(Class<?> aClass) throws SQLException {
-        return false;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        stubConnection.runSql();
+                        return realParameterMetaData.isWrapperFor(aClass);
+                    }
+                }, stubPreparedStatement.getSql(), "#isWrapperFor", aClass.getCanonicalName());
     }
 
     private String[] useKeys(String name, int i) {

@@ -58,6 +58,15 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
         });
     }
 
+    public StubCallableStatement(StubConnection stubConnection, String sql, int i, int i1, int i2) throws SQLException {
+        super(stubConnection);
+        this.sql = sql;
+
+        stubConnection.add(() -> {
+            realCallableStatement = stubConnection.getRealConnection().prepareCall(sql, i, i1, i2);
+        });
+    }
+
 
     @Override
     public void registerOutParameter(int parameterIndex, int sqlType) throws SQLException {

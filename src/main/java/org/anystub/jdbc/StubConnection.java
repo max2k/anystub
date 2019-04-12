@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
@@ -80,7 +81,15 @@ public class StubConnection implements Connection {
 
     @Override
     public boolean getAutoCommit() throws SQLException {
-        return false;
+        return getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        runSql();
+                        return getRealConnection().getAutoCommit();
+                    }
+                }, callKey("getAutoCommit", "-"));
     }
 
     @Override
@@ -320,32 +329,32 @@ public class StubConnection implements Connection {
 
     @Override
     public Statement createStatement(int i, int i1, int i2) throws SQLException {
-        return null;
+        return spy(new StubStatement(this, i, i1, i2));
     }
 
     @Override
     public PreparedStatement prepareStatement(String s, int i, int i1, int i2) throws SQLException {
-        return null;
+        return spy(new StubPreparedStatement(this, s, i, i1, i2));
     }
 
     @Override
     public CallableStatement prepareCall(String s, int i, int i1, int i2) throws SQLException {
-        return null;
+        return spy(new StubCallableStatement(this, s, i, i1, i2));
     }
 
     @Override
     public PreparedStatement prepareStatement(String s, int i) throws SQLException {
-        return null;
+        return spy(new StubPreparedStatement(this, s, i));
     }
 
     @Override
     public PreparedStatement prepareStatement(String s, int[] ints) throws SQLException {
-        return null;
+        return spy(new StubPreparedStatement(this, s, ints));
     }
 
     @Override
     public PreparedStatement prepareStatement(String s, String[] strings) throws SQLException {
-        return null;
+        return spy(new StubPreparedStatement(this, s, strings));
     }
 
     @Override
@@ -370,17 +379,37 @@ public class StubConnection implements Connection {
 
     @Override
     public boolean isValid(int i) throws SQLException {
-        return false;
+        return getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        runSql();
+                        return getRealConnection().isValid(i);
+                    }
+                }, callKey("isValid", String.valueOf(i)));
     }
 
     @Override
     public void setClientInfo(String s, String s1) throws SQLClientInfoException {
-
+        try {
+            add(() -> {
+                getRealConnection().setClientInfo(s, s1);
+            });
+        } catch (SQLException e) {
+            throw new SQLClientInfoException(new TreeMap<>(), e);
+        }
     }
 
     @Override
     public void setClientInfo(Properties properties) throws SQLClientInfoException {
-
+        try {
+            add(() -> {
+                getRealConnection().setClientInfo(properties);
+            });
+        } catch (SQLException e) {
+            throw new SQLClientInfoException(new TreeMap<>(), e);
+        }
     }
 
     @Override
@@ -406,6 +435,9 @@ public class StubConnection implements Connection {
     @Override
     public void setSchema(String s) throws SQLException {
 
+        add(() -> {
+            getRealConnection().setSchema(s);
+        });
     }
 
     @Override
@@ -415,12 +447,16 @@ public class StubConnection implements Connection {
 
     @Override
     public void abort(Executor executor) throws SQLException {
-
+        add(() -> {
+            getRealConnection().abort(executor);
+        });
     }
 
     @Override
     public void setNetworkTimeout(Executor executor, int i) throws SQLException {
-
+        add(() -> {
+            getRealConnection().setNetworkTimeout(executor, i);
+        });
     }
 
     @Override
@@ -435,7 +471,15 @@ public class StubConnection implements Connection {
 
     @Override
     public boolean isWrapperFor(Class<?> aClass) throws SQLException {
-        return false;
+        return getStubDataSource()
+                .getBase()
+                .requestB(new Supplier<Boolean, SQLException>() {
+                    @Override
+                    public Boolean get() throws SQLException {
+                        runSql();
+                        return getRealConnection().isWrapperFor(aClass);
+                    }
+                }, callKey("isWrapperFor", aClass.getCanonicalName()));
     }
 
 
