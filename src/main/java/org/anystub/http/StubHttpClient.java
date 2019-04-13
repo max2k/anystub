@@ -17,7 +17,7 @@ import org.apache.http.protocol.HttpContext;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import static org.anystub.http.HttpResponseUtil.encode;
+import static org.anystub.http.HttpUtil.encode;
 
 
 /**
@@ -62,7 +62,7 @@ public class StubHttpClient implements HttpClient {
                              },
                 new DecoderHttpResponse(),
                 new EncoderHttpResponse(),
-                HttpResponseUtil.encode(httpUriRequest).toArray(new String[0]));
+                HttpUtil.encode(httpUriRequest).toArray(new String[0]));
     }
 
     @Override
@@ -75,7 +75,7 @@ public class StubHttpClient implements HttpClient {
                              },
                 new DecoderHttpResponse(),
                 new EncoderHttpResponse(),
-                HttpResponseUtil.encode(httpUriRequest).toArray(new String[0]));
+                HttpUtil.encode(httpUriRequest).toArray(new String[0]));
     }
 
     @Override
@@ -88,7 +88,7 @@ public class StubHttpClient implements HttpClient {
                              },
                 new DecoderHttpResponse(),
                 new EncoderHttpResponse(),
-                HttpResponseUtil.encode(httpRequest, httpHost, true).toArray(new String[0]));
+                HttpUtil.encode(httpRequest, httpHost, true).toArray(new String[0]));
     }
 
     @Override
