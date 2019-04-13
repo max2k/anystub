@@ -3,5 +3,5 @@ request0:
   keys: [GET, HTTP/1.1, 'https://gturnquist-quoters.cfapps.io/api/random']
   values: [HTTP/1.1, '200', OK, 'Content-Type: application/json;charset=UTF-8', 'Date:
       Sun, 31 Mar 2019 01:40:05 GMT', 'X-Vcap-Request-Id: b72a7417-c9cd-41d9-6a87-d8e7f632cc48',
-    'Content-Length: 107', 'Connection: keep-alive', 'TEXT {"type":"success","value":{"id":2,"quote":"With
+    'Content-Length: 107', 'Connection: keep-alive', '{"type":"success","value":{"id":2,"quote":"With
       Boot you deploy everywhere you can find a JVM basically."}}']

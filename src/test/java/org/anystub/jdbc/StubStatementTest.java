@@ -1,0 +1,41 @@
+package org.anystub.jdbc;
+
+import org.anystub.Base;
+import org.junit.Test;
+
+import java.sql.SQLException;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+public class StubStatementTest {
+
+
+    @Test
+    public void executeQueryTest() throws SQLException {
+        StubDataSource dataSource = mock(StubDataSource.class);
+        StubConnection connection = mock(StubConnection.class);
+        when(connection.getStubDataSource()).thenReturn(dataSource);
+        Base base = spy(new Base("executeQueryTest.yml"));
+        when(dataSource.getBase()).thenReturn(base);
+
+        StubStatement stubStatement = spy(new StubStatement(connection));
+        verify(connection, times(0)).getRealConnection();
+
+        stubStatement.executeQuery("select * from dual");
+        verify(connection, times(0)).getRealConnection();
+        verify(connection, times(0)).runSql();
+        verify(stubStatement, times(0)).getRealStatement();
+
+        verify(base, times(1))
+                .request2(any(),
+                        any(DecoderResultSet.class),
+                        any(EncoderResultSet.class),
+                        org.mockito.ArgumentMatchers.eq("select * from dual"));
+    }
+
+}
