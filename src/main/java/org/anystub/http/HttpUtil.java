@@ -25,9 +25,9 @@ import java.util.logging.Logger;
 
 import static java.lang.Integer.parseInt;
 
-public class HttpResponseUtil {
+public class HttpUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(HttpResponseUtil.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(HttpUtil.class.getName());
 
     public static HttpResponse decode(Iterable<String> iterable) {
         BasicHttpResponse basicHttpResponse;
@@ -67,7 +67,9 @@ public class HttpResponseUtil {
                 httpEntity.setContentLength(decode.length);
                 httpEntity.setContent(new ByteArrayInputStream(decode));
             } else {
-                LOGGER.severe("Failed to recover httpEntity: " + postHeader.substring(0, 5) + "...");
+                LOGGER.finest("fallback to TEXT");
+                httpEntity.setContentLength(postHeader.length());
+                httpEntity.setContent(new ByteArrayInputStream(postHeader.getBytes()));
             }
             basicHttpResponse.setEntity(httpEntity);
         }
@@ -129,8 +131,13 @@ public class HttpResponseUtil {
             }
 
             if (bytes != null) {
-                if (plainContent && Base.isText(new String(bytes, StandardCharsets.UTF_8))) {
-                    strings.add("TEXT " + new String(bytes, StandardCharsets.UTF_8));
+                String bodyText = new String(bytes, StandardCharsets.UTF_8);
+                if (plainContent && Base.isText(bodyText)) {
+                    if (bodyText.startsWith("TEXT") || bodyText.startsWith("BASE")) {
+                        strings.add("TEXT " + bodyText);
+                    } else {
+                        strings.add(bodyText);
+                    }
                 } else {
                     String encode = Base64.getEncoder().encodeToString(bytes);
                     strings.add("BASE64 " + encode);
@@ -156,10 +163,6 @@ public class HttpResponseUtil {
         } else {
             strings.add(uri);
         }
-
-//        for (Header h : httpUriRequest.getAllHeaders()) {
-//            LOGGER.info("Header: {} - {}", h.getName(), h.getValue());
-//        }
 
         if (httpRequest instanceof HttpEntityEnclosingRequest) {
             HttpEntityEnclosingRequest httpEntityEnclosingRequest = (HttpEntityEnclosingRequest) httpRequest;
