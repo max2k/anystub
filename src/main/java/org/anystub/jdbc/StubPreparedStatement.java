@@ -47,30 +47,72 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
         });
     }
 
+    public StubPreparedStatement(StubConnection stubConnection, String sql, int i, int i1) throws SQLException {
+        super(true, stubConnection);
+        this.sql = sql;
+        stubConnection.add(() ->
+        {
+            realPreparedStatement = this.stubConnection.getRealConnection().prepareStatement(sql, i, i1);
+        });
+    }
+
+    public StubPreparedStatement(StubConnection stubConnection, String sql, int i, int i1, int i2) throws SQLException {
+        super(true, stubConnection);
+        this.sql = sql;
+        stubConnection.add(() ->
+        {
+            realPreparedStatement = this.stubConnection.getRealConnection().prepareStatement(sql, i, i1, i2);
+        });
+    }
+
+    public StubPreparedStatement(StubConnection stubConnection, String s, int i) throws SQLException {
+        super(true, stubConnection);
+        this.sql = sql;
+        stubConnection.add(() ->
+        {
+            realPreparedStatement = this.stubConnection.getRealConnection().prepareStatement(sql, i);
+        });
+    }
+
+    public StubPreparedStatement(StubConnection stubConnection, String sql, int[] ints) throws SQLException {
+        super(true, stubConnection);
+        this.sql = sql;
+        stubConnection.add(() ->
+        {
+            realPreparedStatement = this.stubConnection.getRealConnection().prepareStatement(sql, ints);
+        });
+    }
+
+    public StubPreparedStatement(StubConnection stubConnection, String sql, String[] strings) throws SQLException {
+        super(true, stubConnection);
+        this.sql = sql;
+        stubConnection.add(() ->
+        {
+            realPreparedStatement = this.stubConnection.getRealConnection().prepareStatement(sql, strings);
+        });
+    }
+
     @Override
     public ResultSet executeQuery() throws SQLException {
-        Base base = stubConnection.getStubDataSource().getBase();
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<ResultSet, SQLException>() {
+                              @Override
+                              public ResultSet get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().executeQuery();
+                              }
+                          },
+                        new DecoderResultSet(),
+                        new Encoder<ResultSet>() {
+                            @Override
+                            public Iterable<String> encode(ResultSet resultSet) {
+                                return ResultSetUtil.encode(getRealStatement(), resultSet);
+                            }
+                        },
 
-        return base.request2(new Supplier<ResultSet, SQLException>() {
-                                 @Override
-                                 public ResultSet get() throws SQLException {
-                                     stubConnection.runSql();
-                                     return getRealStatement().executeQuery();
-                                 }
-                             },
-                new Decoder<ResultSet>() {
-                    @Override
-                    public ResultSet decode(Iterable<String> values) {
-                        return ResultSetUtil.decode(values);
-                    }
-                }, new Encoder<ResultSet>() {
-                    @Override
-                    public Iterable<String> encode(ResultSet resultSet) {
-                        return ResultSetUtil.encode(getRealStatement(), resultSet);
-                    }
-                },
-
-                useKeys());
+                        useKeys());
 
     }
 
@@ -241,7 +283,9 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
 
     @Override
     public void clearParameters() throws SQLException {
-        throw new UnsupportedOperationException();
+        stubConnection.add(() -> {
+            getRealStatement().clearParameters();
+        });
     }
 
     @Override
@@ -587,7 +631,12 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
         return keys1;
     }
 
-    public String getSql() {
+    protected String getSql() {
         return sql;
+    }
+
+    @Override
+    protected String[] id() {
+        return new String[]{getSql()};
     }
 }
