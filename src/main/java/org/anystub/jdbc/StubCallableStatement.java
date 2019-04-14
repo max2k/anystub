@@ -1,7 +1,5 @@
 package org.anystub.jdbc;
 
-import org.anystub.Decoder;
-import org.anystub.Encoder;
 import org.anystub.Supplier;
 
 import java.io.InputStream;
@@ -21,16 +19,11 @@ import java.sql.SQLException;
 import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 public class StubCallableStatement extends StubPreparedStatement implements CallableStatement {
@@ -49,7 +42,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
         });
     }
 
-    public StubCallableStatement(StubConnection stubConnection, int i, int i1) throws SQLException {
+    public StubCallableStatement(StubConnection stubConnection, String sql, int i, int i1) throws SQLException {
         super(stubConnection);
         this.sql = sql;
 
