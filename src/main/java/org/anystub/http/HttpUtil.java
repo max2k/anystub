@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,11 +30,14 @@ public class HttpUtil {
 
     private static final Logger LOGGER = Logger.getLogger(HttpUtil.class.getName());
 
+    private HttpUtil() {
+    }
+
     public static HttpResponse decode(Iterable<String> iterable) {
         BasicHttpResponse basicHttpResponse;
 
         Iterator<String> iterator = iterable.iterator();
-        String[] protocol = iterator.next().split("[/\\.]");
+        String[] protocol = iterator.next().split("[/.]");
         String code = iterator.next();
         String reason = iterator.next();
 
@@ -77,7 +81,7 @@ public class HttpUtil {
         return basicHttpResponse;
     }
 
-    public static ArrayList<String> encode(HttpResponse httpResponse, boolean plainContent) {
+    public static List<String> encode(HttpResponse httpResponse, boolean plainContent) {
         ArrayList<String> strings = new ArrayList<>();
         strings.add(httpResponse.getStatusLine().getProtocolVersion().toString());
         strings.add(String.valueOf(httpResponse.getStatusLine().getStatusCode()));
@@ -93,7 +97,7 @@ public class HttpUtil {
     }
 
 
-    public static ArrayList<String> encode(HttpEntity entity, boolean plainContent) {
+    public static List<String> encode(HttpEntity entity, boolean plainContent) {
         ArrayList<String> strings = new ArrayList<>();
         if (entity == null) {
             return strings;
@@ -149,7 +153,7 @@ public class HttpUtil {
         return strings;
     }
 
-    public static ArrayList<String> encode(HttpRequest httpRequest, HttpHost httpHost, boolean plainContent) {
+    public static List<String> encode(HttpRequest httpRequest, HttpHost httpHost, boolean plainContent) {
         ArrayList<String> strings = new ArrayList<>();
 
         strings.add(httpRequest.getRequestLine().getMethod());
@@ -173,7 +177,7 @@ public class HttpUtil {
         return strings;
     }
 
-    public static ArrayList<String> encode(HttpRequest httpRequest) {
+    public static List<String> encode(HttpRequest httpRequest) {
         ArrayList<String> strings = new ArrayList<>();
 
         strings.add(httpRequest.getRequestLine().getMethod());

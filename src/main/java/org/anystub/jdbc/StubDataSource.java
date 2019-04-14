@@ -38,37 +38,37 @@ public class StubDataSource implements DataSource {
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        return null;
+        return getRealDataSource().getLogWriter();
     }
 
     @Override
     public void setLogWriter(PrintWriter printWriter) throws SQLException {
-
+        getRealDataSource().setLogWriter(printWriter);
     }
 
     @Override
     public void setLoginTimeout(int i) throws SQLException {
-
+        getRealDataSource().setLoginTimeout(i);
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        return 0;
+        return getRealDataSource().getLoginTimeout();
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return null;
+        return getRealDataSource().getParentLogger();
     }
 
     @Override
     public <T> T unwrap(Class<T> aClass) throws SQLException {
-        return null;
+        return getRealDataSource().unwrap(aClass);
     }
 
     @Override
     public boolean isWrapperFor(Class<?> aClass) throws SQLException {
-        return false;
+        return getRealDataSource().isWrapperFor(aClass);
     }
 
 

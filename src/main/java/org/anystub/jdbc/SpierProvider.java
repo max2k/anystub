@@ -1,7 +1,11 @@
 package org.anystub.jdbc;
 
-public class SpierProvider {
-    static private Spier spier = null;
+final public class SpierProvider {
+
+    private SpierProvider() {
+    }
+
+    private static Spier spier = null;
 
     public static Spier getSpier() {
         return spier;
