@@ -1,6 +1,5 @@
 package org.anystub.jdbc;
 
-import org.anystub.Base;
 import org.anystub.Decoder;
 import org.anystub.Encoder;
 import org.anystub.Supplier;
@@ -10,19 +9,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 
 public class StubStatement implements Statement {
     protected StubConnection stubConnection;
     private Statement realStatement = null;
-    private List<String> keys = new LinkedList<>();
+    private List<String> batch = new LinkedList<>();
+    private String executedCommand = null;
 
 
     public StubStatement(StubConnection stubConnection) throws SQLException {
@@ -63,6 +64,7 @@ public class StubStatement implements Statement {
 
     @Override
     public ResultSet executeQuery(String s) throws SQLException {
+        executedCommand = s;
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -80,7 +82,7 @@ public class StubStatement implements Statement {
 
     @Override
     public int executeUpdate(String s) throws SQLException {
-        addKeys(s);
+        executedCommand = s;
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -90,7 +92,7 @@ public class StubStatement implements Statement {
                         stubConnection.runSql();
                         return getRealStatement().executeUpdate(s);
                     }
-                }, useKeys());
+                }, s);
     }
 
     @Override
@@ -201,6 +203,7 @@ public class StubStatement implements Statement {
 
     @Override
     public boolean execute(String s) throws SQLException {
+        executedCommand = s;
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -331,6 +334,7 @@ public class StubStatement implements Statement {
 
     @Override
     public void addBatch(String s) throws SQLException {
+        addCallBatch(s);
         stubConnection.add(() -> {
             getRealStatement().addBatch(s);
         });
@@ -338,6 +342,7 @@ public class StubStatement implements Statement {
 
     @Override
     public void clearBatch() throws SQLException {
+        useCallBatch();
         stubConnection.add(() -> {
             getRealStatement().clearBatch();
         });
@@ -345,9 +350,10 @@ public class StubStatement implements Statement {
 
     @Override
     public int[] executeBatch() throws SQLException {
-        Base base = stubConnection.getStubDataSource().getBase();
-
-        return base.request2(new Supplier<int[], SQLException>() {
+        return  stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<int[], SQLException>() {
                                  @Override
                                  public int[] get() throws SQLException {
                                      stubConnection.runSql();
@@ -370,15 +376,11 @@ public class StubStatement implements Statement {
                 }, new Encoder<int[]>() {
                     @Override
                     public Iterable<String> encode(int[] values) {
-                        String[] s = new String[values.length];
-                        for (int i = 0; i < values.length; i++) {
-                            s[i] = String.valueOf(values[i]);
-                        }
-                        return Arrays.asList(s);
+                        return stream(values)
+                                .mapToObj(String::valueOf)
+                                .collect(Collectors.toList());
                     }
-                },
-
-                useKeys());
+                }, useCallBatch());
 
 
     }
@@ -399,7 +401,7 @@ public class StubStatement implements Statement {
                         stubConnection.runSql();
                         return getRealStatement().getMoreResults();
                     }
-                }, callKey("getQueryTimeout", i));
+                }, callKey("getMoreResults", i));
     }
 
     @Override
@@ -421,6 +423,7 @@ public class StubStatement implements Statement {
 
     @Override
     public int executeUpdate(String s, int i) throws SQLException {
+        executedCommand = s;
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -435,6 +438,7 @@ public class StubStatement implements Statement {
 
     @Override
     public int executeUpdate(String s, int[] ints) throws SQLException {
+        executedCommand = s;
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -449,6 +453,7 @@ public class StubStatement implements Statement {
 
     @Override
     public int executeUpdate(String s, String[] strings) throws SQLException {
+        executedCommand = s;
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -463,6 +468,7 @@ public class StubStatement implements Statement {
 
     @Override
     public boolean execute(String s, int i) throws SQLException {
+        executedCommand = s;
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -477,6 +483,7 @@ public class StubStatement implements Statement {
 
     @Override
     public boolean execute(String s, int[] ints) throws SQLException {
+        executedCommand = s;
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -491,6 +498,7 @@ public class StubStatement implements Statement {
 
     @Override
     public boolean execute(String s, String[] strings) throws SQLException {
+        executedCommand = s;
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -595,32 +603,46 @@ public class StubStatement implements Statement {
     }
 
 
-    protected void addKeys(String... keys) {
-        this.keys.addAll(Arrays.asList(keys));
+
+    protected String[] statementId() {
+        if (executedCommand == null) {
+            return new String[0];
+        }
+        return new String[]{executedCommand};
     }
-
-    protected String[] useKeys() {
-        String[] requestsKeys = keys.toArray(new String[0]);
-        keys.clear();
-        return requestsKeys;
-    }
-
-
-    protected String[] id() {
-        return keys.toArray(new String[0]);
-    }
-
 
     protected String[] callKey(String callName, Integer... a) {
-        return stubConnection.callKey(callName, Arrays.toString(a), id());
+        List<String> callKey;
+        callKey = new ArrayList<>(asList(statementId()));
+        callKey.add(callName);
+        callKey.addAll(Arrays.stream(a)
+                .map(String::valueOf)
+                .collect(Collectors.toList()));
+
+        return stubConnection.callKey(callKey.toArray(new String[0]));
     }
 
     protected String[] callKey(String callName, String a) {
-        return stubConnection.callKey(callName, a, id());
+        List<String> callKey = new ArrayList<>(asList(statementId()));
+        callKey.add(callName);
+        callKey.add(a);
+
+        return stubConnection.callKey(callKey.toArray(new String[0]));
     }
 
     protected Statement getRealStatement() {
         return realStatement;
+    }
+
+    private void addCallBatch(String s) {
+        batch.add(s);
+    }
+    private String[] useCallBatch() {
+        List<String> callKey = new ArrayList<>();
+        callKey.add("executeBatch");
+        callKey.addAll(batch);
+        batch.clear();
+        return callKey.toArray(new String[0]);
     }
 
 }
