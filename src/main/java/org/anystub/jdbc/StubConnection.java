@@ -4,11 +4,27 @@ import org.anystub.Decoder;
 import org.anystub.Encoder;
 import org.anystub.Supplier;
 
-import java.sql.*;
+import java.sql.Array;
+import java.sql.Blob;
+import java.sql.CallableStatement;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.NClob;
+import java.sql.PreparedStatement;
+import java.sql.SQLClientInfoException;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.SQLXML;
+import java.sql.Savepoint;
+import java.sql.Statement;
+import java.sql.Struct;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.MissingFormatArgumentException;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Properties;
@@ -274,7 +290,7 @@ public class StubConnection implements Connection {
                                 try {
                                     return asList("Savepoint", String.valueOf(savepoint.getSavepointId()), savepoint.getSavepointName());
                                 } catch (SQLException e) {
-                                    throw new NoSuchElementException("bad Savepoint: "+e.getMessage());
+                                    throw new NoSuchElementException("bad Savepoint: " + e.getMessage());
                                 }
                             }
                         },
@@ -306,7 +322,7 @@ public class StubConnection implements Connection {
                                 try {
                                     return asList("Savepoint", String.valueOf(savepoint.getSavepointId()), savepoint.getSavepointName());
                                 } catch (SQLException e) {
-                                    throw new NoSuchElementException("bad Savepoint: "+e.getMessage());
+                                    throw new NoSuchElementException("bad Savepoint: " + e.getMessage());
                                 }
                             }
                         },
@@ -519,13 +535,23 @@ public class StubConnection implements Connection {
 
     }
 
-    public String[] callKey(String callName, String a, String... id) {
-        Integer orDefault = callCounters.getOrDefault(callName, 0);
-        callCounters.put(callName, orDefault + 1);
-        String[] strings = new String[id.length + 1];
-        System.arraycopy(strings, 0, id, 0, id.length);
-        strings[strings.length - 1] = String.format("%s%s#%d", callName, a, orDefault);
+    public String[] callKey(String... details) {
+        if (details.length < 1) {
+            throw new MissingFormatArgumentException("details must include at least one string");
+        }
+        String key = Arrays.toString(details);
+        Integer orDefault = callCounters.getOrDefault(key, 0);
+        callCounters.put(key, orDefault + 1);
+
+        if (orDefault == 0) {
+            return details;
+        }
+        String[] strings;
+        strings = new String[details.length + 1];
+        System.arraycopy(details, 0, strings, 0, details.length);
+        strings[strings.length - 1] = String.format("#%d", orDefault);
         return strings;
+
     }
 
 }
