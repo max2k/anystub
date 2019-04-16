@@ -15,6 +15,7 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import static org.anystub.http.HttpUtil.encode;
@@ -29,6 +30,7 @@ public class StubHttpClient implements HttpClient {
 
     private final Base base;
     private final HttpClient httpClient;
+    private String[] addBodyRules ={};
 
     // TODO: plain vs base64 encoding selector - requests body/response body matching/ default-auto-selector(on keys)
 
@@ -62,7 +64,7 @@ public class StubHttpClient implements HttpClient {
                              },
                 new DecoderHttpResponse(),
                 new EncoderHttpResponse(),
-                HttpUtil.encode(httpUriRequest).toArray(new String[0]));
+                keys(httpUriRequest));
     }
 
     @Override
@@ -75,7 +77,7 @@ public class StubHttpClient implements HttpClient {
                              },
                 new DecoderHttpResponse(),
                 new EncoderHttpResponse(),
-                HttpUtil.encode(httpUriRequest).toArray(new String[0]));
+                keys(httpUriRequest));
     }
 
     @Override
@@ -88,17 +90,13 @@ public class StubHttpClient implements HttpClient {
                              },
                 new DecoderHttpResponse(),
                 new EncoderHttpResponse(),
-                HttpUtil.encode(httpRequest, httpHost, true).toArray(new String[0]));
+                HttpUtil.encode(httpRequest, httpHost, addBodyRules).toArray(new String[0]));
     }
 
     @Override
     public HttpResponse execute(HttpHost httpHost, HttpRequest httpRequest, HttpContext httpContext) throws IOException, ClientProtocolException {
         LOGGER.info("execute(HttpUriRequest httpUriRequest, HttpContext httpContext)");
-        LOGGER.info(()->String.format("input parameters: %s, %s", httpRequest, httpContext));
-
-        boolean plainContent = true;
-//      check if something should be convert to bin  (httpUriRequest.getURI().getHost().startsWith("idad")) {
-
+        LOGGER.info(() -> String.format("input parameters: %s, %s", httpRequest, httpContext));
 
         return base.request2(new Supplier<HttpResponse, IOException>() {
                                  @Override
@@ -108,7 +106,7 @@ public class StubHttpClient implements HttpClient {
                              },
                 new DecoderHttpResponse(),
                 new EncoderHttpResponse(),
-                keys(httpRequest, plainContent));
+                keys(httpRequest));
     }
 
     @Override
@@ -132,7 +130,13 @@ public class StubHttpClient implements HttpClient {
         return responseHandler.handleResponse(execute);
     }
 
-    private static String[] keys(HttpRequest httpRequest, boolean plainContent) {
-        return encode(httpRequest, null, plainContent).toArray(new String[0]);
+    private String[] keys(HttpRequest httpRequest) {
+        return encode(httpRequest, addBodyRules).toArray(new String[0]);
+    }
+
+    public StubHttpClient addBodyToKeyRules(String partOfUrl) {
+        this.addBodyRules = Arrays.copyOf(this.addBodyRules, addBodyRules.length+1);
+        this.addBodyRules[this.addBodyRules.length-1] = partOfUrl;
+        return this;
     }
 }

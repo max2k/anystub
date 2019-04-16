@@ -10,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import static org.junit.Assert.assertEquals;
@@ -27,6 +29,9 @@ public class HttpSourceSystemTest {
     @Autowired
     private Base httpBase;
 
+    @Autowired(required = false)
+    private RestTemplate restTemplate;
+
     @Test
     public void getStringsTest() {
 
@@ -34,6 +39,16 @@ public class HttpSourceSystemTest {
 
         assertEquals("{\"type\":\"success\",\"value\":{\"id\":2,\"quote\":\"With Boot you deploy everywhere you can find a JVM basically.\"}}", r);
 
+    }
+
+    @Test(expected = HttpClientErrorException.class)
+    public void postTest() {
+        restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random", null, String.class);
+    }
+
+    @Test(expected = HttpClientErrorException.class)
+    public void postBodyTest() {
+        restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random/xxx", "{test}", String.class);
     }
 
 
@@ -51,7 +66,7 @@ public class HttpSourceSystemTest {
             HttpClient real = HttpClientBuilder.create().build();
             StubHttpClient result = new StubHttpClient(httpBase, real);
 
-            return result;
+            return result.addBodyToKeyRules("random/xxx");
 
         }
 

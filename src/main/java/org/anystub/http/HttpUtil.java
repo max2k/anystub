@@ -18,9 +18,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
+import java.util.MissingFormatArgumentException;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,7 +84,7 @@ public class HttpUtil {
         return basicHttpResponse;
     }
 
-    public static List<String> encode(HttpResponse httpResponse, boolean plainContent) {
+    public static List<String> encode(HttpResponse httpResponse) {
         ArrayList<String> strings = new ArrayList<>();
         strings.add(httpResponse.getStatusLine().getProtocolVersion().toString());
         strings.add(String.valueOf(httpResponse.getStatusLine().getStatusCode()));
@@ -91,17 +94,27 @@ public class HttpUtil {
             strings.add(String.format("%s: %s", h.getName(), h.getValue()));
         }
 
-        strings.addAll(encode(httpResponse.getEntity(), plainContent));
+        extractEntity(httpResponse.getEntity())
+                .ifPresent(strings::add);
 
         return strings;
     }
 
 
-    public static List<String> encode(HttpEntity entity, boolean plainContent) {
-        ArrayList<String> strings = new ArrayList<>();
-        if (entity == null) {
-            return strings;
+    public static Optional<String> extractEntity(HttpRequest httpRequest) {
+
+        if (httpRequest instanceof HttpEntityEnclosingRequest) {
+            HttpEntityEnclosingRequest request = (HttpEntityEnclosingRequest) httpRequest;
+            return extractEntity(request.getEntity());
         }
+        return Optional.empty();
+    }
+
+    public static Optional<String> extractEntity(HttpEntity entity) {
+        if (entity == null) {
+            return Optional.empty();
+        }
+        String result = null;
 
         try {
             byte[] bytes = null;
@@ -136,54 +149,69 @@ public class HttpUtil {
 
             if (bytes != null) {
                 String bodyText = new String(bytes, StandardCharsets.UTF_8);
-                if (plainContent && Base.isText(bodyText)) {
+                if (Base.isText(bodyText)) {
                     if (bodyText.startsWith("TEXT") || bodyText.startsWith("BASE")) {
-                        strings.add("TEXT " + bodyText);
+                        result = "TEXT " + bodyText;
                     } else {
-                        strings.add(bodyText);
+                        result = bodyText;
                     }
                 } else {
                     String encode = Base64.getEncoder().encodeToString(bytes);
-                    strings.add("BASE64 " + encode);
+                    result = "BASE64 " + encode;
                 }
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Stringify entity failed", e);
         }
-        return strings;
+        return result == null || result.isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
-    public static List<String> encode(HttpRequest httpRequest, HttpHost httpHost, boolean plainContent) {
+    public static List<String> encode(HttpRequest httpRequest, HttpHost httpHost, String[] addBodyRules) {
         ArrayList<String> strings = new ArrayList<>();
 
         strings.add(httpRequest.getRequestLine().getMethod());
         strings.add(httpRequest.getRequestLine().getProtocolVersion().toString());
 
-        String uri = httpRequest.getRequestLine().getUri();
+        String fullUrl = httpRequest.getRequestLine().getUri();
         if (httpHost != null && !httpRequest.getRequestLine().getUri().contains(httpHost.toString())) {
-            if (!uri.contains(httpHost.toString())) {
-                strings.add(httpHost.toString() + uri);
+            if (!fullUrl.contains(httpHost.toString())) {
+                fullUrl = httpHost.toString() + fullUrl;
+                strings.add(fullUrl);
             }
         } else {
-            strings.add(uri);
+            strings.add(fullUrl);
         }
 
-        if (httpRequest instanceof HttpEntityEnclosingRequest) {
-            HttpEntityEnclosingRequest httpEntityEnclosingRequest = (HttpEntityEnclosingRequest) httpRequest;
-            HttpEntity entity = httpEntityEnclosingRequest.getEntity();
+        matchBodyRule(fullUrl, addBodyRules)
+                .ifPresent(x -> extractEntity(httpRequest)
+                        .ifPresent(strings::add));
 
-            strings.addAll(encode(entity, plainContent));
-        }
         return strings;
     }
 
-    public static List<String> encode(HttpRequest httpRequest) {
+    public static List<String> encode(HttpRequest httpRequest, String[] addBodyRules) {
         ArrayList<String> strings = new ArrayList<>();
 
         strings.add(httpRequest.getRequestLine().getMethod());
         strings.add(httpRequest.getRequestLine().getProtocolVersion().toString());
-        strings.add(httpRequest.getRequestLine().getUri());
+        String fullUrl = httpRequest.getRequestLine().getUri();
+        strings.add(fullUrl);
+
+
+        matchBodyRule(fullUrl, addBodyRules)
+                .ifPresent(x -> extractEntity(httpRequest)
+                        .ifPresent(strings::add));
+
         return strings;
+    }
+
+    private static Optional<String> matchBodyRule(String url, String[] addBodyRules) {
+        if (addBodyRules == null) {
+            return Optional.empty();
+        }
+        return Arrays.stream(addBodyRules)
+                .filter(url::contains)
+                .findFirst();
     }
 
 }
