@@ -12,3 +12,10 @@ request1:
     'Date: Tue, 16 Apr 2019 00:35:23 GMT', 'X-Vcap-Request-Id: 6100fca6-806e-4a66-4b4a-7d9c08b78d56',
     'Content-Length: 155', 'Connection: keep-alive', '{"timestamp":"2019-04-16T00:35:23.780+0000","status":405,"error":"Method
       Not Allowed","message":"Request method ''POST'' not supported","path":"/api/random"}']
+request2:
+  exception: []
+  keys: [POST, HTTP/1.1, 'https://gturnquist-quoters.cfapps.io/api/random/xxx', '{test}']
+  values: [HTTP/1.1, '404', Not Found, 'Content-Type: application/json;charset=UTF-8',
+    'Date: Tue, 16 Apr 2019 00:45:28 GMT', 'X-Vcap-Request-Id: 206272e6-1ad3-4798-74fa-19d478e0f76b',
+    'Content-Length: 135', 'Connection: keep-alive', '{"timestamp":"2019-04-16T00:45:28.116+0000","status":404,"error":"Not
+      Found","message":"No message available","path":"/api/random/xxx"}']

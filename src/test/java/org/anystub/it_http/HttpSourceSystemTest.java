@@ -43,7 +43,12 @@ public class HttpSourceSystemTest {
 
     @Test(expected = HttpClientErrorException.class)
     public void postTest() {
-        restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random", "test", String.class);
+        restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random", null, String.class);
+    }
+
+    @Test(expected = HttpClientErrorException.class)
+    public void postBodyTest() {
+        restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random/xxx", "{test}", String.class);
     }
 
 
@@ -61,7 +66,7 @@ public class HttpSourceSystemTest {
             HttpClient real = HttpClientBuilder.create().build();
             StubHttpClient result = new StubHttpClient(httpBase, real);
 
-            return result;
+            return result.addBodyToKeyRules("random/xxx");
 
         }
 
