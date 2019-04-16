@@ -51,6 +51,12 @@ public class HttpSourceSystemTest {
         restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random/xxx", "{test}", String.class);
     }
 
+    @Test
+    public void getBase64Test() {
+        ResponseEntity<String> forEntity = restTemplate.getForEntity("https://test", String.class);
+        assertEquals("test", forEntity.getBody());
+    }
+
 
     @TestConfiguration
     static class Conf {
