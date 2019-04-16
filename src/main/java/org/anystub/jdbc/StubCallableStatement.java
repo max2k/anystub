@@ -4,6 +4,7 @@ import org.anystub.Supplier;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -254,32 +255,106 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public Date getDate(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Date, SQLException>() {
+                              @Override
+                              public Date get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getDate(i);
+                              }
+                          },
+                        values -> Date.valueOf(values.iterator().next()),
+                        date -> singletonList(date.toString()),
+                        callKey("getDate", i));
     }
 
     @Override
     public Time getTime(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Time, SQLException>() {
+                              @Override
+                              public Time get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getTime(i);
+                              }
+                          },
+                        values -> Time.valueOf(values.iterator().next()),
+                        time -> singletonList(time.toString()),
+                        callKey("getTime", i));
     }
 
     @Override
     public Timestamp getTimestamp(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Timestamp, SQLException>() {
+                              @Override
+                              public Timestamp get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getTimestamp(i);
+                              }
+                          },
+                        values -> Timestamp.valueOf(values.iterator().next()),
+                        time -> singletonList(time.toString()),
+                        callKey("getTimestamp", i));
     }
 
     @Override
     public Object getObject(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestSerializable(new Supplier<Serializable, SQLException>() {
+                    @Override
+                    public Serializable get() throws SQLException {
+                        stubConnection.runSql();
+                        Object object = getRealStatement().getObject(i);
+                        if (object instanceof Serializable) {
+                            return (Serializable) object;
+                        }
+                        throw new UnsupportedOperationException();
+                    }
+                }, callKey("getObject", i));
     }
 
     @Override
     public BigDecimal getBigDecimal(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<BigDecimal, SQLException>() {
+                              @Override
+                              public BigDecimal get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getBigDecimal(i);
+                              }
+                          },
+                        values -> new BigDecimal(values.iterator().next()),
+                        time -> singletonList(time.toString()),
+                        callKey("getBigDecimal", i));
     }
 
     @Override
     public Object getObject(int i, Map<String, Class<?>> map) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestSerializable(new Supplier<Serializable, SQLException>() {
+                    @Override
+                    public Serializable get() throws SQLException {
+                        stubConnection.runSql();
+                        Object object = getRealStatement().getObject(i, map);
+                        if (object instanceof Serializable) {
+                            return (Serializable) object;
+                        }
+                        throw new UnsupportedOperationException();
+                    }
+                }, callKey("getObject", i));
     }
 
     @Override
@@ -289,7 +364,19 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public Blob getBlob(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Blob, SQLException>() {
+                              @Override
+                              public Blob get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realCallableStatement.getBlob(i);
+                              }
+                          },
+                        SqlTypeEncoder::decodeBlob,
+                        SqlTypeEncoder::encodeBlob,
+                        callKey("getBlob", i));
     }
 
     @Override
@@ -304,17 +391,53 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public Date getDate(int i, Calendar calendar) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Date, SQLException>() {
+                              @Override
+                              public Date get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getDate(i, calendar);
+                              }
+                          },
+                        values -> Date.valueOf(values.iterator().next()),
+                        date -> singletonList(date.toString()),
+                        callKey("getDate", i));
     }
 
     @Override
     public Time getTime(int i, Calendar calendar) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Time, SQLException>() {
+                              @Override
+                              public Time get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getTime(i, calendar);
+                              }
+                          },
+                        values -> Time.valueOf(values.iterator().next()),
+                        time -> singletonList(time.toString()),
+                        callKey("getTime", i));
     }
 
     @Override
     public Timestamp getTimestamp(int i, Calendar calendar) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Timestamp, SQLException>() {
+                              @Override
+                              public Timestamp get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getTimestamp(i, calendar);
+                              }
+                          },
+                        values -> Timestamp.valueOf(values.iterator().next()),
+                        time -> singletonList(time.toString()),
+                        callKey("getTimestamp", i));
     }
 
     @Override
@@ -716,22 +839,71 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public Date getDate(String s) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<Date, SQLException>() {
+                             @Override
+                             public Date get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return getRealStatement().getDate(s);
+                             }
+                         },
+                        Date::valueOf,
+                        Date::toString,
+                        callKey("getDate", s));
     }
 
     @Override
     public Time getTime(String s) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<Time, SQLException>() {
+                             @Override
+                             public Time get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return getRealStatement().getTime(s);
+                             }
+                         },
+                        Time::valueOf,
+                        Time::toString,
+                        callKey("getTime", s));
     }
 
     @Override
     public Timestamp getTimestamp(String s) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<Timestamp, SQLException>() {
+                             @Override
+                             public Timestamp get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return getRealStatement().getTimestamp(s);
+                             }
+                         },
+                        Timestamp::valueOf,
+                        Timestamp::toString,
+                        callKey("getTimestamp", s));
     }
 
     @Override
     public Object getObject(String s) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestSerializable(new Supplier<Serializable, SQLException>() {
+                    @Override
+                    public Serializable get() throws SQLException {
+                        stubConnection.runSql();
+                        Object object = getRealStatement().getObject(s);
+                        if (object instanceof Serializable) {
+                            return (Serializable) object;
+                        }
+                        throw new UnsupportedOperationException();
+                    }
+                }, callKey("getObject", s));
     }
 
     @Override
@@ -753,7 +925,20 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public Object getObject(String s, Map<String, Class<?>> map) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestSerializable(new Supplier<Serializable, SQLException>() {
+                    @Override
+                    public Serializable get() throws SQLException {
+                        stubConnection.runSql();
+                        Object object = getRealStatement().getObject(s, map);
+                        if (object instanceof Serializable) {
+                            return (Serializable) object;
+                        }
+                        throw new UnsupportedOperationException();
+                    }
+                }, callKey("getObject", s));
     }
 
     @Override
@@ -763,7 +948,19 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public Blob getBlob(String s) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Blob, SQLException>() {
+                              @Override
+                              public Blob get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realCallableStatement.getBlob(s);
+                              }
+                          },
+                        SqlTypeEncoder::decodeBlob,
+                        SqlTypeEncoder::encodeBlob,
+                        callKey("getBlob", s));
     }
 
     @Override
@@ -778,32 +975,111 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public Date getDate(String s, Calendar calendar) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Date, SQLException>() {
+                              @Override
+                              public Date get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getDate(s, calendar);
+                              }
+                          },
+                        values -> Date.valueOf(values.iterator().next()),
+                        date -> singletonList(date.toString()),
+                        callKey("getDate", s));
     }
 
     @Override
     public Time getTime(String s, Calendar calendar) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Time, SQLException>() {
+                              @Override
+                              public Time get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getTime(s, calendar);
+                              }
+                          },
+                        values -> Time.valueOf(values.iterator().next()),
+                        time -> singletonList(time.toString()),
+                        callKey("getTime", s));
     }
 
     @Override
     public Timestamp getTimestamp(String s, Calendar calendar) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Timestamp, SQLException>() {
+                              @Override
+                              public Timestamp get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getTimestamp(s, calendar);
+                              }
+                          },
+                        values -> Timestamp.valueOf(values.iterator().next()),
+                        time -> singletonList(time.toString()),
+                        callKey("getTimestamp", s));
     }
 
     @Override
     public URL getURL(String s) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<URL, SQLException>() {
+                              @Override
+                              public URL get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return realCallableStatement.getURL(s);
+                              }
+                          },
+                        values -> {
+                            try {
+                                return new URL(values.iterator().next());
+                            } catch (MalformedURLException e) {
+                                throw new NoSuchElementException(e.getMessage());
+                            }
+                        },
+                        aLong -> singletonList(aLong.toString()),
+                        callKey("getURL", s));
     }
 
     @Override
     public RowId getRowId(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<RowId, SQLException>() {
+                              @Override
+                              public RowId get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getRowId(i);
+                              }
+                          },
+                        SqlTypeEncoder::decodeRowid,
+                        SqlTypeEncoder::encodeRowid,
+                        callKey("getRowId", i));
+
     }
 
     @Override
     public RowId getRowId(String s) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<RowId, SQLException>() {
+                              @Override
+                              public RowId get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().getRowId(s);
+                              }
+                          },
+                        SqlTypeEncoder::decodeRowid,
+                        SqlTypeEncoder::encodeRowid,
+                        callKey("getRowId", s));
     }
 
     @Override

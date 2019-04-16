@@ -2,7 +2,6 @@ package org.anystub.jdbc;
 
 import org.h2.tools.SimpleResultSet;
 
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -95,7 +94,7 @@ public class ResultSetUtil {
                 int cScale = Integer.parseInt(it.next());
 
 
-                String[] split = cNameLabel.split("\\/");
+                String[] split = cNameLabel.split("/");
 
                 if (split.length == 2 && split[0] != null && !split[0].equalsIgnoreCase(split[1])) {
                     simpleResultSet.addColumn(split[0], cType, cTypeName, cPrecision, cScale);
@@ -114,7 +113,7 @@ public class ResultSetUtil {
                         row.add(next);
                     }
                 }
-                simpleResultSet.addRow(row.toArray(new String[0]));
+                simpleResultSet.addRow((Object []) row.toArray(new Object[0]));
             }
         }
         return simpleResultSet;

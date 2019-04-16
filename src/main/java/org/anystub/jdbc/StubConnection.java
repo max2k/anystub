@@ -1,5 +1,6 @@
 package org.anystub.jdbc;
 
+import org.anystub.Base;
 import org.anystub.Decoder;
 import org.anystub.Encoder;
 import org.anystub.Supplier;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.MissingFormatArgumentException;
 import java.util.NoSuchElementException;
@@ -235,7 +237,40 @@ public class StubConnection implements Connection {
 
     @Override
     public Map<String, Class<?>> getTypeMap() throws SQLException {
-        return null;
+        return getStubDataSource()
+                .getBase()
+                .request2(new Supplier<Map<String, Class<?>>, SQLException>() {
+                              @Override
+                              public Map<String, Class<?>> get() throws SQLException {
+                                  runSql();
+                                  return getRealConnection().getTypeMap();
+                              }
+                          },
+                        new Decoder<Map<String, Class<?>>>() {
+                            @Override
+                            public Map<String, Class<?>> decode(Iterable<String> values) {
+                                Map<String, Class<?>> res = new HashMap<>();
+                                Iterator<String> it = values.iterator();
+                                while (it.hasNext()) {
+                                    String key = it.next();
+                                    Class<?> value = Base.decode(it.next());
+                                    res.put(key, value);
+                                }
+                                return res;
+                            }
+                        },
+                        new Encoder<Map<String, Class<?>>>() {
+                            @Override
+                            public Iterable<String> encode(Map<String, Class<?>> stringClassMap) {
+                                List<String> res = new LinkedList<>();
+                                for (Map.Entry<String, Class<?>> o : stringClassMap.entrySet()) {
+                                    res.add(o.getKey());
+                                    res.add(Base.encode(o.getValue()));
+                                }
+                                return res;
+                            }
+                        },
+                        callKey("getSchema"));
     }
 
     @Override
@@ -262,7 +297,7 @@ public class StubConnection implements Connection {
                         runSql();
                         return getRealConnection().getHoldability();
                     }
-                }, callKey("getHoldability", "-"));
+                }, callKey("getHoldability"));
     }
 
     @Override
@@ -294,7 +329,7 @@ public class StubConnection implements Connection {
                                 }
                             }
                         },
-                        callKey("getHoldability", "-"));
+                        callKey("getHoldability"));
     }
 
     @Override
@@ -430,7 +465,16 @@ public class StubConnection implements Connection {
 
     @Override
     public String getClientInfo(String s) throws SQLException {
-        return null;
+        return getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 runSql();
+                                 return getRealConnection().getClientInfo(s);
+                             }
+                         },
+                        callKey("getClientInfo", s));
     }
 
     @Override
@@ -458,7 +502,16 @@ public class StubConnection implements Connection {
 
     @Override
     public String getSchema() throws SQLException {
-        return null;
+        return getStubDataSource()
+                .getBase()
+                .request(new Supplier<String, SQLException>() {
+                             @Override
+                             public String get() throws SQLException {
+                                 runSql();
+                                 return getRealConnection().getSchema();
+                             }
+                         },
+                        callKey("getSchema"));
     }
 
     @Override
@@ -477,7 +530,16 @@ public class StubConnection implements Connection {
 
     @Override
     public int getNetworkTimeout() throws SQLException {
-        return 0;
+        return getStubDataSource()
+                .getBase()
+                .requestI(new Supplier<Integer, SQLException>() {
+                              @Override
+                              public Integer get() throws SQLException {
+                                  runSql();
+                                  return getRealConnection().getNetworkTimeout();
+                              }
+                          },
+                        callKey("getNetworkTimeout"));
     }
 
     @Override
