@@ -40,4 +40,15 @@ public class AnyStubFileLocator {
         return res + ".yml";
     }
 
+    public static String discoverFile(String stubSuffix) {
+        String s = discoverFile();
+        if (s == null || stubSuffix == null) {
+            return s;
+        }
+        if (s.endsWith(".yml")) {
+            return String.format("%s-%s.yml", s.substring(0, s.length() - 4), stubSuffix);
+        }
+        return String.format("%s-%s", s, stubSuffix);
+
+    }
 }

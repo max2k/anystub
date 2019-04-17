@@ -1,5 +1,6 @@
 package org.anystub;
 
+import org.anystub.mgmt.BaseManagerImpl;
 import org.junit.Test;
 
 import java.io.*;
@@ -18,14 +19,15 @@ public class BaseTest {
 
     @Test
     public void save() throws IOException {
-        Base base = new Base("", "stubSaveTest.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("./stubSaveTest.yml");
 
         base.put("123", "321", "123123");
         base.put("1231", "321", "123123");
         assertEquals("123123", base.get("123", "321"));
         base.save();
 
-        base = new Base("", "stubSaveTest.yml");
+        base.clear();
         Optional<String> opt = base.getOpt("123", "321");
         assertFalse(opt.isPresent());
 
@@ -34,8 +36,8 @@ public class BaseTest {
         opt = base.getOpt("123", "321");
         assertTrue(opt.isPresent());
 
-        base = new Base("", "stubSaveTest.yml")
-                .constrain(Base.RequestMode.rmNone);
+        base.clear();
+        base.constrain(Base.RequestMode.rmNone);
         opt = base.getOpt("123", "321");
         assertTrue(opt.isPresent());
     }
@@ -43,7 +45,7 @@ public class BaseTest {
 
     @Test
     public void stringRequest() {
-        Base base = new Base();
+        Base base = BaseManagerImpl.instance().getBase();
         String request = base.request(() -> "xxx", "qwe", "stringkey");
 
         assertEquals("xxx", request);
@@ -51,7 +53,8 @@ public class BaseTest {
 
     @Test
     public void request() {
-        Base base = new Base();
+        Base base = BaseManagerImpl.instance().getBase();
+        base.clear();
         assertTrue(base.isNew());
 
         String rand = base.request("rand", "1002");
@@ -118,7 +121,7 @@ public class BaseTest {
                 "binaryDataB64");
 
 
-        base = new Base("", "stubBin.yml");
+        base = new Base("./stubBin.yml");
         byte[] arr1 = base.request(Base::throwNSE,
                 s -> Base64.getDecoder().decode(s),
                 Base::throwNSE,
@@ -136,7 +139,7 @@ public class BaseTest {
 
     @Test(expected = NoSuchElementException.class)
     public void restrictionTest() {
-        Base base = new Base();
+        Base base = new Base("restrictionTest.yml");
         base.constrain(Base.RequestMode.rmNone);
 
         base.request("restrictionTest");
@@ -186,7 +189,7 @@ public class BaseTest {
     public void requestComplexObject() {
         Human h = new Human(13, 180, 30, 60, "i'm");
 
-        Base base = new Base("", "complexObject.yml");
+        Base base = new Base("./complexObject.yml");
         Human human = base.request2(() -> h,
                 values -> {
                     Iterator<String> v = values.iterator();
@@ -209,11 +212,9 @@ public class BaseTest {
         assertEquals(13, (int) human.id);
 
 
-        base = new Base("", "complexObject.yml");
+        base.clear();
 
-        human = base.request2(() -> {
-                    throw new NoSuchElementException();
-                },
+        human = base.request2(Base::throwNSE,
                 values -> {
                     Iterator<String> v = values.iterator();
                     return new Human(parseInt(v.next()),
@@ -258,8 +259,10 @@ public class BaseTest {
 
     @Test
     public void nullMatching() {
-        Base base = new Base("", "historyCheck.yml")
-                .constrain(Base.RequestMode.rmNew);
+        Base base = BaseManagerImpl.instance()
+                .getBase("./historyCheck.yml");
+        base.clear();
+        base.constrain(Base.RequestMode.rmNew);
 
         assertEquals(0L, base.times());
 
@@ -273,7 +276,8 @@ public class BaseTest {
 
     @Test
     public void regexpMatching() {
-        Base base = new Base("", "historyCheck.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("./historyCheck.yml");
 
         base.request(() -> "okok", "2222", "3", "3");
         base.request(() -> "okok", "2321", "3345", "4");
@@ -306,7 +310,7 @@ public class BaseTest {
 
         assertTrue(exceptionCaught);
 
-        base = new Base("./exceptionStub.yml");
+        base.clear();
         exceptionCaught = false;
         try {
             base.request(() -> {
@@ -401,7 +405,7 @@ public class BaseTest {
     public void isTextTest() {
         assertTrue(Base.isText("thisistextline"));
         assertTrue(Base.isText("{\"this is\": \'text' }; line"));
-        assertFalse(Base.isText("thisistextline"+ (char) 0x03));
+        assertFalse(Base.isText("thisistextline" + (char) 0x03));
     }
 
 }
