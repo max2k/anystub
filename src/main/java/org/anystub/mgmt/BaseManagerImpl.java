@@ -2,13 +2,10 @@ package org.anystub.mgmt;
 
 import org.anystub.Base;
 
-import java.nio.file.FileSystemAlreadyExistsException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class BaseManagerImpl implements BaseManager {
     private static BaseManagerImpl baseManager = new BaseManagerImpl();
@@ -23,21 +20,16 @@ public class BaseManagerImpl implements BaseManager {
     }
 
 
+    public Base getBase() {
+        return getBase(getDefaultFilePath());
+    }
     public Base getBase(String filename) {
-        Base base;
-        try {
-            base = new Base(filename);
 
-        } catch (StubFileAlreadyCreatedException e) {
-            Optional<Base> base1 = get(e.filePath);
-            if(base1.isPresent()) {
-                base=base1.get();
-            }else{
-                throw new RuntimeException("Unknown  error");
-            }
-        }
+        String fullPath = filename==null||filename.isEmpty()?
+                getDefaultFilePath():
+                getFilePath(filename);
 
-        return base;
+        return get(fullPath).orElseGet(() -> new Base(fullPath));
     }
 
     public void register(Base base) {
@@ -51,13 +43,24 @@ public class BaseManagerImpl implements BaseManager {
     private Optional<Base> get(String fullFileName) {
         return list
                 .stream()
-                .filter(new Predicate<Base>() {
-                    @Override
-                    public boolean test(Base base) {
-                        return base.getFilePath().equals(fullFileName);
-                    }
-                })
+                .filter(base -> base.getFilePath().equals(fullFileName))
                 .findFirst();
+    }
+
+    public static String getDefaultFilePath() {
+        return "src/test/resources/anystub/stub.yml";
+    }
+
+    public static String getFilePath(String filename) {
+        File file = new File(filename);
+        if (file.getParentFile()==null || file.getParent().isEmpty()) {
+            return "src/test/resources/anystub/" + file.getName();
+        }
+        return file.getPath();
+    }
+
+    public static String getFilePath(String path, String filename) {
+        return new File(path).getPath() + new File(filename).getPath();
     }
 
 }
