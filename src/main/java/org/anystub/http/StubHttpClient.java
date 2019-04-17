@@ -30,16 +30,11 @@ public class StubHttpClient implements HttpClient {
 
     private static final Logger LOGGER = Logger.getLogger(StubHttpClient.class.getName());
 
-    private final Base base;
+    private Base base=null;
     private final HttpClient httpClient;
     private String[] addBodyRules = {};
 
-    // TODO: plain vs base64 encoding selector - requests body/response body matching/ default-auto-selector(on keys)
-
-    // TODO: opt for keys (protocol/host/port/url/headers/entity)
-
-    public StubHttpClient(Base base, HttpClient httpClient) {
-        this.base = base;
+    public StubHttpClient(HttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
@@ -148,9 +143,18 @@ public class StubHttpClient implements HttpClient {
 
     private Base getBase() {
         String s = AnyStubFileLocator.discoverFile();
-        if (s == null) {
+        if (s != null) {
             return BaseManagerImpl.instance().getBase(s);
         }
-        return base;
+        if (base != null) {
+            return base;
+        }
+        return BaseManagerImpl.instance().getBase();
     }
+
+    public StubHttpClient setFallbackBase(Base base) {
+        this.base = base;
+        return this;
+    }
+
 }
