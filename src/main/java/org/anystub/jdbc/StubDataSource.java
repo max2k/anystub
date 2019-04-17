@@ -1,6 +1,8 @@
 package org.anystub.jdbc;
 
+import org.anystub.AnyStubFileLocator;
 import org.anystub.Base;
+import org.anystub.mgmt.BaseManagerImpl;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -11,6 +13,7 @@ import java.util.logging.Logger;
 
 public class StubDataSource implements DataSource {
 
+    final private Logger log = Logger.getLogger("StubDataSource");
     final private DataSource realDataSource;
     final private Base base;
 
@@ -26,7 +29,7 @@ public class StubDataSource implements DataSource {
 
     @Override
     public Connection getConnection() throws SQLException {
-        StubConnection stubConnection = new StubConnection( this);
+        StubConnection stubConnection = new StubConnection(this);
         return spy(stubConnection);
     }
 
@@ -78,6 +81,12 @@ public class StubDataSource implements DataSource {
 
 
     public Base getBase() {
+
+        String s = AnyStubFileLocator.discoverFile();
+        if (s != null) {
+            return BaseManagerImpl.instance().getBase(s);
+        }
+
         return base;
     }
 

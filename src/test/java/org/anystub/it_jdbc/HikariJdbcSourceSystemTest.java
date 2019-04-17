@@ -2,6 +2,7 @@ package org.anystub.it_jdbc;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.jdbc.StubDataSource;
 import org.junit.Test;
@@ -24,8 +25,9 @@ import static org.mockito.Mockito.spy;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
+@AnyStubId
 public class HikariJdbcSourceSystemTest {
-    private Logger log = Logger.getLogger("test");
+    private final static Logger log = Logger.getLogger("test");
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -62,6 +64,25 @@ public class HikariJdbcSourceSystemTest {
         assertEquals("Long", query.get(1).last_name);
     }
 
+    @Test
+    @AnyStubId(filename = "testcasefile.yml")
+    public void testCaseFileTest() {
+
+
+
+        log.info("Creating tables");
+
+        jdbcTemplate.execute("DROP TABLE testcasefile IF EXISTS");
+    }
+
+    @Test
+    @AnyStubId()
+    public void testCaseNameTest() {
+
+        log.info("Creating tables");
+
+        jdbcTemplate.execute("DROP TABLE testcasename IF EXISTS");
+    }
 
     @TestConfiguration
     static class Conf {
@@ -78,6 +99,7 @@ public class HikariJdbcSourceSystemTest {
             DataSource stubDataSource = new StubDataSource(ds, base);
             return spy(stubDataSource);
         }
+
 
     }
 }

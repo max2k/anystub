@@ -1,5 +1,6 @@
 package org.anystub;
 
+import org.anystub.mgmt.BaseManagerImpl;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -59,6 +60,8 @@ public class Base {
 
     public Base() {
         filePath = "src/test/resources/anystub/stub.yml";
+        BaseManagerImpl.instance().register(this);
+
     }
 
     /**
@@ -76,6 +79,7 @@ public class Base {
         } else {
             this.filePath = file.getPath();
         }
+        BaseManagerImpl.instance().register(this);
     }
 
     /**
@@ -85,6 +89,7 @@ public class Base {
      */
     public Base(String path, String filename) {
         this.filePath = new File(path).getPath() + new File(filename).getPath();
+        BaseManagerImpl.instance().register(this);
     }
 
 
@@ -424,7 +429,7 @@ public class Base {
         try {
             load();
         } catch (IOException e) {
-            log.warning(()->"loading failed during loading: " + e);
+            log.warning(()->"loading failed: " + e);
         }
     }
 
@@ -675,4 +680,7 @@ public class Base {
         return text.matches("\\p{Print}*");
     }
 
+    public String getFilePath() {
+        return filePath;
+    }
 }
