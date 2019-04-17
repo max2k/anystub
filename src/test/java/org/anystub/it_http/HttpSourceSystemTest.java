@@ -62,7 +62,7 @@ public class HttpSourceSystemTest {
     static class Conf {
 
         @Bean
-        Base HttpBase() {
+        Base httpBase() {
             return new Base("httpStub.yml");
         }
 
@@ -70,7 +70,7 @@ public class HttpSourceSystemTest {
         public HttpClient createHttpClient(Base httpBase) {
 
             HttpClient real = HttpClientBuilder.create().build();
-            StubHttpClient result = new StubHttpClient(httpBase, real);
+            StubHttpClient result = new StubHttpClient(real).setFallbackBase(httpBase);
 
             return result.addBodyToKeyRules("random/xxx");
 

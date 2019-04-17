@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class BaseManagerImpl implements BaseManager {
     private static BaseManagerImpl baseManager = new BaseManagerImpl();
@@ -21,15 +22,21 @@ public class BaseManagerImpl implements BaseManager {
 
 
     public Base getBase() {
-        return getBase(getDefaultFilePath());
+        return getBase(getFilePath());
     }
+
     public Base getBase(String filename) {
 
-        String fullPath = filename==null||filename.isEmpty()?
-                getDefaultFilePath():
+        String fullPath = filename == null || filename.isEmpty() ?
+                getFilePath() :
                 getFilePath(filename);
 
-        return get(fullPath).orElseGet(() -> new Base(fullPath));
+        return get(fullPath).orElseGet(new Supplier<Base>() {
+            @Override
+            public Base get() {
+                return new Base(fullPath);
+            }
+        });
     }
 
     public void register(Base base) {
@@ -47,20 +54,20 @@ public class BaseManagerImpl implements BaseManager {
                 .findFirst();
     }
 
-    public static String getDefaultFilePath() {
-        return "src/test/resources/anystub/stub.yml";
+    public static String getFilePath() {
+        return new File("src/test/resources/anystub/stub.yml").getPath();
     }
 
     public static String getFilePath(String filename) {
         File file = new File(filename);
-        if (file.getParentFile()==null || file.getParent().isEmpty()) {
-            return "src/test/resources/anystub/" + file.getName();
+        if (file.getParentFile() == null || file.getParent().isEmpty()) {
+            return new File("src/test/resources/anystub").getPath() + File.separator + file.getPath();
         }
         return file.getPath();
     }
 
     public static String getFilePath(String path, String filename) {
-        return new File(path).getPath() + new File(filename).getPath();
+        return new File(path).getPath() + File.separator + new File(filename).getPath();
     }
 
 }

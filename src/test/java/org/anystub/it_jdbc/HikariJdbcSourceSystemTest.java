@@ -96,7 +96,9 @@ public class HikariJdbcSourceSystemTest {
             config.setJdbcUrl("jdbc:h2:./test4;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
             HikariDataSource ds = new HikariDataSource(config);
 
-            DataSource stubDataSource = new StubDataSource(ds, base);
+            DataSource stubDataSource = new StubDataSource(ds)
+                    .setFallbackBase(base)
+                    .setStubSuffix("hikariTest");
             return spy(stubDataSource);
         }
 
