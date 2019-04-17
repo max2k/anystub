@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
-import java.util.MissingFormatArgumentException;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;

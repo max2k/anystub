@@ -51,12 +51,18 @@ public class HttpSourceSystemTest {
         restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random/xxx", "{test}", String.class);
     }
 
+    @Test
+    public void getBase64Test() {
+        ResponseEntity<String> forEntity = restTemplate.getForEntity("https://test", String.class);
+        assertEquals("test", forEntity.getBody());
+    }
+
 
     @TestConfiguration
     static class Conf {
 
         @Bean
-        Base HttpBase() {
+        Base httpBase() {
             return new Base("httpStub.yml");
         }
 
@@ -64,7 +70,7 @@ public class HttpSourceSystemTest {
         public HttpClient createHttpClient(Base httpBase) {
 
             HttpClient real = HttpClientBuilder.create().build();
-            StubHttpClient result = new StubHttpClient(httpBase, real);
+            StubHttpClient result = new StubHttpClient(real).setFallbackBase(httpBase);
 
             return result.addBodyToKeyRules("random/xxx");
 

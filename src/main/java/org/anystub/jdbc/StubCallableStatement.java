@@ -227,7 +227,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                           },
                         values -> new BigDecimal(values.iterator().next()),
                         aLong -> singletonList(aLong.toString()),
-                        callKey("getBigDecimal", i));
+                        callKey("getBigDecimal", i, i1));
     }
 
     @Override

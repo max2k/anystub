@@ -1,10 +1,29 @@
 package org.anystub;
 
+import org.anystub.mgmt.BaseManagerImpl;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,17 +33,16 @@ import static java.util.Collections.singletonList;
 
 /**
  * provide basic access to stub-file
- *
+ * <p>
  * methods put/get* allow work with in-memory cache
  * methods request* allow get/keep data in file
- *
+ * <p>
  * you can control case of using file-cache by constrain:
  * - rmNew  first seek in cache if failed make real request
  * - rmNone  first seek in cache if failed throw {@link NoSuchElementException}
  * - rmAll  makes real request without seeking in cache (use it for logging), keep all requests in the stub
- *
+ * <p>
  * * most of the methods return this to cascading operations
- *
  */
 public class Base {
 
@@ -58,7 +76,9 @@ public class Base {
     }
 
     public Base() {
-        filePath = "src/test/resources/anystub/stub.yml";
+        filePath = BaseManagerImpl.getFilePath();
+        BaseManagerImpl.instance().register(this);
+
     }
 
     /**
@@ -70,21 +90,17 @@ public class Base {
      * @param filename used file name
      */
     public Base(String filename) {
-        File file = new File(filename);
-        if (file.getParentFile()==null || file.getParent().isEmpty()) {
-            this.filePath = "src/test/resources/anystub/" + file.getName();
-        } else {
-            this.filePath = file.getPath();
-        }
+        this.filePath = BaseManagerImpl.getFilePath(filename);
+        BaseManagerImpl.instance().register(this);
     }
 
     /**
-     * new Base("", "stub.yml") equal to new Base("./stub.yml")
-     * @param path dir
+     * @param path     dir
      * @param filename file
      */
     public Base(String path, String filename) {
-        this.filePath = new File(path).getPath() + new File(filename).getPath();
+        this.filePath = BaseManagerImpl.getFilePath(path, filename);
+        BaseManagerImpl.instance().register(this);
     }
 
 
@@ -158,6 +174,7 @@ public class Base {
      * Finds document with given keys. if document is found then returns the 1st value from it's response.
      * If document is not found then returns empty Optional. If found document contains exception the exception will be
      * raised.
+     *
      * @param keys for search of the document
      * @return first value from document's response or empty
      */
@@ -210,10 +227,10 @@ public class Base {
     /**
      * Requests string. looking Document in cache. If it is not found then gets value using supplier.
      * Use supplier to request real system. Use this method if response just a {@link String}
-
+     *
      * @param supplier method to obtain response
-     * @param keys keys for document and parameters for request real system
-     * @param <E> some
+     * @param keys     keys for document and parameters for request real system
+     * @param <E>      some
      * @return response from real system
      * @throws E type of expected exception
      */
@@ -240,10 +257,11 @@ public class Base {
 
     /**
      * requests serializable object
+     *
      * @param supplier provides requested object
-     * @param keys keys for document and parameters for request real system
-     * @param <T> expected type for requested object
-     * @param <E> expected exception
+     * @param keys     keys for document and parameters for request real system
+     * @param <T>      expected type for requested object
+     * @param <E>      expected exception
      * @return recovered object
      * @throws E expected exception
      */
@@ -387,7 +405,7 @@ public class Base {
             try {
                 save();
             } catch (IOException ioEx) {
-                log.warning(()->"exception information is not saved into stub: " + ioEx);
+                log.warning(() -> "exception information is not saved into stub: " + ioEx);
             }
             throw ex;
         }
@@ -408,7 +426,7 @@ public class Base {
         try {
             save();
         } catch (IOException ex) {
-            log.warning(()->"exception information is not saved into stub: " + ex);
+            log.warning(() -> "exception information is not saved into stub: " + ex);
         }
         if (responseData == null) {
             return null;
@@ -424,12 +442,13 @@ public class Base {
         try {
             load();
         } catch (IOException e) {
-            log.warning(()->"loading failed during loading: " + e);
+            log.warning(() -> "loading failed: " + e);
         }
     }
 
     /**
      * cleans history, reloads stub-file
+     *
      * @throws IOException due to file access error
      */
     private void load() throws IOException {
@@ -441,12 +460,12 @@ public class Base {
 
             if (load instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) load;
-                map.forEach((k,v)-> documentList
+                map.forEach((k, v) -> documentList
                         .add(new Document((Map<String, Object>) v)));
             }
             isNew = false;
-        }catch (FileNotFoundException e) {
-            log.info(()->String.format("stub file %s is not found: %s", file.getAbsolutePath(), e));
+        } catch (FileNotFoundException e) {
+            log.info(() -> String.format("stub file %s is not found: %s", file.getAbsolutePath(), e));
         }
     }
 
@@ -462,13 +481,13 @@ public class Base {
 
         if (path != null && !path.exists()) {
             if (path.mkdirs())
-                log.info(()->"dirs created");
+                log.info(() -> "dirs created");
             else
                 throw new IOException("dirs for stub isn't created");
         }
         if (!file.exists()) {
             if (file.createNewFile())
-                log.info(()->"stub file is created:" + file.getAbsolutePath());
+                log.info(() -> "stub file is created:" + file.getAbsolutePath());
             else
                 throw new IOException("stub file isn't created");
         }
@@ -495,6 +514,7 @@ public class Base {
 
     /**
      * clear buffer, set isNew to true
+     * doesn't touch appropriate file (a note: just remove a file you need to remove manually )
      */
     public void clear() {
         documentList.clear();
@@ -661,12 +681,12 @@ public class Base {
         }
     }
 
-    public static <T extends Serializable> T decode(String s){
+    public static <T extends Serializable> T decode(String s) {
         byte[] decode = Base64.getDecoder().decode(s);
-        try(ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
-            ObjectInputStream si = new ObjectInputStream(byteArrayInputStream)){
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
+             ObjectInputStream si = new ObjectInputStream(byteArrayInputStream)) {
             return (T) si.readObject();
-        } catch (ClassNotFoundException| IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -675,4 +695,7 @@ public class Base {
         return text.matches("\\p{Print}*");
     }
 
+    public String getFilePath() {
+        return filePath;
+    }
 }

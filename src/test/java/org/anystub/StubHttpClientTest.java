@@ -3,9 +3,7 @@ package org.anystub;
 import org.anystub.http.StubHttpClient;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
@@ -17,13 +15,11 @@ import static org.junit.Assert.assertEquals;
 public class StubHttpClientTest {
 
     @Test
+    @AnyStubId(filename = "httpStub-static.yml")
     public void executeGetTest() throws IOException {
 
-        Base base = new Base("httpStub-static.yml")
-                .constrain(Base.RequestMode.rmNone);
-
         HttpClient real = HttpClients.createDefault();
-        StubHttpClient result = new StubHttpClient(base, real);
+        StubHttpClient result = new StubHttpClient(real);
 
         HttpGet httpUriRequest = new HttpGet("https://gturnquist-quoters.cfapps.io:443/api/random");
         HttpResponse response = result.execute(httpUriRequest);
@@ -33,13 +29,11 @@ public class StubHttpClientTest {
     }
 
     @Test
+    @AnyStubId(filename = "httpStub-static")
     public void executeHostUriTest() throws IOException {
 
-        Base base = new Base("httpStub-static.yml")
-                .constrain(Base.RequestMode.rmNone);
-
         HttpClient real = HttpClients.createDefault();
-        StubHttpClient result = new StubHttpClient(base, real);
+        StubHttpClient result = new StubHttpClient(real);
 
         HttpHost httpHost = new HttpHost("gturnquist-quoters.cfapps.io", 443, "https");
         HttpGet httpUriRequest = new HttpGet("/api/random");
@@ -56,7 +50,7 @@ public class StubHttpClientTest {
                 .constrain(Base.RequestMode.rmNone);
 
         HttpClient real = HttpClients.createDefault();
-        StubHttpClient result = new StubHttpClient(base, real);
+        StubHttpClient result = new StubHttpClient(real).setFallbackBase(base);
 
         HttpGet httpUriRequest = new HttpGet("https://gturnquist-quoters.cfapps.io:443/api/random");
         int response = result.execute(httpUriRequest,

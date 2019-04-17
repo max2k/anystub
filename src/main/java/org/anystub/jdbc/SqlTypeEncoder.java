@@ -1,7 +1,6 @@
 package org.anystub.jdbc;
 
 import javax.sql.rowset.serial.SerialBlob;
-import javax.sql.rowset.serial.SerialClob;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,12 +14,15 @@ import java.util.Base64;
 import static java.util.Collections.singletonList;
 
 public class SqlTypeEncoder {
+
+    public static final String BASE_64 = "BASE64 ";
+
     private SqlTypeEncoder() {
     }
 
     public static Blob decodeBlob(Iterable<String> values) {
         String next = values.iterator().next();
-        if (next.startsWith("BASE64 ")) {
+        if (next.startsWith(BASE_64)) {
             next = next.substring(7);
         }
         byte[] bytes = Base64.getDecoder().decode(next);
