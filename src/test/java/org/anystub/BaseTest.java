@@ -290,6 +290,7 @@ public class BaseTest {
     public void regexpMatching() {
         Base base = BaseManagerImpl.instance()
                 .getBase("./historyCheck.yml");
+        base.clear();
 
         base.request(() -> "okok", "2222", "3", "3");
         base.request(() -> "okok", "2321", "3345", "4");
