@@ -1,6 +1,7 @@
 package org.anystub.it;
 
 import org.anystub.Base;
+import org.anystub.mgmt.BaseManagerImpl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ public class WorkerEasyTest {
 
     @Before
     public void createStub() {
-        Base base = new Base();
+        Base base = BaseManagerImpl.instance().getBase();
         sourceSystem = new SourceSystem("http://localhost:8080") {
             @Override
             public String get() throws IOException {

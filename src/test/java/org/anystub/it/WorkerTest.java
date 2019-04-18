@@ -1,6 +1,7 @@
 package org.anystub.it;
 
 import org.anystub.Base;
+import org.anystub.mgmt.BaseManagerImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,7 @@ public class WorkerTest {
 
         @Bean
         Base base() {
-            return new Base();
+            return BaseManagerImpl.instance().getBase();
         }
 
         @Bean

@@ -1,6 +1,8 @@
 package org.anystub.jdbc;
 
+import org.anystub.AnyStubFileLocator;
 import org.anystub.Base;
+import org.anystub.mgmt.BaseManagerImpl;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -11,22 +13,22 @@ import java.util.logging.Logger;
 
 public class StubDataSource implements DataSource {
 
+    final private Logger log = Logger.getLogger("StubDataSource");
     final private DataSource realDataSource;
-    final private Base base;
+    private Base base = null;
+    private String stubSuffix = null;
 
-    public StubDataSource(DataSource realDataSource, Base base) {
+    public StubDataSource(DataSource realDataSource) {
         this.realDataSource = realDataSource;
-        this.base = base;
     }
 
-    public StubDataSource(DataSource realDataSource, Base base, Spier spier) {
+    public StubDataSource(DataSource realDataSource, Spier spier) {
         this.realDataSource = realDataSource;
-        this.base = base;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        StubConnection stubConnection = new StubConnection( this);
+        StubConnection stubConnection = new StubConnection(this);
         return spy(stubConnection);
     }
 
@@ -78,11 +80,30 @@ public class StubDataSource implements DataSource {
 
 
     public Base getBase() {
-        return base;
+
+        String s = AnyStubFileLocator.discoverFile(stubSuffix);
+        if (s != null) {
+            return BaseManagerImpl.instance().getBase(s);
+        }
+        if (base != null) {
+            return base;
+        }
+        return BaseManagerImpl.instance().getBase();
+
     }
 
     public DataSource getRealDataSource() {
         return realDataSource;
+    }
+
+    public StubDataSource setFallbackBase(Base base) {
+        this.base = base;
+        return this;
+    }
+
+    public StubDataSource setStubSuffix(String s) {
+        this.stubSuffix = s;
+        return this;
     }
 
 }

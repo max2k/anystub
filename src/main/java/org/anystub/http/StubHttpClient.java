@@ -1,8 +1,10 @@
 package org.anystub.http;
 
 
+import org.anystub.AnyStubFileLocator;
 import org.anystub.Base;
 import org.anystub.Supplier;
+import org.anystub.mgmt.BaseManagerImpl;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -28,16 +30,11 @@ public class StubHttpClient implements HttpClient {
 
     private static final Logger LOGGER = Logger.getLogger(StubHttpClient.class.getName());
 
-    private final Base base;
+    private Base base=null;
     private final HttpClient httpClient;
-    private String[] addBodyRules ={};
+    private String[] addBodyRules = {};
 
-    // TODO: plain vs base64 encoding selector - requests body/response body matching/ default-auto-selector(on keys)
-
-    // TODO: opt-out keys (protocol/host/port/url/headers/entity)
-
-    public StubHttpClient(Base base, HttpClient httpClient) {
-        this.base = base;
+    public StubHttpClient(HttpClient httpClient) {
         this.httpClient = httpClient;
     }
 
@@ -54,43 +51,46 @@ public class StubHttpClient implements HttpClient {
 
     @Override
     public HttpResponse execute(HttpUriRequest httpUriRequest) throws IOException, ClientProtocolException {
-        return base.request2(new Supplier<HttpResponse, IOException>() {
-                                 @Override
-                                 public HttpResponse get() throws IOException {
-                                     HttpResponse execute1 = httpClient.execute(httpUriRequest);
-                                     LOGGER.finest("response: " + execute1);
-                                     return execute1;
-                                 }
-                             },
-                new DecoderHttpResponse(),
-                new EncoderHttpResponse(),
-                keys(httpUriRequest));
+        return getBase()
+                .request2(new Supplier<HttpResponse, IOException>() {
+                              @Override
+                              public HttpResponse get() throws IOException {
+                                  HttpResponse execute1 = httpClient.execute(httpUriRequest);
+                                  LOGGER.finest("response: " + execute1);
+                                  return execute1;
+                              }
+                          },
+                        new DecoderHttpResponse(),
+                        new EncoderHttpResponse(),
+                        keys(httpUriRequest));
     }
 
     @Override
     public HttpResponse execute(HttpUriRequest httpUriRequest, HttpContext httpContext) throws IOException, ClientProtocolException {
-        return base.request2(new Supplier<HttpResponse, IOException>() {
-                                 @Override
-                                 public HttpResponse get() throws IOException {
-                                     return httpClient.execute(httpUriRequest, httpContext);
-                                 }
-                             },
-                new DecoderHttpResponse(),
-                new EncoderHttpResponse(),
-                keys(httpUriRequest));
+        return getBase()
+                .request2(new Supplier<HttpResponse, IOException>() {
+                              @Override
+                              public HttpResponse get() throws IOException {
+                                  return httpClient.execute(httpUriRequest, httpContext);
+                              }
+                          },
+                        new DecoderHttpResponse(),
+                        new EncoderHttpResponse(),
+                        keys(httpUriRequest));
     }
 
     @Override
     public HttpResponse execute(HttpHost httpHost, HttpRequest httpRequest) throws IOException, ClientProtocolException {
-        return base.request2(new Supplier<HttpResponse, IOException>() {
-                                 @Override
-                                 public HttpResponse get() throws IOException {
-                                     return httpClient.execute(httpHost, httpRequest);
-                                 }
-                             },
-                new DecoderHttpResponse(),
-                new EncoderHttpResponse(),
-                HttpUtil.encode(httpRequest, httpHost, addBodyRules).toArray(new String[0]));
+        return getBase()
+                .request2(new Supplier<HttpResponse, IOException>() {
+                              @Override
+                              public HttpResponse get() throws IOException {
+                                  return httpClient.execute(httpHost, httpRequest);
+                              }
+                          },
+                        new DecoderHttpResponse(),
+                        new EncoderHttpResponse(),
+                        HttpUtil.encode(httpRequest, httpHost, addBodyRules).toArray(new String[0]));
     }
 
     @Override
@@ -98,15 +98,16 @@ public class StubHttpClient implements HttpClient {
         LOGGER.info("execute(HttpUriRequest httpUriRequest, HttpContext httpContext)");
         LOGGER.info(() -> String.format("input parameters: %s, %s", httpRequest, httpContext));
 
-        return base.request2(new Supplier<HttpResponse, IOException>() {
-                                 @Override
-                                 public HttpResponse get() throws IOException {
-                                     return httpClient.execute(httpHost, httpRequest, httpContext);
-                                 }
-                             },
-                new DecoderHttpResponse(),
-                new EncoderHttpResponse(),
-                keys(httpRequest));
+        return getBase()
+                .request2(new Supplier<HttpResponse, IOException>() {
+                              @Override
+                              public HttpResponse get() throws IOException {
+                                  return httpClient.execute(httpHost, httpRequest, httpContext);
+                              }
+                          },
+                        new DecoderHttpResponse(),
+                        new EncoderHttpResponse(),
+                        keys(httpRequest));
     }
 
     @Override
@@ -135,8 +136,25 @@ public class StubHttpClient implements HttpClient {
     }
 
     public StubHttpClient addBodyToKeyRules(String partOfUrl) {
-        this.addBodyRules = Arrays.copyOf(this.addBodyRules, addBodyRules.length+1);
-        this.addBodyRules[this.addBodyRules.length-1] = partOfUrl;
+        this.addBodyRules = Arrays.copyOf(this.addBodyRules, addBodyRules.length + 1);
+        this.addBodyRules[this.addBodyRules.length - 1] = partOfUrl;
         return this;
     }
+
+    private Base getBase() {
+        String s = AnyStubFileLocator.discoverFile();
+        if (s != null) {
+            return BaseManagerImpl.instance().getBase(s);
+        }
+        if (base != null) {
+            return base;
+        }
+        return BaseManagerImpl.instance().getBase();
+    }
+
+    public StubHttpClient setFallbackBase(Base base) {
+        this.base = base;
+        return this;
+    }
+
 }
