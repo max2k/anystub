@@ -47,7 +47,7 @@ public class StubHttpClientTest {
     public void executeResponseHandlerTest() throws IOException {
 
         Base base = new Base("httpStub-static.yml")
-                .constrain(Base.RequestMode.rmNone);
+                .constrain(RequestMode.rmNone);
 
         HttpClient real = HttpClients.createDefault();
         StubHttpClient result = new StubHttpClient(real).setFallbackBase(base);

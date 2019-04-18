@@ -2,6 +2,7 @@ package org.anystub.http;
 
 
 import org.anystub.AnyStubFileLocator;
+import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.Supplier;
 import org.anystub.mgmt.BaseManagerImpl;
@@ -142,14 +143,19 @@ public class StubHttpClient implements HttpClient {
     }
 
     private Base getBase() {
-        String s = AnyStubFileLocator.discoverFile();
+        AnyStubId s = AnyStubFileLocator.discoverFile();
         if (s != null) {
-            return BaseManagerImpl.instance().getBase(s);
+            return BaseManagerImpl
+                    .instance()
+                    .getBase(s.filename())
+                    .constrain(s.requestMode());
         }
         if (base != null) {
             return base;
         }
-        return BaseManagerImpl.instance().getBase();
+        return BaseManagerImpl
+                .instance()
+                .getBase();
     }
 
     public StubHttpClient setFallbackBase(Base base) {

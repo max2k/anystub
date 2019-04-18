@@ -1,17 +1,24 @@
 package org.anystub.jdbc;
 
+import org.h2.jdbc.JdbcBlob;
 import org.h2.tools.SimpleResultSet;
 
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 public class ResultSetUtil {
 
@@ -108,15 +115,29 @@ public class ResultSetUtil {
                 ArrayList<Object> row = new ArrayList<>();
                 for (int i = 0; i < columnCount; i++) {
                     String next = it.next();
-                    row.add(next);
+                    Object item;
+                    try {
+                        item = recoverType(next, simpleResultSet.getColumnType(i+1));
+                    } catch (SQLException e) {
+                        item = next;
+                    }
+                    row.add(item);
                     if (doubleColumnIndexes.contains(i)) {
-                        row.add(next);
+                        row.add(item);
                     }
                 }
                 simpleResultSet.addRow((Object []) row.toArray(new Object[0]));
             }
         }
         return simpleResultSet;
+    }
+
+
+    private static Object recoverType(String next, int columnType){
+        if(columnType == Types.BLOB) {
+            return SqlTypeEncoder.decodeBlob(singletonList(next));
+        }
+        return next;
     }
 
 }
