@@ -90,7 +90,9 @@ public class BaseTest {
 
     @Test(expected = NoSuchElementException.class)
     public void requestException() {
-        Base base = new Base();
+        Base base = BaseManagerImpl.instance()
+                .getBase();
+        base.clear();
         assertTrue(base.isNew());
 
         base.request("rand", "1002", "notakey");
@@ -98,7 +100,9 @@ public class BaseTest {
 
     @Test
     public void binaryDataTest() {
-        Base base = new Base("", "stubBin.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("./stubBin.yml");
+        base.clear();
 
         byte[] arr = new byte[256];
         IntStream.range(0, 256).forEach(x -> arr[x] = (byte) (x));
@@ -121,7 +125,7 @@ public class BaseTest {
                 "binaryDataB64");
 
 
-        base = new Base("./stubBin.yml");
+        base.clear();
         byte[] arr1 = base.request(Base::throwNSE,
                 s -> Base64.getDecoder().decode(s),
                 Base::throwNSE,
@@ -139,7 +143,9 @@ public class BaseTest {
 
     @Test(expected = NoSuchElementException.class)
     public void restrictionTest() {
-        Base base = new Base("restrictionTest.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("restrictionTest.yml");
+        base.clear();
         base.constrain(Base.RequestMode.rmNone);
 
         base.request("restrictionTest");
@@ -176,7 +182,8 @@ public class BaseTest {
     @Test
     public void requestNull() {
 
-        Base base = new Base("", "NullObj.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("./NullObj.yml");
         Human human = base.request2(() -> null,
                 values -> null,
                 x -> emptyList(),
@@ -189,7 +196,10 @@ public class BaseTest {
     public void requestComplexObject() {
         Human h = new Human(13, 180, 30, 60, "i'm");
 
-        Base base = new Base("./complexObject.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("./complexObject.yml");
+        base.clear();
+        
         Human human = base.request2(() -> h,
                 values -> {
                     Iterator<String> v = values.iterator();
@@ -236,7 +246,9 @@ public class BaseTest {
 
     @Test
     public void historyCheck() {
-        Base base = new Base("", "historyCheck.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("./historyCheck.yml");
+        base.clear();
 
         assertEquals(0L, base.times());
 
@@ -278,6 +290,7 @@ public class BaseTest {
     public void regexpMatching() {
         Base base = BaseManagerImpl.instance()
                 .getBase("./historyCheck.yml");
+        base.clear();
 
         base.request(() -> "okok", "2222", "3", "3");
         base.request(() -> "okok", "2321", "3345", "4");
@@ -298,7 +311,10 @@ public class BaseTest {
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void exceptionTest() {
-        Base base = new Base("./exceptionStub.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("./exceptionStub.yml");
+        base.clear();
+        
         boolean exceptionCaught = false;
         try {
             base.request(() -> {
@@ -326,7 +342,9 @@ public class BaseTest {
 
     @Test
     public void nullReturning() {
-        Base base = new Base("./nullReturning.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("./nullReturning.yml");
+        base.clear();
 
         String[] emptyResult = base.requestArray(() -> null,
                 "nullKey");
@@ -344,7 +362,9 @@ public class BaseTest {
 
     @Test
     public void request_oneway_object() throws IOException {
-        Base base = new Base("./streams.yml").constrain(Base.RequestMode.rmAll);
+        Base base = BaseManagerImpl.instance()
+                .getBase("./streams.yml")
+                .constrain(Base.RequestMode.rmAll);
         base.clear();
         base.save();
 
@@ -372,7 +392,9 @@ public class BaseTest {
 
     @Test
     public void requestSerializableTest() {
-        Base base = new Base("./serialize.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("./serialize.yml");
+        base.clear();
 
         AAA aaa = base.requestSerializable(() -> new AAA(), "123");
         assertEquals(1, aaa.aaa);
@@ -384,7 +406,9 @@ public class BaseTest {
 
     @Test
     public void fileInResourcesTest() {
-        Base base = new Base("in-res.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("in-res.yml");
+        base.clear();
 
         String test = base.request(() -> "xxx", "test");
         assertEquals("xxx", test);
@@ -393,7 +417,9 @@ public class BaseTest {
     @Test
     public void punctuationInStub() {
 
-        Base base = new Base("./punctuation.yml");
+        Base base = BaseManagerImpl.instance()
+                .getBase("./punctuation.yml");
+        base.clear();
 
         String request = base.request(() -> "[][!\"#$%&'()*+,./:;<=>?@\\^_`{|}~-]", "[][!\"#$%&'()*+,./:;<=>?@\\^_`{|}~-]");
 
