@@ -7,8 +7,8 @@ import java.sql.SQLException;
 
 public class StubResultSetMetaData implements ResultSetMetaData {
 
-    final private StubConnection stubConnection;
-    final private StubPreparedStatement stubPreparedStatement;
+    private final StubConnection stubConnection;
+    private final StubPreparedStatement stubPreparedStatement;
     private ResultSetMetaData realResultSetMetaData = null;
 
     public StubResultSetMetaData(StubConnection stubConnection, StubPreparedStatement stubPreparedStatement) throws SQLException {

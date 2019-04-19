@@ -4,8 +4,8 @@ import java.lang.annotation.Annotation;
 
 public class AnyStubIdData implements AnyStubId {
 
-    final private String filename;
-    final private RequestMode requestMode;
+    private final String filename;
+    private final RequestMode requestMode;
 
     public AnyStubIdData(String filename, RequestMode requestMode) {
         this.filename = filename;

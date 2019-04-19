@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.spy;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
@@ -100,7 +99,7 @@ public class HikariJdbcSourceSystemTest {
             DataSource stubDataSource = new StubDataSource(ds)
                     .setFallbackBase(base)
                     .setStubSuffix("hikariTest");
-            return spy(stubDataSource);
+            return stubDataSource;
         }
 
     }

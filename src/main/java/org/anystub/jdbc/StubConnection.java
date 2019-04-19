@@ -27,14 +27,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingFormatArgumentException;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
-
-import static java.util.Arrays.asList;
 
 public class StubConnection implements Connection {
 

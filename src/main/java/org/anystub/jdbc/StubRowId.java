@@ -4,7 +4,7 @@ import java.sql.RowId;
 import java.util.Arrays;
 
 public class StubRowId implements RowId {
-    final byte[] rowid;
+    private final byte[] rowid;
 
     public StubRowId(byte[] rowid) {
         this.rowid = rowid;
