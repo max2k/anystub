@@ -103,6 +103,5 @@ public class HikariJdbcSourceSystemTest {
             return spy(stubDataSource);
         }
 
-
     }
 }

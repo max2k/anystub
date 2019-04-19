@@ -1,18 +1,12 @@
 package org.anystub.it_jdbc;
 
 import org.anystub.AnyStubId;
-import org.anystub.Base;
-import org.anystub.jdbc.StubDataSource;
-import org.anystub.mgmt.BaseManagerImpl;
-import org.h2.jdbcx.JdbcDataSource;
 import org.h2.tools.SimpleResultSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -39,17 +33,16 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.spy;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
+@AnyStubId(filename = "jdbcStub.yml")
 public class JdbcSourceSystemTest {
 
     private Logger log = Logger.getLogger("test");
@@ -69,66 +62,58 @@ public class JdbcSourceSystemTest {
     @Test
     public void someTest() {
 
-        try {
 
-            log.info("Creating tables");
+        log.info("Creating tables");
 
-            jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
-            jdbcTemplate.execute("CREATE TABLE customers(" +
-                    "id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
+        jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
+        jdbcTemplate.execute("CREATE TABLE customers(" +
+                "id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
 
-            // Split up the array of whole names into an array of first/last names
-            List<Object[]> splitUpNames = Arrays.asList("John Woo", "Jeff Dean", "Josh Bloch", "Josh Long").stream()
-                    .map(name -> name.split(" "))
-                    .collect(Collectors.toList());
+        // Split up the array of whole names into an array of first/last names
+        List<Object[]> splitUpNames = Arrays.asList("John Woo", "Jeff Dean", "Josh Bloch", "Josh Long").stream()
+                .map(name -> name.split(" "))
+                .collect(Collectors.toList());
 
-            // Use a Java 8 stream to print out each tuple of the list
-            splitUpNames.forEach(name -> log.info(String.format("Inserting customer record for %s %s", name[0], name[1])));
+        // Use a Java 8 stream to print out each tuple of the list
+        splitUpNames.forEach(name -> log.info(String.format("Inserting customer record for %s %s", name[0], name[1])));
 
-            // Uses JdbcTemplate's batchUpdate operation to bulk load data
-            jdbcTemplate.batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)", splitUpNames);
+        // Uses JdbcTemplate's batchUpdate operation to bulk load data
+        jdbcTemplate.batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)", splitUpNames);
 
-            log.info("Querying for customer records where first_name = 'Josh':");
-            List<Customer> query = jdbcTemplate.query(
-                    "SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                    (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
-            );
+        log.info("Querying for customer records where first_name = 'Josh':");
+        List<Customer> query = jdbcTemplate.query(
+                "SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new Object[]{"Josh"},
+                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
+        );
 
-            query.forEach(customer -> log.info(customer.toString()));
+        query.forEach(customer -> log.info(customer.toString()));
 
-            assertEquals(2, query.size());
-            assertEquals("Bloch", query.get(0).last_name);
-            assertEquals("Long", query.get(1).last_name);
-        } finally {
-            after();
-        }
+        assertEquals(2, query.size());
+        assertEquals("Bloch", query.get(0).last_name);
+        assertEquals("Long", query.get(1).last_name);
+
     }
 
 
     @Test
     public void storeProcedureTest() {
-        try {
+        jdbcTemplate.execute("DROP ALIAS SP_HELLO if Exists");
+        jdbcTemplate.execute("CREATE ALIAS SP_HELLO AS $$\n" +
+                "String spHello(String value) {\n" +
+                "    return \"HELLO: \"+value;\n" +
+                "}\n" +
+                "$$;");
 
-            jdbcTemplate.execute("DROP ALIAS SP_HELLO if Exists");
-            jdbcTemplate.execute("CREATE ALIAS SP_HELLO AS $$\n" +
-                    "String spHello(String value) {\n" +
-                    "    return \"HELLO: \"+value;\n" +
-                    "}\n" +
-                    "$$;");
+        List<String> query = jdbcTemplate.query("call SP_HELLO('XX');", new RowMapper<String>() {
+            @Override
+            public String mapRow(ResultSet resultSet, int i) throws SQLException {
+                return resultSet.getString(1);
+            }
 
-            List<String> query = jdbcTemplate.query("call SP_HELLO('XX');", new RowMapper<String>() {
-                @Override
-                public String mapRow(ResultSet resultSet, int i) throws SQLException {
-                    return resultSet.getString(1);
-                }
+        });
 
-            });
-
-            assertEquals(1, query.size());
-            assertEquals("HELLO: XX", query.get(0));
-        } finally {
-            after();
-        }
+        assertEquals(1, query.size());
+        assertEquals("HELLO: XX", query.get(0));
     }
 
     @AnyStubId
@@ -263,45 +248,6 @@ public class JdbcSourceSystemTest {
     private static List<Statement> statements = Collections.synchronizedList(new ArrayList<>());
     private static List<DatabaseMetaData> metaData = Collections.synchronizedList(new ArrayList<>());
 
-    @TestConfiguration
-    static class Conf {
-
-        @Bean
-        DataSource dataSource() {
-
-//            SpierProvider.setSpier(new Spier() {
-//
-//                @Override
-//                public Connection spy(Connection connection) {
-//                    Connection s = Mockito.spy(connection);
-//                    connections.add(s);
-//                    return s;
-//                }
-//
-//                @Override
-//                public Statement spy(Statement statement) {
-//                    Statement s = Mockito.spy(statement);
-//                    statements.add(s);
-//                    return s;
-//                }
-//
-//                @Override
-//                public DatabaseMetaData spy(DatabaseMetaData databaseMetaData) {
-//                    DatabaseMetaData m = Mockito.spy(databaseMetaData);
-//                    metaData.add(m);
-//                    return m;
-//                }
-//            });
-
-            Base base = BaseManagerImpl.instance().getBase("jdbcStub.yml");
-            JdbcDataSource ds = new JdbcDataSource();
-            ds.setURL("jdbc:h2:./test3;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
-            DataSource stubDataSource = new StubDataSource(ds).setFallbackBase(base);
-            return spy(stubDataSource);
-        }
-
-    }
-
     public void after() {
         log.info("!!!!!!!!!!!!!!!!!!!!!!!");
         Mockito.mockingDetails(dataSource)
@@ -342,7 +288,6 @@ public class JdbcSourceSystemTest {
                         log.info(x.getLocation().toString());
                     });
         });
-
 
     }
 

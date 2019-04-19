@@ -1,5 +1,6 @@
 package org.anystub.it_http;
 
+import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.http.StubHttpClient;
 import org.anystub.mgmt.BaseManagerImpl;
@@ -22,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
+@AnyStubId(filename = "httpStub.yml")
 public class HttpSourceSystemTest {
 
     @Autowired
@@ -58,36 +60,4 @@ public class HttpSourceSystemTest {
         assertEquals("test", forEntity.getBody());
     }
 
-
-    @TestConfiguration
-    static class Conf {
-
-        @Bean
-        Base httpBase() {
-            return BaseManagerImpl.instance().getBase("httpStub.yml");
-        }
-
-        @Bean
-        public HttpClient createHttpClient(Base httpBase) {
-
-            HttpClient real = HttpClientBuilder.create().build();
-            StubHttpClient result = new StubHttpClient(real).setFallbackBase(httpBase);
-
-            return result.addBodyToKeyRules("random/xxx");
-
-        }
-
-        @Bean
-        public ClientHttpRequestFactory requestFactory(HttpClient httpClient) {
-            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-            requestFactory.setHttpClient(httpClient);
-            return requestFactory;
-        }
-
-        @Bean
-        public RestTemplate restTemplate(ClientHttpRequestFactory requestFactory) {
-
-            return new RestTemplate(requestFactory);
-        }
-    }
 }
