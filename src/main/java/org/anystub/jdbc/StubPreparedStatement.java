@@ -112,12 +112,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
                               }
                           },
                         new DecoderResultSet(),
-                        new Encoder<ResultSet>() {
-                            @Override
-                            public Iterable<String> encode(ResultSet resultSet) {
-                                return ResultSetUtil.encode(getRealStatement(), resultSet);
-                            }
-                        },
+                        resultSet -> ResultSetUtil.encode(getRealStatement(), resultSet),
 
                         useCallKeys());
 

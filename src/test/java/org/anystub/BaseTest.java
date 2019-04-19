@@ -13,7 +13,6 @@ import static org.anystub.Document.ars;
 import static org.junit.Assert.*;
 
 /**
- * Created by Kirill on 9/3/2016.
  */
 public class BaseTest {
 
@@ -37,7 +36,7 @@ public class BaseTest {
         assertTrue(opt.isPresent());
 
         base.clear();
-        base.constrain(Base.RequestMode.rmNone);
+        base.constrain(RequestMode.rmNone);
         opt = base.getOpt("123", "321");
         assertTrue(opt.isPresent());
     }
@@ -146,7 +145,7 @@ public class BaseTest {
         Base base = BaseManagerImpl.instance()
                 .getBase("restrictionTest.yml");
         base.clear();
-        base.constrain(Base.RequestMode.rmNone);
+        base.constrain(RequestMode.rmNone);
 
         base.request("restrictionTest");
     }
@@ -274,7 +273,7 @@ public class BaseTest {
         Base base = BaseManagerImpl.instance()
                 .getBase("./historyCheck.yml");
         base.clear();
-        base.constrain(Base.RequestMode.rmNew);
+        base.constrain(RequestMode.rmNew);
 
         assertEquals(0L, base.times());
 
@@ -364,7 +363,7 @@ public class BaseTest {
     public void request_oneway_object() throws IOException {
         Base base = BaseManagerImpl.instance()
                 .getBase("./streams.yml")
-                .constrain(Base.RequestMode.rmAll);
+                .constrain(RequestMode.rmAll);
         base.clear();
         base.save();
 
@@ -427,11 +426,6 @@ public class BaseTest {
     }
 
 
-    @Test
-    public void isTextTest() {
-        assertTrue(Base.isText("thisistextline"));
-        assertTrue(Base.isText("{\"this is\": \'text' }; line"));
-        assertFalse(Base.isText("thisistextline" + (char) 0x03));
-    }
+
 
 }

@@ -311,24 +311,8 @@ public class StubConnection implements Connection {
                                   return getRealConnection().setSavepoint();
                               }
                           },
-                        new Decoder<Savepoint>() {
-                            @Override
-                            public Savepoint decode(Iterable<String> values) {
-                                Iterator<String> iterator = values.iterator();
-                                iterator.next();
-                                return new StubSavepoint(Integer.parseInt(iterator.next()), iterator.next());
-                            }
-                        },
-                        new Encoder<Savepoint>() {
-                            @Override
-                            public Iterable<String> encode(Savepoint savepoint) {
-                                try {
-                                    return asList("Savepoint", String.valueOf(savepoint.getSavepointId()), savepoint.getSavepointName());
-                                } catch (SQLException e) {
-                                    throw new NoSuchElementException("bad Savepoint: " + e.getMessage());
-                                }
-                            }
-                        },
+                        new DecoderSavepoint(),
+                        new EncoderSavepoint(),
                         callKey("getHoldability"));
     }
 
@@ -343,24 +327,8 @@ public class StubConnection implements Connection {
                                   return getRealConnection().setSavepoint(s);
                               }
                           },
-                        new Decoder<Savepoint>() {
-                            @Override
-                            public Savepoint decode(Iterable<String> values) {
-                                Iterator<String> iterator = values.iterator();
-                                iterator.next();
-                                return new StubSavepoint(Integer.parseInt(iterator.next()), iterator.next());
-                            }
-                        },
-                        new Encoder<Savepoint>() {
-                            @Override
-                            public Iterable<String> encode(Savepoint savepoint) {
-                                try {
-                                    return asList("Savepoint", String.valueOf(savepoint.getSavepointId()), savepoint.getSavepointName());
-                                } catch (SQLException e) {
-                                    throw new NoSuchElementException("bad Savepoint: " + e.getMessage());
-                                }
-                            }
-                        },
+                        new DecoderSavepoint(),
+                        new EncoderSavepoint(),
                         callKey("getHoldability", s));
     }
 

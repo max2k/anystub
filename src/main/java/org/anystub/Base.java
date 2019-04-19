@@ -54,27 +54,6 @@ public class Base {
     private boolean seekInCache = true;
     private boolean writeInCache = true;
 
-    public enum RequestMode {
-        /**
-         * Use case: general using of cache.
-         * request is sent to real system if it is not found in cache
-         */
-        rmNew,
-
-        /**
-         * Use case: strict checking.
-         * sending requests to real system is forbidden.
-         * cache is loaded immediately. if request is not found in cache then exception is thrown
-         */
-        rmNone,
-
-        /**
-         * Use case: cache logging from upstream.
-         * all requests are sent to real system. all responses recorded to cache
-         */
-        rmAll
-    }
-
     public Base() {
         filePath = BaseManagerImpl.getFilePath();
         BaseManagerImpl.instance().register(this);
@@ -121,7 +100,9 @@ public class Base {
             case rmNone:
                 seekInCache = true;
                 writeInCache = false;
-                init();
+                if (isNew()) {
+                    init();
+                }
                 break;
             case rmAll:
                 seekInCache = false;
@@ -452,18 +433,18 @@ public class Base {
      * @throws IOException due to file access error
      */
     private void load() throws IOException {
-        clear();
         File file = new File(filePath);
         try (InputStream input = new FileInputStream(file)) {
             Yaml yaml = new Yaml(new SafeConstructor());
             Object load = yaml.load(input);
 
             if (load instanceof Map) {
+                clear();
                 Map<String, Object> map = (Map<String, Object>) load;
                 map.forEach((k, v) -> documentList
                         .add(new Document((Map<String, Object>) v)));
+                isNew = false;
             }
-            isNew = false;
         } catch (FileNotFoundException e) {
             log.info(() -> String.format("stub file %s is not found: %s", file.getAbsolutePath(), e));
         }
@@ -689,10 +670,6 @@ public class Base {
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static boolean isText(String text) {
-        return text.matches("\\p{Print}*");
     }
 
     public String getFilePath() {

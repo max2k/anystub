@@ -7,48 +7,56 @@ public class AnyStubFileLocator {
     private AnyStubFileLocator() {
     }
 
-    public static String discoverFile() {
+    public static AnyStubId discoverFile() {
         String res = null;
+        AnyStubId id = null;
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (StackTraceElement s : stackTrace) {
             try {
                 Class<?> aClass = Class.forName(s.getClassName());
-                AnyStubId classAnnotation = aClass.getDeclaredAnnotation(AnyStubId.class);
-                if (classAnnotation != null) {
-                    res = classAnnotation.filename().isEmpty() ?
-                            aClass.getSimpleName() :
-                            classAnnotation.filename();
-                }
                 Method method = aClass.getMethod(s.getMethodName());
-                AnyStubId methodAnnotation = method.getAnnotation(AnyStubId.class);
-                if (methodAnnotation != null) {
-                    res = methodAnnotation.filename().isEmpty() ?
+                id = method.getAnnotation(AnyStubId.class);
+
+                if (id != null) {
+                    res = id.filename().isEmpty() ?
                             s.getMethodName() :
-                            methodAnnotation.filename();
+                            id.filename();
+                } else {
+                    id = aClass.getDeclaredAnnotation(AnyStubId.class);
+                    if (id != null) {
+                        res = id.filename().isEmpty() ?
+                                aClass.getSimpleName() :
+                                id.filename();
+                    }
                 }
             } catch (ClassNotFoundException | NoSuchMethodException ignored) {
                 // it's acceptable that some class/method is not found
                 // need to investigate when that happens
             }
-            if (res != null && !res.isEmpty()) {
+            if (id != null) {
                 break;
             }
         }
-        if (res == null || res.endsWith(".yml")) {
-            return res;
+        if (id == null) {
+            return null;
         }
-        return res + ".yml";
+
+        return new AnyStubIdData(res + (res.endsWith(".yml") ? "" : ".yml"),
+                id.requestMode());
     }
 
-    public static String discoverFile(String stubSuffix) {
-        String s = discoverFile();
+    public static AnyStubId discoverFile(String stubSuffix) {
+        AnyStubId s = discoverFile();
+
         if (s == null || stubSuffix == null) {
             return s;
         }
-        if (s.endsWith(".yml")) {
-            return String.format("%s-%s.yml", s.substring(0, s.length() - 4), stubSuffix);
+        String filename = s.filename();
+        if (filename.endsWith(".yml")) {
+            filename = String.format("%s-%s.yml", filename.substring(0, filename.length() - 4), stubSuffix);
+        } else {
+            filename = String.format("%s-%s", s, stubSuffix);
         }
-        return String.format("%s-%s", s, stubSuffix);
-
+        return new AnyStubIdData(filename, s.requestMode());
     }
 }
