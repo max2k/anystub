@@ -1,6 +1,6 @@
 package org.anystub.jdbc;
 
-final public class SpierProvider {
+public class SpierProvider {
 
     private SpierProvider() {
     }

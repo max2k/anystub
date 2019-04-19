@@ -14,16 +14,12 @@ import java.util.logging.Logger;
 
 public class StubDataSource implements DataSource {
 
-    final private Logger log = Logger.getLogger("StubDataSource");
-    final private DataSource realDataSource;
+    private final Logger log = Logger.getLogger("StubDataSource");
+    private final DataSource realDataSource;
     private Base base = null;
     private String stubSuffix = null;
 
     public StubDataSource(DataSource realDataSource) {
-        this.realDataSource = realDataSource;
-    }
-
-    public StubDataSource(DataSource realDataSource, Spier spier) {
         this.realDataSource = realDataSource;
     }
 
