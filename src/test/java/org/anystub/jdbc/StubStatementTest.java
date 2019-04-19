@@ -1,6 +1,7 @@
 package org.anystub.jdbc;
 
 import org.anystub.Base;
+import org.anystub.mgmt.BaseManagerImpl;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -20,7 +21,7 @@ public class StubStatementTest {
         StubDataSource dataSource = mock(StubDataSource.class);
         StubConnection connection = mock(StubConnection.class);
         when(connection.getStubDataSource()).thenReturn(dataSource);
-        Base base = spy(new Base("executeQueryTest.yml"));
+        Base base = spy(BaseManagerImpl.instance().getBase("executeQueryTest.yml"));
         when(dataSource.getBase()).thenReturn(base);
 
         StubStatement stubStatement = spy(new StubStatement(connection));

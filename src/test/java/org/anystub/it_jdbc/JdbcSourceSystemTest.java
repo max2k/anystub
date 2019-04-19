@@ -3,6 +3,7 @@ package org.anystub.it_jdbc;
 import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.jdbc.StubDataSource;
+import org.anystub.mgmt.BaseManagerImpl;
 import org.h2.jdbcx.JdbcDataSource;
 import org.h2.tools.SimpleResultSet;
 import org.junit.Test;
@@ -292,7 +293,7 @@ public class JdbcSourceSystemTest {
 //                }
 //            });
 
-            Base base = new Base("jdbcStub.yml");
+            Base base = BaseManagerImpl.instance().getBase("jdbcStub.yml");
             JdbcDataSource ds = new JdbcDataSource();
             ds.setURL("jdbc:h2:./test3;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
             DataSource stubDataSource = new StubDataSource(ds).setFallbackBase(base);

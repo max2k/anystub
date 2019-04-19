@@ -77,7 +77,7 @@ public class WorkerEasyTest {
     @Before
     public void createStub()
     {
-        base = new Base();
+        base = BaseManagerImpl.instance().getBase();
         sourceSystem = new SourceSystem("http://localhost:8080") {
             @Override
             public String get() throws IOException {
