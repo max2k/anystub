@@ -66,6 +66,7 @@ public class Base {
      * * new Base("./stub.yml") uses file in current dir
      * * new Base("stub.yml") uses src/test/resources/anystub/stub.yml
      *
+     * Note: Consider using BaseManagerImpl instead
      * @param filename used file name
      */
     public Base(String filename) {

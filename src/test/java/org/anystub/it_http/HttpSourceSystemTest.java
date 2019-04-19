@@ -2,6 +2,7 @@ package org.anystub.it_http;
 
 import org.anystub.Base;
 import org.anystub.http.StubHttpClient;
+import org.anystub.mgmt.BaseManagerImpl;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Test;
@@ -63,7 +64,7 @@ public class HttpSourceSystemTest {
 
         @Bean
         Base httpBase() {
-            return new Base("httpStub.yml");
+            return BaseManagerImpl.instance().getBase("httpStub.yml");
         }
 
         @Bean
