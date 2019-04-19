@@ -367,13 +367,13 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .request2(new Supplier<Blob, SQLException>() {
-                              @Override
-                              public Blob get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return realCallableStatement.getBlob(i);
-                              }
-                          },
+                .request(new Supplier<Blob, SQLException>() {
+                             @Override
+                             public Blob get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realCallableStatement.getBlob(i);
+                             }
+                         },
                         SqlTypeEncoder::decodeBlob,
                         SqlTypeEncoder::encodeBlob,
                         callKey("getBlob", i));
@@ -951,13 +951,13 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .request2(new Supplier<Blob, SQLException>() {
-                              @Override
-                              public Blob get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return realCallableStatement.getBlob(s);
-                              }
-                          },
+                .request(new Supplier<Blob, SQLException>() {
+                             @Override
+                             public Blob get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return realCallableStatement.getBlob(s);
+                             }
+                         },
                         SqlTypeEncoder::decodeBlob,
                         SqlTypeEncoder::encodeBlob,
                         callKey("getBlob", s));

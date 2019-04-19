@@ -426,11 +426,6 @@ public class BaseTest {
     }
 
 
-    @Test
-    public void isTextTest() {
-        assertTrue(Base.isText("thisistextline"));
-        assertTrue(Base.isText("{\"this is\": \'text' }; line"));
-        assertFalse(Base.isText("thisistextline" + (char) 0x03));
-    }
+
 
 }

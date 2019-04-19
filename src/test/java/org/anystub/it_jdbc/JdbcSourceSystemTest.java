@@ -1,10 +1,7 @@
 package org.anystub.it_jdbc;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.anystub.AnyStubId;
 import org.anystub.Base;
-import org.anystub.jdbc.Spier;
-import org.anystub.jdbc.SpierProvider;
 import org.anystub.jdbc.StubDataSource;
 import org.h2.jdbcx.JdbcDataSource;
 import org.h2.tools.SimpleResultSet;
@@ -15,15 +12,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.core.CallableStatementCreator;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -111,6 +128,134 @@ public class JdbcSourceSystemTest {
         } finally {
             after();
         }
+    }
+
+    @AnyStubId
+    @Test
+    public void blobTest() {
+        jdbcTemplate.execute("DROP TABLE BLOBREPORT IF EXISTS");
+
+        jdbcTemplate.execute("CREATE TABLE BLOBREPORT(\n" +
+                "ID BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "NAME VARCHAR(255) NOT NULL,\n" +
+                "IMAGE BLOB\n" +
+                ");");
+
+        String sql = "insert into BLOBREPORT (NAME, IMAGE) values (?, ?)";
+        KeyHolder holder = new GeneratedKeyHolder();
+        int affRows = jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection)
+                    throws SQLException {
+                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, "TEXT");
+                ByteArrayInputStream inputStream = new ByteArrayInputStream("blob content".getBytes());
+                ps.setBlob(2, inputStream);
+                return ps;
+            }
+        }, holder);
+
+        assertEquals(1, affRows);
+
+        List<String> query = jdbcTemplate.query("select * from Report where id =?", new Object[]{1},
+                (resultSet, i) -> {
+                    String s;
+                    Blob image = resultSet.getBlob("IMAGE");
+                    try (InputStream binaryStream = image.getBinaryStream();
+                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                        int r;
+                        while ((r = binaryStream.read()) != -1) {
+                            byteArrayOutputStream.write(r);
+                        }
+                        s = new String(byteArrayOutputStream.toByteArray(), StandardCharsets.UTF_8);
+
+                    } catch (IOException e) {
+                        s = null;
+                    }
+                    return s;
+                }
+        );
+
+        assertEquals(1, query.size());
+        assertEquals("blob content", query.get(0));
+    }
+
+
+    @Test
+    @AnyStubId
+    public void integerLongTest() {
+        jdbcTemplate.execute("DROP TABLE SOMETYPES IF EXISTS");
+
+        String sql = "CREATE TABLE SOMETYPES(\n" +
+                "ID BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "NAME INT NOT NULL,\n" +
+                "C_BIGINT BIGINT, \n" +
+                "C_SMALLINT SMALLINT, \n" +
+                "C_BOOL BOOL, \n" +
+                "C_DECIMAL DECIMAL, \n" +
+                "C_DOUBLE DOUBLE, \n" +
+                "C_TIME TIME, \n" +
+                "C_DATE DATE, \n" +
+                "C_TIMESTAMP TIMESTAMP \n" +
+                ");";
+        jdbcTemplate.execute(sql);
+
+        String sqlI = "insert into SOMETYPES (NAME, " +
+                "C_BIGINT," +
+                "C_SMALLINT," +
+                "C_BOOL," +
+                "C_DECIMAL," +
+                "C_DOUBLE," +
+                "C_TIME," +
+                "C_DATE," +
+                "C_TIMESTAMP) values (?, ?,?, ?,?, ?,?, ?,?)";
+        KeyHolder holder = new GeneratedKeyHolder();
+        int affectedRows = jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                PreparedStatement preparedStatement = connection.prepareStatement(sqlI);
+                preparedStatement.setInt(1, 1);
+                preparedStatement.setLong(2, Integer.MAX_VALUE + 1L);
+                preparedStatement.setShort(3, (short) 126);
+                preparedStatement.setBoolean(4, true);
+                preparedStatement.setFloat(5, 14);
+                preparedStatement.setDouble(6, 43.124);
+                preparedStatement.setTime(7, new Time(123534534));
+                preparedStatement.setDate(8, new Date(126534534));
+                preparedStatement.setTimestamp(9, new Timestamp(1235385345));
+                return preparedStatement;
+            }
+        }, holder);
+
+        List<String> query = jdbcTemplate.query("select * from SOMETYPES where id =?", new Object[]{1},
+                (resultSet, i) -> {
+                    String s = String.valueOf(resultSet.getInt(2)) +
+                            String.valueOf(resultSet.getInt("NAME")) +
+                            String.valueOf(resultSet.getLong("C_BIGINT")) +
+                            String.valueOf(resultSet.getShort("C_SMALLINT")) +
+                            String.valueOf(resultSet.getBoolean("C_BOOL")) +
+                            String.valueOf(resultSet.getFloat("C_DECIMAL")) +
+                            String.valueOf(resultSet.getDouble("C_DOUBLE")) +
+                            String.valueOf(resultSet.getTime("C_TIME")) +
+                            String.valueOf(resultSet.getDate("C_DATE")) +
+                            String.valueOf(resultSet.getTimestamp("C_TIMESTAMP")) +
+                            String.valueOf(resultSet.getLong(3)) +
+                            String.valueOf(resultSet.getShort(4)) +
+                            String.valueOf(resultSet.getBoolean(5)) +
+                            String.valueOf(resultSet.getFloat(6)) +
+                            String.valueOf(resultSet.getDouble(7)) +
+                            String.valueOf(resultSet.getTime(8)) +
+                            String.valueOf(resultSet.getDate(9)) +
+                            String.valueOf(resultSet.getTimestamp(10));
+
+
+                    return s;
+                }
+        );
+
+        assertEquals(1, query.size());
+        assertEquals("112147483648126true14.043.12411:18:551970-01-021970-01-15 08:09:45.3452147483648126true14.043.12411:18:551970-01-021970-01-15 08:09:45.345",
+                query.get(0));
     }
 
     private static List<Connection> connections = Collections.synchronizedList(new ArrayList<>());

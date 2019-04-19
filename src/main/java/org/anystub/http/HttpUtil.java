@@ -1,6 +1,6 @@
 package org.anystub.http;
 
-import org.anystub.Base;
+import org.anystub.Util;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -63,20 +63,9 @@ public class HttpUtil {
         if (postHeader != null) {
             BasicHttpEntity httpEntity = new BasicHttpEntity();
 
-            if (postHeader.startsWith("TEXT ")) {
-                String textEntity = postHeader.substring(5);
-                httpEntity.setContentLength(textEntity.length());
-                httpEntity.setContent(new ByteArrayInputStream(textEntity.getBytes()));
-            } else if (postHeader.startsWith("BASE64 ")) {
-                String base64Entity = postHeader.substring(7);
-                byte[] decode = Base64.getDecoder().decode(base64Entity);
-                httpEntity.setContentLength(decode.length);
-                httpEntity.setContent(new ByteArrayInputStream(decode));
-            } else {
-                LOGGER.finest("fallback to TEXT");
-                httpEntity.setContentLength(postHeader.length());
-                httpEntity.setContent(new ByteArrayInputStream(postHeader.getBytes()));
-            }
+            byte[] bytes = Util.recoverBinaryData(postHeader);
+            httpEntity.setContentLength(bytes.length);
+            httpEntity.setContent(new ByteArrayInputStream(bytes));
             basicHttpResponse.setEntity(httpEntity);
         }
 
@@ -147,17 +136,8 @@ public class HttpUtil {
             }
 
             if (bytes != null) {
-                String bodyText = new String(bytes, StandardCharsets.UTF_8);
-                if (Base.isText(bodyText)) {
-                    if (bodyText.startsWith("TEXT") || bodyText.startsWith("BASE")) {
-                        result = "TEXT " + bodyText;
-                    } else {
-                        result = bodyText;
-                    }
-                } else {
-                    String encode = Base64.getEncoder().encodeToString(bytes);
-                    result = "BASE64 " + encode;
-                }
+                result = Util.toCharacterString(bytes);
+
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Stringify entity failed", e);

@@ -1,6 +1,7 @@
 package org.anystub.jdbc;
 
 import org.anystub.AnyStubFileLocator;
+import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.mgmt.BaseManagerImpl;
 
@@ -81,9 +82,12 @@ public class StubDataSource implements DataSource {
 
     public Base getBase() {
 
-        String s = AnyStubFileLocator.discoverFile(stubSuffix);
+        AnyStubId s = AnyStubFileLocator.discoverFile(stubSuffix);
         if (s != null) {
-            return BaseManagerImpl.instance().getBase(s);
+            return BaseManagerImpl
+                    .instance()
+                    .getBase(s.filename())
+                    .constrain(s.requestMode());
         }
         if (base != null) {
             return base;

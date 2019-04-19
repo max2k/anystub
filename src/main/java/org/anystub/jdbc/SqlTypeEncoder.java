@@ -1,10 +1,15 @@
 package org.anystub.jdbc;
 
+import org.anystub.Util;
+
 import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialClob;
 import java.io.ByteArrayOutputStream;
+import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.RowId;
@@ -20,12 +25,9 @@ public class SqlTypeEncoder {
     private SqlTypeEncoder() {
     }
 
-    public static Blob decodeBlob(Iterable<String> values) {
-        String next = values.iterator().next();
-        if (next.startsWith(BASE_64)) {
-            next = next.substring(7);
-        }
-        byte[] bytes = Base64.getDecoder().decode(next);
+    public static Blob decodeBlob(String next) {
+//        String next = values.iterator().next();
+        byte[] bytes = Util.recoverBinaryData(next);
         try {
             return new SerialBlob(bytes);
         } catch (SQLException e) {
@@ -34,36 +36,40 @@ public class SqlTypeEncoder {
     }
 
 
-    public static Iterable<String> encodeBlob(Blob blob) {
+    public static String encodeBlob(Blob blob) {
         try {
             byte[] bytes = blob.getBytes(1, (int) blob.length());
 
-            String s = Base64.getEncoder().encodeToString(bytes);
+            String s = Util.toCharacterString(bytes);
             blob.free();
-            return singletonList("BASE64 " + s);
+            return s;
         } catch (SQLException e) {
             throw new UnsupportedOperationException("failed to extract blob", e);
         }
     }
 
-    public static Clob decodeClob(Iterable<String> values) {
-        throw new UnsupportedOperationException("recover clob unsupported");
+    public static Clob decodeClob(String next) {
+        byte[] bytes = Util.recoverBinaryData(next);
+        try (CharArrayWriter charArrayWriter = new CharArrayWriter()) {
+            for (byte b : bytes) {
+                charArrayWriter.write(b);
+            }
+            return new SerialClob(charArrayWriter.toCharArray());
+        } catch (SQLException e) {
+            throw new UnsupportedOperationException("failed to recover blob", e);
+        }
     }
 
-    public static Iterable<String> encodeClob(Clob clob) {
-        try (InputStream asciiStream = clob.getAsciiStream();
-             ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-             OutputStream wrap = Base64.getEncoder().wrap(byteArray)) {
+    public static String encodeClob(Clob clob) {
+        try (Reader characterStream = clob.getCharacterStream();
+             CharArrayWriter charArrayWriter = new CharArrayWriter()) {
 
             int i;
-            while ((i = asciiStream.read()) != -1) {
-                wrap.write(i);
+            while ((i = characterStream.read()) != -1) {
+                charArrayWriter.write(i);
             }
 
-            byte[] bytes = byteArray.toByteArray();
-
-            String s = Base64.getEncoder().encodeToString(bytes);
-            return singletonList("BASE64 " + s);
+            return  Util.toCharacterString(charArrayWriter.toString().getBytes());
         } catch (SQLException | IOException e) {
             throw new UnsupportedOperationException("failed to extract clob", e);
         }
@@ -72,15 +78,11 @@ public class SqlTypeEncoder {
 
     public static RowId decodeRowid(Iterable<String> values) {
         String next = values.iterator().next();
-        if (next.startsWith("BASE64 ")) {
-            next = next.substring(7);
-        }
-        byte[] bytes = Base64.getDecoder().decode(next);
+        byte[] bytes = Util.recoverBinaryData(next);
         return new StubRowId(bytes);
     }
 
     public static Iterable<String> encodeRowid(RowId rowId) {
-        String s = Base64.getEncoder().encodeToString(rowId.getBytes());
-        return singletonList("BASE64 " + s);
+        return singletonList(Util.toCharacterString(rowId.getBytes()));
     }
 }

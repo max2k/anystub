@@ -672,10 +672,6 @@ public class Base {
         }
     }
 
-    public static boolean isText(String text) {
-        return text.matches("\\p{Print}*");
-    }
-
     public String getFilePath() {
         return filePath;
     }
