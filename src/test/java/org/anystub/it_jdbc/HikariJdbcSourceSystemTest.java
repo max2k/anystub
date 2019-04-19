@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.jdbc.StubDataSource;
+import org.anystub.mgmt.BaseManagerImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +91,7 @@ public class HikariJdbcSourceSystemTest {
         @Bean
         DataSource dataSource() {
 
-            Base base = new Base("jdbcStub-hk.yml");
+            Base base = BaseManagerImpl.instance().getBase("jdbcStub-hk.yml");
 
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:h2:./test4;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
@@ -101,7 +102,6 @@ public class HikariJdbcSourceSystemTest {
                     .setStubSuffix("hikariTest");
             return spy(stubDataSource);
         }
-
 
     }
 }

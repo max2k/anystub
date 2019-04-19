@@ -1,6 +1,7 @@
 package org.anystub;
 
 import org.anystub.http.StubHttpClient;
+import org.anystub.mgmt.BaseManagerImpl;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -46,8 +47,9 @@ public class StubHttpClientTest {
     @Test
     public void executeResponseHandlerTest() throws IOException {
 
-        Base base = new Base("httpStub-static.yml")
+        Base base = BaseManagerImpl.instance().getBase("httpStub-static.yml")
                 .constrain(RequestMode.rmNone);
+        base.clear();
 
         HttpClient real = HttpClients.createDefault();
         StubHttpClient result = new StubHttpClient(real).setFallbackBase(base);
