@@ -15,8 +15,15 @@ public enum RequestMode {
     rmNone,
 
     /**
-     * Use case: cache logging from upstream.
+     * Use case: logging from upstream.
      * all requests are sent to real system. all responses recorded to cache
      */
-    rmAll
+    rmAll,
+
+    /**
+     * Use case: check anystub works properly
+     * all requests are sent to upstream, results return with no mutations
+     */
+    rmPassThrough
+
 }

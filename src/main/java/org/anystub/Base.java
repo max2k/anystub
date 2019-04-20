@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Collections.singletonList;
+import static org.anystub.RequestMode.*;
 
 /**
  * provide basic access to stub-file
@@ -51,8 +52,7 @@ public class Base {
     private List<Document> requestHistory = new ArrayList<>();
     private final String filePath;
     private boolean isNew = true;
-    private boolean seekInCache = true;
-    private boolean writeInCache = true;
+    private RequestMode requestMode = rmNew;
 
     public Base() {
         filePath = BaseManagerImpl.getFilePath();
@@ -92,25 +92,10 @@ public class Base {
      * @return this to cascade operations
      */
     public Base constrain(RequestMode requestMode) {
-        switch (requestMode) {
-
-            case rmNew:
-                seekInCache = true;
-                writeInCache = true;
-                break;
-            case rmNone:
-                seekInCache = true;
-                writeInCache = false;
-                if (isNew()) {
-                    init();
-                }
-                break;
-            case rmAll:
-                seekInCache = false;
-                writeInCache = true;
-                break;
+        this.requestMode = requestMode;
+        if (requestMode== rmNone && isNew()) {
+            init();
         }
-
         return this;
     }
 
@@ -351,13 +336,16 @@ public class Base {
                                                Encoder<T> encoder,
                                                String... keys) throws E {
 
+        if (requestMode== rmPassThrough) {
+            return supplier.get();
+        }
         log.finest(() -> String.format("request executing: %s", Arrays.stream(keys).collect(Collectors.joining(","))));
 
         if (isNew()) {
             init();
         }
 
-        if (seekInCache) {
+        if (seekInCache()) {
 
             Optional<Document> storedDocument = getDocument(keys);
             if (storedDocument.isPresent()) {
@@ -372,7 +360,7 @@ public class Base {
             }
         }
 
-        if (!writeInCache) {
+        if (!writeInCache()) {
             throwNSE();
         }
 
@@ -675,5 +663,13 @@ public class Base {
 
     public String getFilePath() {
         return filePath;
+    }
+
+    private boolean seekInCache() {
+        return requestMode== rmNew || requestMode== rmNone;
+    }
+
+    private boolean writeInCache() {
+        return requestMode== rmNew || requestMode== rmAll;
     }
 }
