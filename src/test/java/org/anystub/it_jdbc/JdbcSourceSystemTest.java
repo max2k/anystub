@@ -222,17 +222,17 @@ public class JdbcSourceSystemTest {
                             String.valueOf(resultSet.getBoolean("C_BOOL")) +
                             String.valueOf(resultSet.getFloat("C_DECIMAL")) +
                             String.valueOf(resultSet.getDouble("C_DOUBLE")) +
-                            String.valueOf(resultSet.getTime("C_TIME")) +
-                            String.valueOf(resultSet.getDate("C_DATE")) +
-                            String.valueOf(resultSet.getTimestamp("C_TIMESTAMP")) +
+                            String.valueOf(resultSet.getTime("C_TIME").getTime()) +
+                            String.valueOf(resultSet.getDate("C_DATE").getTime()) +
+                            String.valueOf(resultSet.getTimestamp("C_TIMESTAMP").getTime()) +
                             String.valueOf(resultSet.getLong(3)) +
                             String.valueOf(resultSet.getShort(4)) +
                             String.valueOf(resultSet.getBoolean(5)) +
                             String.valueOf(resultSet.getFloat(6)) +
                             String.valueOf(resultSet.getDouble(7)) +
-                            String.valueOf(resultSet.getTime(8)) +
-                            String.valueOf(resultSet.getDate(9)) +
-                            String.valueOf(resultSet.getTimestamp(10));
+                            String.valueOf(resultSet.getTime(8).getTime()) +
+                            String.valueOf(resultSet.getDate(9).getTime()) +
+                            String.valueOf(resultSet.getTimestamp(10).getTime());
 
 
                     return s;
@@ -240,7 +240,7 @@ public class JdbcSourceSystemTest {
         );
 
         assertEquals(1, query.size());
-        assertEquals("112147483648126true14.043.12411:18:551970-01-021970-01-15 08:09:45.3452147483648126true14.043.12411:18:551970-01-021970-01-15 08:09:45.345",
+        assertEquals("112147483648126true14.043.124371350008280000012353853452147483648126true14.043.12437135000828000001235385345",
                 query.get(0));
     }
 
