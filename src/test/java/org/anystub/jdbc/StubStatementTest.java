@@ -1,6 +1,9 @@
 package org.anystub.jdbc;
 
 import org.anystub.Base;
+import org.anystub.Decoder;
+import org.anystub.Encoder;
+import org.anystub.KeysSupplier;
 import org.anystub.mgmt.BaseManagerImpl;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +20,7 @@ import static org.mockito.Mockito.when;
 public class StubStatementTest {
 
     @Test
-    @Ignore("mokito failed on java 11")
+//    @Ignore("mokito failed on java 11")
     public void executeQueryTest() throws SQLException {
         StubConnection connection = mock(StubConnection.class);
         StubDataSource dataSource = mock(StubDataSource.class);
@@ -35,9 +38,9 @@ public class StubStatementTest {
 
         verify(base, times(1))
                 .request2(any(),
-                        any(DecoderResultSet.class),
-                        any(EncoderResultSet.class),
-                        org.mockito.ArgumentMatchers.eq("select * from dual"));
+                        any(Decoder.class),
+                        any(Encoder.class),
+                        any(KeysSupplier.class));
     }
 
 }

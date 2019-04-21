@@ -4,20 +4,15 @@ import org.anystub.mgmt.BaseManagerImpl;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +25,11 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Collections.singletonList;
+import static org.anystub.RequestMode.rmAll;
+import static org.anystub.RequestMode.rmNew;
+import static org.anystub.RequestMode.rmNone;
+import static org.anystub.RequestMode.rmPassThrough;
+import static org.anystub.RequestMode.rmTrack;
 
 /**
  * provide basic access to stub-file
@@ -48,11 +48,11 @@ public class Base {
 
     private static Logger log = Logger.getLogger(Base.class.getName());
     private List<Document> documentList = new ArrayList<>();
+    private Iterator<Document> documentListTrackIterator;
     private List<Document> requestHistory = new ArrayList<>();
     private final String filePath;
     private boolean isNew = true;
-    private boolean seekInCache = true;
-    private boolean writeInCache = true;
+    private RequestMode requestMode = rmNew;
 
     public Base() {
         filePath = BaseManagerImpl.getFilePath();
@@ -65,8 +65,9 @@ public class Base {
      * examples:
      * * new Base("./stub.yml") uses file in current dir
      * * new Base("stub.yml") uses src/test/resources/anystub/stub.yml
-     *
+     * <p>
      * Note: Consider using BaseManagerImpl instead
+     *
      * @param filename used file name
      */
     public Base(String filename) {
@@ -92,25 +93,29 @@ public class Base {
      * @return this to cascade operations
      */
     public Base constrain(RequestMode requestMode) {
-        switch (requestMode) {
-
-            case rmNew:
-                seekInCache = true;
-                writeInCache = true;
-                break;
-            case rmNone:
-                seekInCache = true;
-                writeInCache = false;
-                if (isNew()) {
+        if (isNew()) {
+            this.requestMode = requestMode;
+            switch (requestMode) {
+                case rmNone:
                     init();
-                }
-                break;
-            case rmAll:
-                seekInCache = false;
-                writeInCache = true;
-                break;
+                    break;
+                case rmAll:
+                    isNew = false;
+                    break;
+                case rmTrack:
+                    init();
+                    if (documentList.isEmpty()) {
+                        documentListTrackIterator = null;
+                    } else {
+                        documentListTrackIterator = documentList.iterator();
+                    }
+            }
+        } else {
+            if (this.requestMode != requestMode) {
+                log.warning(() -> String.format("Stub constrains change after creation for %s. Consider to split stub-files", filePath));
+            }
+            this.requestMode = requestMode;
         }
-
         return this;
     }
 
@@ -168,7 +173,7 @@ public class Base {
     }
 
     public String get(String... keys) {
-        return getVals(keys).next();
+        return getVals(keys).iterator().next();
     }
 
     /**
@@ -178,7 +183,7 @@ public class Base {
      * @return values of requested document
      * @throws NoSuchElementException throws when document is not found
      */
-    public Iterator<String> getVals(String... keys) throws NoSuchElementException {
+    public Iterable<String> getVals(String... keys) throws NoSuchElementException {
         return getDocument(keys)
                 .orElseThrow(NoSuchElementException::new)
                 .getVals();
@@ -249,8 +254,8 @@ public class Base {
      */
     public <T extends Serializable, E extends Exception> T requestSerializable(Supplier<T, E> supplier, String... keys) throws E {
         return request(supplier,
-                Base::decode,
-                Base::encode,
+                Util::decode,
+                Util::encode,
                 keys);
     }
 
@@ -350,29 +355,49 @@ public class Base {
                                                Decoder<T> decoder,
                                                Encoder<T> encoder,
                                                String... keys) throws E {
+        return request2(supplier,
+                decoder,
+                encoder,
+                () -> keys);
+    }
 
-        log.finest(() -> String.format("request executing: %s", Arrays.stream(keys).collect(Collectors.joining(","))));
+    public <T, E extends Throwable> T request2(Supplier<T, E> supplier,
+                                               Decoder<T> decoder,
+                                               Encoder<T> encoder,
+                                               KeysSupplier keyGen) throws E {
+
+        if (requestMode == rmPassThrough) {
+            return supplier.get();
+        }
+        KeysSupplier keyGenCashed = new KeysSupplierCashed(keyGen);
+
+        log.finest(() -> String.format("request executing: %s", Arrays.stream(keyGenCashed.get()).collect(Collectors.joining(","))));
 
         if (isNew()) {
             init();
         }
 
-        if (seekInCache) {
+        if (seekInCache()) {
 
-            Optional<Document> storedDocument = getDocument(keys);
+            Optional<Document> storedDocument = getDocument(keyGenCashed.get());
             if (storedDocument.isPresent()) {
                 requestHistory.add(storedDocument.get());
                 if (storedDocument.get().isNullValue()) {
                     // it's not necessarily to decode null objects
                     return null;
                 }
-                ArrayList<String> ar = new ArrayList<>();
-                storedDocument.get().getVals().forEachRemaining(ar::add);
-                return decoder.decode(ar);
+                return decoder.decode(storedDocument.get().getVals());
+            }
+        } else if (isTrackCache()) {
+            if (documentListTrackIterator.hasNext()) {
+                Document next = documentListTrackIterator.next();
+                if (next.keyEqual_to(keyGenCashed.get())) {
+                    return decoder.decode(next.getVals());
+                }
             }
         }
 
-        if (!writeInCache) {
+        if (!writeInCache()) {
             throwNSE();
         }
 
@@ -382,7 +407,7 @@ public class Base {
         try {
             res = supplier.get();
         } catch (Throwable ex) {
-            Document exceptionalDocument = put(ex, keys);
+            Document exceptionalDocument = put(ex, keyGenCashed.get());
             requestHistory.add(exceptionalDocument);
             try {
                 save();
@@ -393,7 +418,7 @@ public class Base {
         }
 
         // keep values
-        Document retrievedDocument = new Document(keys);
+        Document retrievedDocument = new Document(keyGenCashed.get());
 
         Iterable<String> responseData;
         if (res == null) {
@@ -634,46 +659,21 @@ public class Base {
                 .count();
     }
 
-
-    /**
-     * invokes request, uses reflection to serialize/deserialize object
-     * * {@link UnsupportedOperationException}
-     *
-     * @param supplier produce response (ex. query real remote system)
-     * @param keys     id of request
-     * @param <T>      type of produced result
-     * @param <E>      type of allowed Exception
-     * @return requested object
-     * @throws E occurs in real system or created from
-     */
-    public <T, E extends Throwable> T requestMapped(Supplier<T, E> supplier,
-                                                    String... keys) throws E {
-        throw new UnsupportedOperationException();
-    }
-
-
-    public static String encode(Serializable s) {
-        try (ByteArrayOutputStream of = new ByteArrayOutputStream();
-             ObjectOutputStream so = new ObjectOutputStream(of)) {
-            so.writeObject(s);
-            so.flush();
-            return Base64.getEncoder().encodeToString(of.toByteArray());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T extends Serializable> T decode(String s) {
-        byte[] decode = Base64.getDecoder().decode(s);
-        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
-             ObjectInputStream si = new ObjectInputStream(byteArrayInputStream)) {
-            return (T) si.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public String getFilePath() {
         return filePath;
+    }
+
+    private boolean seekInCache() {
+        return requestMode == rmNew || requestMode == rmNone;
+    }
+
+    private boolean writeInCache() {
+        return requestMode == rmNew ||
+                requestMode == rmAll ||
+                (requestMode == rmTrack && documentListTrackIterator == null);
+    }
+
+    private boolean isTrackCache() {
+        return requestMode == rmTrack && documentListTrackIterator != null;
     }
 }

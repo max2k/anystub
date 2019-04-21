@@ -1,8 +1,10 @@
 package org.anystub.jdbc;
 
 import org.anystub.Base;
+import org.anystub.Decoder;
 import org.anystub.Encoder;
 import org.anystub.Supplier;
+import org.anystub.SupplierCached;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -27,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -101,20 +104,36 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
 
     @Override
     public ResultSet executeQuery() throws SQLException {
-        return stubConnection
-                .getStubDataSource()
-                .getBase()
-                .request2(new Supplier<ResultSet, SQLException>() {
-                              @Override
-                              public ResultSet get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealStatement().executeQuery();
-                              }
-                          },
-                        new DecoderResultSet(),
-                        resultSet -> ResultSetUtil.encode(getRealStatement(), resultSet),
+        Supplier<ResultSet, SQLException> rsSupplier = new SupplierCached<>(() -> {
+            return getRealStatement().executeQuery();
+        });
 
-                        useCallKeys());
+        return produceResultSet(rsSupplier, this::useCallKeys);
+//        return stubConnection
+//                .getStubDataSource()
+//                .getBase()
+//                .request2(new Supplier<ResultSet, SQLException>() {
+//                              @Override
+//                              public ResultSet get() throws SQLException {
+//                                  stubConnection.runSql();
+//                                  return rsSupplier.get();
+//                              }
+//                          },
+//                        new Decoder<ResultSet>() {
+//                            @Override
+//                            public StubResultSet decode(Iterable<String> values) {
+//                                return decodeStubResultSet(rsSupplier);
+//                            }
+//                        },
+//                        new Encoder<ResultSet>() {
+//                            @Override
+//                            public Iterable<String> encode(ResultSet resultSet) {
+//                                return encodeResultSetHeader(resultSet);
+////                                return ResultSetUtil.encode(resultSet);
+//                            }
+//                        },
+//
+//                        this::useCallKeys);
 
     }
 
@@ -388,7 +407,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
 
     @Override
     public ResultSetMetaData getMetaData() throws SQLException {
-        return new StubResultSetMetaData(stubConnection, this);
+        return new StubResultSetMetaData(stubConnection, statementId()[0], () -> getRealStatement().getMetaData());
     }
 
     @Override
@@ -638,6 +657,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     protected String[] statementId() {
         return new String[]{getSql()};
     }
+
     protected void addCallKeys(String... keys) {
         this.keys.addAll(asList(keys));
     }

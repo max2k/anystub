@@ -13,7 +13,6 @@ import java.net.URLConnection;
 import java.util.stream.Collectors;
 
 /**
- * Created by Kirill on 9/3/2016.
  */
 @Component
 public class SourceSystem {
@@ -48,6 +47,6 @@ public class SourceSystem {
 
     public String getPath() throws URISyntaxException {
         URI uri = new URI(getUrl());
-        return uri.getPath();
+        return uri.toASCIIString();
     }
 }
