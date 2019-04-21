@@ -49,6 +49,7 @@ public class Base {
 
     private static Logger log = Logger.getLogger(Base.class.getName());
     private List<Document> documentList = new ArrayList<>();
+    private Iterator<Document> documentListTrackIterator;
     private List<Document> requestHistory = new ArrayList<>();
     private final String filePath;
     private boolean isNew = true;
@@ -65,8 +66,9 @@ public class Base {
      * examples:
      * * new Base("./stub.yml") uses file in current dir
      * * new Base("stub.yml") uses src/test/resources/anystub/stub.yml
-     *
+     * <p>
      * Note: Consider using BaseManagerImpl instead
+     *
      * @param filename used file name
      */
     public Base(String filename) {
@@ -92,9 +94,27 @@ public class Base {
      * @return this to cascade operations
      */
     public Base constrain(RequestMode requestMode) {
-        this.requestMode = requestMode;
-        if (requestMode== rmNone && isNew()) {
-            init();
+        if (isNew()) {
+            this.requestMode = requestMode;
+            switch (requestMode) {
+                case rmNone:
+                    init();
+                    break;
+                case rmAll:
+                    isNew = false;
+                    break;
+                case rmTrack:
+                    init();
+                    if (documentList.isEmpty()) {
+                        documentListTrackIterator = null;
+                    } else {
+                        documentListTrackIterator = documentList.iterator();
+                    }
+            }
+        } else {
+            if (this.requestMode != requestMode) {
+                log.warning(() -> String.format("Stub constrains change after creation for %s. Consider to split stub-files", filePath));
+            }
         }
         return this;
     }
@@ -153,7 +173,7 @@ public class Base {
     }
 
     public String get(String... keys) {
-        return getVals(keys).next();
+        return getVals(keys).iterator().next();
     }
 
     /**
@@ -163,7 +183,7 @@ public class Base {
      * @return values of requested document
      * @throws NoSuchElementException throws when document is not found
      */
-    public Iterator<String> getVals(String... keys) throws NoSuchElementException {
+    public Iterable<String> getVals(String... keys) throws NoSuchElementException {
         return getDocument(keys)
                 .orElseThrow(NoSuchElementException::new)
                 .getVals();
@@ -335,11 +355,23 @@ public class Base {
                                                Decoder<T> decoder,
                                                Encoder<T> encoder,
                                                String... keys) throws E {
+        return request2(supplier,
+                decoder,
+                encoder,
+                () -> keys);
+    }
 
-        if (requestMode== rmPassThrough) {
+    public <T, E extends Throwable> T request2(Supplier<T, E> supplier,
+                                               Decoder<T> decoder,
+                                               Encoder<T> encoder,
+                                               KeysSupplier keyGen) throws E {
+
+        if (requestMode == rmPassThrough) {
             return supplier.get();
         }
-        log.finest(() -> String.format("request executing: %s", Arrays.stream(keys).collect(Collectors.joining(","))));
+        KeysSupplier keyGenCashed = new KeysSupplierCashed(keyGen);
+
+        log.finest(() -> String.format("request executing: %s", Arrays.stream(keyGenCashed.get()).collect(Collectors.joining(","))));
 
         if (isNew()) {
             init();
@@ -347,16 +379,21 @@ public class Base {
 
         if (seekInCache()) {
 
-            Optional<Document> storedDocument = getDocument(keys);
+            Optional<Document> storedDocument = getDocument(keyGenCashed.get());
             if (storedDocument.isPresent()) {
                 requestHistory.add(storedDocument.get());
                 if (storedDocument.get().isNullValue()) {
                     // it's not necessarily to decode null objects
                     return null;
                 }
-                ArrayList<String> ar = new ArrayList<>();
-                storedDocument.get().getVals().forEachRemaining(ar::add);
-                return decoder.decode(ar);
+                return decoder.decode(storedDocument.get().getVals());
+            }
+        } else if (isTrackCache()) {
+            if (documentListTrackIterator.hasNext()) {
+                Document next = documentListTrackIterator.next();
+                if (next.keyEqual_to(keyGenCashed.get())) {
+                    return decoder.decode(next.getVals());
+                }
             }
         }
 
@@ -370,7 +407,7 @@ public class Base {
         try {
             res = supplier.get();
         } catch (Throwable ex) {
-            Document exceptionalDocument = put(ex, keys);
+            Document exceptionalDocument = put(ex, keyGenCashed.get());
             requestHistory.add(exceptionalDocument);
             try {
                 save();
@@ -381,7 +418,7 @@ public class Base {
         }
 
         // keep values
-        Document retrievedDocument = new Document(keys);
+        Document retrievedDocument = new Document(keyGenCashed.get());
 
         Iterable<String> responseData;
         if (res == null) {
@@ -666,10 +703,16 @@ public class Base {
     }
 
     private boolean seekInCache() {
-        return requestMode== rmNew || requestMode== rmNone;
+        return requestMode == rmNew || requestMode == rmNone;
     }
 
     private boolean writeInCache() {
-        return requestMode== rmNew || requestMode== rmAll;
+        return requestMode == rmNew ||
+                requestMode == rmAll ||
+                (requestMode == rmTrack && documentListTrackIterator == null);
+    }
+
+    private boolean isTrackCache() {
+        return requestMode == rmTrack && documentListTrackIterator != null;
     }
 }

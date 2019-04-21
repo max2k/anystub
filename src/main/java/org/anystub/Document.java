@@ -92,15 +92,15 @@ public class Document {
     }
 
     public String get() {
-        return getVals().next();
+        return getVals().iterator().next();
     }
 
-    public <E extends Throwable> Iterator<String> getVals() throws E {
+    public <E extends Throwable> Iterable<String> getVals() throws E {
         if (exception.isEmpty()) {
             if (nullValue) {
                 return null;
             }
-            return values.iterator();
+            return values;
         }
 
         try {
