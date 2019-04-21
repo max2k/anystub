@@ -1,9 +1,9 @@
 package org.anystub.jdbc;
 
-import org.anystub.Base;
 import org.anystub.Decoder;
 import org.anystub.Encoder;
 import org.anystub.Supplier;
+import org.anystub.Util;
 
 import java.sql.Array;
 import java.sql.Blob;
@@ -250,7 +250,7 @@ public class StubConnection implements Connection {
                                 Iterator<String> it = values.iterator();
                                 while (it.hasNext()) {
                                     String key = it.next();
-                                    Class<?> value = Base.decode(it.next());
+                                    Class<?> value = Util.decode(it.next());
                                     res.put(key, value);
                                 }
                                 return res;
@@ -262,7 +262,7 @@ public class StubConnection implements Connection {
                                 List<String> res = new LinkedList<>();
                                 for (Map.Entry<String, Class<?>> o : stringClassMap.entrySet()) {
                                     res.add(o.getKey());
-                                    res.add(Base.encode(o.getValue()));
+                                    res.add(Util.encode(o.getValue()));
                                 }
                                 return res;
                             }

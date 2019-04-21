@@ -131,7 +131,7 @@ public class DocumentTest {
         Document document = new Document(map);
 
         assertNull(document.get());
-        assertNull(document.getVals().next());
+        assertNull(document.getVals().iterator().next());
 
     }
 }

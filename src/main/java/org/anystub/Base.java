@@ -4,20 +4,15 @@ import org.anystub.mgmt.BaseManagerImpl;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,7 +25,11 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Collections.singletonList;
-import static org.anystub.RequestMode.*;
+import static org.anystub.RequestMode.rmAll;
+import static org.anystub.RequestMode.rmNew;
+import static org.anystub.RequestMode.rmNone;
+import static org.anystub.RequestMode.rmPassThrough;
+import static org.anystub.RequestMode.rmTrack;
 
 /**
  * provide basic access to stub-file
@@ -115,6 +114,7 @@ public class Base {
             if (this.requestMode != requestMode) {
                 log.warning(() -> String.format("Stub constrains change after creation for %s. Consider to split stub-files", filePath));
             }
+            this.requestMode = requestMode;
         }
         return this;
     }
@@ -254,8 +254,8 @@ public class Base {
      */
     public <T extends Serializable, E extends Exception> T requestSerializable(Supplier<T, E> supplier, String... keys) throws E {
         return request(supplier,
-                Base::decode,
-                Base::encode,
+                Util::decode,
+                Util::encode,
                 keys);
     }
 
@@ -657,45 +657,6 @@ public class Base {
     public long timesEx(final String[] keys, final String[] values) {
         return matchEx(keys, values)
                 .count();
-    }
-
-
-    /**
-     * invokes request, uses reflection to serialize/deserialize object
-     * * {@link UnsupportedOperationException}
-     *
-     * @param supplier produce response (ex. query real remote system)
-     * @param keys     id of request
-     * @param <T>      type of produced result
-     * @param <E>      type of allowed Exception
-     * @return requested object
-     * @throws E occurs in real system or created from
-     */
-    public <T, E extends Throwable> T requestMapped(Supplier<T, E> supplier,
-                                                    String... keys) throws E {
-        throw new UnsupportedOperationException();
-    }
-
-
-    public static String encode(Serializable s) {
-        try (ByteArrayOutputStream of = new ByteArrayOutputStream();
-             ObjectOutputStream so = new ObjectOutputStream(of)) {
-            so.writeObject(s);
-            so.flush();
-            return Base64.getEncoder().encodeToString(of.toByteArray());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T extends Serializable> T decode(String s) {
-        byte[] decode = Base64.getDecoder().decode(s);
-        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
-             ObjectInputStream si = new ObjectInputStream(byteArrayInputStream)) {
-            return (T) si.readObject();
-        } catch (ClassNotFoundException | IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public String getFilePath() {

@@ -85,6 +85,8 @@ public class DefaultConfiguration {
         JdbcDataSource ds = new JdbcDataSource();
         ds.setURL("jdbc:h2:./test3;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
         DataSource stubDataSource = new StubDataSource(ds);
+//        ds.setUser("sa");
+//        ds.setPassword("");
         return stubDataSource;
     }
 }

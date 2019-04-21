@@ -1,6 +1,13 @@
 package org.anystub;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Reader;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
@@ -61,4 +68,54 @@ public class Util {
             return in.getBytes();
         }
     }
+
+    public static String toCharacterString(InputStream in)  {
+        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()){
+            int r;
+            while ((r=in.read())!=-1){
+                byteArrayOutputStream.write(r);
+            }
+            return toCharacterString(byteArrayOutputStream.toByteArray());
+        } catch (IOException e) {
+            throw new UnsupportedOperationException("failed save InputStream");
+        }
+    }
+    public static InputStream recoverInputStream(String in) {
+        byte[] bytes = recoverBinaryData(in);
+        return new ByteArrayInputStream(bytes);
+    }
+
+    public static String encode(Serializable s) {
+        try (ByteArrayOutputStream of = new ByteArrayOutputStream();
+             ObjectOutputStream so = new ObjectOutputStream(of)) {
+            so.writeObject(s);
+            so.flush();
+            return Base64.getEncoder().encodeToString(of.toByteArray());
+        } catch (IOException e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
+
+    public static <T extends Serializable> T decode(String s) {
+        byte[] decode = Base64.getDecoder().decode(s);
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
+             ObjectInputStream si = new ObjectInputStream(byteArrayInputStream)) {
+            return (T) si.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
+
+    public static String toCharacterString(Reader in)  {
+        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()){
+            int r;
+            while ((r=in.read())!=-1){
+                byteArrayOutputStream.write(r);
+            }
+            return toCharacterString(byteArrayOutputStream.toByteArray());
+        } catch (IOException e) {
+            throw new UnsupportedOperationException("failed save InputStream");
+        }
+    }
+
 }

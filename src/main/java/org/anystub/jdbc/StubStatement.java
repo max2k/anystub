@@ -2,6 +2,7 @@ package org.anystub.jdbc;
 
 import org.anystub.Decoder;
 import org.anystub.Encoder;
+import org.anystub.KeysSupplier;
 import org.anystub.Supplier;
 
 import java.sql.Connection;
@@ -11,6 +12,7 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,20 +66,22 @@ public class StubStatement implements Statement {
 
     @Override
     public ResultSet executeQuery(String s) throws SQLException {
-        executedCommand = s;
-        return stubConnection
-                .getStubDataSource()
-                .getBase()
-                .request2(new Supplier<ResultSet, SQLException>() {
-                              @Override
-                              public ResultSet get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealStatement().executeQuery(s);
-                              }
-                          },
-                        new DecoderResultSet(),
-                        new EncoderResultSet(),
-                        s);
+        return produceResultSet(()->getRealStatement().executeQuery(s), ()->new String[]{s});
+//        !
+//        executedCommand = s;
+//        return stubConnection
+//                .getStubDataSource()
+//                .getBase()
+//                .request2(new Supplier<ResultSet, SQLException>() {
+//                              @Override
+//                              public ResultSet get() throws SQLException {
+//                                  stubConnection.runSql();
+//                                  return getRealStatement().executeQuery(s);
+//                              }
+//                          },
+//                        new DecoderResultSet(),
+//                        new EncoderResultSet(),
+//                        s);
     }
 
     @Override
@@ -218,21 +222,10 @@ public class StubStatement implements Statement {
 
     @Override
     public ResultSet getResultSet() throws SQLException {
-        return stubConnection
-                .getStubDataSource()
-                .getBase()
-                .request2(new Supplier<ResultSet, SQLException>() {
-                              @Override
-                              public ResultSet get() throws SQLException {
-                                  stubConnection.runSql();
-                                  ResultSet resultSet = getRealStatement().getResultSet();
-                                  return resultSet;
-                              }
-                          },
-                        new DecoderResultSet(),
-                        new EncoderResultSet(),
-                        callKey("getResultSet"));
+        return produceResultSet(()->getRealStatement().getResultSet(), ()->callKey("getResultSet"));
     }
+
+
 
     @Override
     public int getUpdateCount() throws SQLException {
@@ -342,7 +335,7 @@ public class StubStatement implements Statement {
 
     @Override
     public void clearBatch() throws SQLException {
-        useCallBatch();
+        batch.clear();
         stubConnection.add(() -> {
             getRealStatement().clearBatch();
         });
@@ -350,37 +343,37 @@ public class StubStatement implements Statement {
 
     @Override
     public int[] executeBatch() throws SQLException {
-        return  stubConnection
+        return stubConnection
                 .getStubDataSource()
                 .getBase()
                 .request2(new Supplier<int[], SQLException>() {
-                                 @Override
-                                 public int[] get() throws SQLException {
-                                     stubConnection.runSql();
-                                     return getRealStatement().executeBatch();
-                                 }
-                             },
-                new Decoder<int[]>() {
-                    @Override
-                    public int[] decode(Iterable<String> values) {
-                        List<Integer> collect = StreamSupport.stream(values.spliterator(), false)
-                                .map(Integer::parseInt)
-                                .collect(Collectors.toList());
-                        int[] r = new int[collect.size()];
+                              @Override
+                              public int[] get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return getRealStatement().executeBatch();
+                              }
+                          },
+                        new Decoder<int[]>() {
+                            @Override
+                            public int[] decode(Iterable<String> values) {
+                                List<Integer> collect = StreamSupport.stream(values.spliterator(), false)
+                                        .map(Integer::parseInt)
+                                        .collect(Collectors.toList());
+                                int[] r = new int[collect.size()];
 
-                        for (int i = 0; i < r.length; i++) {
-                            r[i] = collect.get(i);
-                        }
-                        return r;
-                    }
-                }, new Encoder<int[]>() {
-                    @Override
-                    public Iterable<String> encode(int[] values) {
-                        return stream(values)
-                                .mapToObj(String::valueOf)
-                                .collect(Collectors.toList());
-                    }
-                }, useCallBatch());
+                                for (int i = 0; i < r.length; i++) {
+                                    r[i] = collect.get(i);
+                                }
+                                return r;
+                            }
+                        }, new Encoder<int[]>() {
+                            @Override
+                            public Iterable<String> encode(int[] values) {
+                                return stream(values)
+                                        .mapToObj(String::valueOf)
+                                        .collect(Collectors.toList());
+                            }
+                        }, useCallKeys());
 
 
     }
@@ -406,6 +399,7 @@ public class StubStatement implements Statement {
 
     @Override
     public ResultSet getGeneratedKeys() throws SQLException {
+
         return stubConnection
                 .getStubDataSource()
                 .getBase()
@@ -603,7 +597,6 @@ public class StubStatement implements Statement {
     }
 
 
-
     protected String[] statementId() {
         if (executedCommand == null) {
             return new String[0];
@@ -637,12 +630,59 @@ public class StubStatement implements Statement {
     private void addCallBatch(String s) {
         batch.add(s);
     }
-    private String[] useCallBatch() {
+
+
+    protected String[] useCallKeys() {
         List<String> callKey = new ArrayList<>();
         callKey.add("executeBatch");
         callKey.addAll(batch);
         batch.clear();
         return callKey.toArray(new String[0]);
+
+    }
+
+    protected StubResultSet decodeStubResultSet(Supplier<ResultSet, SQLException> rsSupplier){
+        try {
+            return new StubResultSet(stubConnection, statementId(), rsSupplier);
+        } catch (SQLException e) {
+            throw new UnsupportedOperationException("failed to create StubResultSet from recorded data", e);
+        }
+    }
+
+    protected Iterable<String> encodeResultSetHeader(ResultSet resultSet) {
+        try {
+            return ResultSetUtil.encodeHeader(resultSet.getMetaData());
+        } catch (SQLException e) {
+            return Collections.singletonList("0");
+        }
+    }
+
+    protected ResultSet produceResultSet(Supplier<ResultSet, SQLException> rsSupplier, KeysSupplier keysSupplier) throws SQLException {
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<ResultSet, SQLException>() {
+                              @Override
+                              public ResultSet get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return rsSupplier.get();
+                              }
+                          },
+                        new Decoder<ResultSet>() {
+                            @Override
+                            public StubResultSet decode(Iterable<String> values) {
+                                return decodeStubResultSet(rsSupplier);
+                            }
+                        },
+                        new Encoder<ResultSet>() {
+                            @Override
+                            public Iterable<String> encode(ResultSet resultSet) {
+                                return encodeResultSetHeader(resultSet);
+//                                return ResultSetUtil.encode(resultSet);
+                            }
+                        },
+
+                        keysSupplier);
     }
 
 }
