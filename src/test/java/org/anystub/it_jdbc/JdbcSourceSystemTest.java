@@ -213,8 +213,8 @@ public class JdbcSourceSystemTest {
                 preparedStatement.setBoolean(4, true);
                 preparedStatement.setFloat(5, 14);
                 preparedStatement.setDouble(6, 43.124);
-                preparedStatement.setTime(7, new Time(37135000));
-                preparedStatement.setDate(8, new Date(82800000));
+                preparedStatement.setTime(7, new Time(34509000));
+                preparedStatement.setDate(8, new Date(1555887600000l));
                 preparedStatement.setTimestamp(9, new Timestamp(1235385345));
                 return preparedStatement;
             }
@@ -240,7 +240,7 @@ public class JdbcSourceSystemTest {
         );
 
         assertEquals(1, query.size());
-        assertEquals("1 2147483648 14.0 1.0 126.0 43.124 37135000 82800000 1235385345",
+        assertEquals("1 2147483648 14.0 1.0 126.0 43.124 34509000 1555887600000 1235385345",
                 query.get(0));
 
 
@@ -259,7 +259,7 @@ public class JdbcSourceSystemTest {
         );
 
         assertEquals(1, query.size());
-        assertEquals("1 2147483648 126 true 14.0 43.124 37135000 82800000 1235385345",
+        assertEquals("1 2147483648 126 true 14.0 43.124 34509000 1555887600000 1235385345",
                 query.get(0));
     }
 
