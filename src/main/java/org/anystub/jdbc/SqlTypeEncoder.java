@@ -4,17 +4,13 @@ import org.anystub.Util;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialClob;
-import java.io.ByteArrayOutputStream;
 import java.io.CharArrayWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.RowId;
 import java.sql.SQLException;
-import java.util.Base64;
 
 import static java.util.Collections.singletonList;
 
@@ -76,13 +72,12 @@ public class SqlTypeEncoder {
     }
 
 
-    public static RowId decodeRowid(Iterable<String> values) {
-        String next = values.iterator().next();
+    public static RowId decodeRowid(String next) {
         byte[] bytes = Util.recoverBinaryData(next);
         return new StubRowId(bytes);
     }
 
-    public static Iterable<String> encodeRowid(RowId rowId) {
-        return singletonList(Util.toCharacterString(rowId.getBytes()));
+    public static String encodeRowid(RowId rowId) {
+        return Util.toCharacterString(rowId.getBytes());
     }
 }

@@ -8,15 +8,16 @@ import java.sql.SQLException;
 public class StubResultSetMetaData implements ResultSetMetaData {
 
     private final StubConnection stubConnection;
-    private final StubPreparedStatement stubPreparedStatement;
+    //    private final StubPreparedStatement stubPreparedStatement;
+    private final String id;
     private ResultSetMetaData realResultSetMetaData = null;
 
-    public StubResultSetMetaData(StubConnection stubConnection, StubPreparedStatement stubPreparedStatement) throws SQLException {
+    public StubResultSetMetaData(StubConnection stubConnection, String id, Supplier<ResultSetMetaData, SQLException> supplier) throws SQLException {
         this.stubConnection = stubConnection;
-        this.stubPreparedStatement = stubPreparedStatement;
+        this.id = id;
 
         stubConnection.add(() -> {
-            realResultSetMetaData = stubPreparedStatement.getRealStatement().getMetaData();
+            realResultSetMetaData = supplier.get();
         });
     }
 
@@ -33,7 +34,7 @@ public class StubResultSetMetaData implements ResultSetMetaData {
                                           realResultSetMetaData.getColumnCount();
                               }
                           },
-                        stubPreparedStatement.getSql(), "getColumnCount");
+                        id, "getColumnCount");
     }
 
     @Override
@@ -374,10 +375,10 @@ public class StubResultSetMetaData implements ResultSetMetaData {
                                           realResultSetMetaData.isWrapperFor(aClass);
                               }
                           },
-                        stubPreparedStatement.getSql(), "isWrapperFor", aClass.getCanonicalName());
+                        id, "isWrapperFor", aClass.getCanonicalName());
     }
 
     private String[] useKeys(String name, int i) {
-        return new String[]{stubPreparedStatement.getSql(), name, String.valueOf(i)};
+        return new String[]{id, name, String.valueOf(i)};
     }
 }

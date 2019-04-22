@@ -52,7 +52,7 @@ public class BaseTest {
 
     @Test
     public void request() {
-        Base base = BaseManagerImpl.instance().getBase();
+        Base base = BaseManagerImpl.instance().getBase("request.yml");
         base.clear();
         assertTrue(base.isNew());
 

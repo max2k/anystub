@@ -80,7 +80,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public Boolean get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.wasNull();
+                                  return getRealStatement().wasNull();
                               }
                           },
                         callKey("wasNull"));
@@ -95,7 +95,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                              @Override
                              public String get() throws SQLException {
                                  stubConnection.runSql();
-                                 return realCallableStatement.getString(i);
+                                 return getRealStatement().getString(i);
                              }
                          },
                         callKey("getString", 1));
@@ -110,7 +110,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public Boolean get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getBoolean(i);
+                                  return getRealStatement().getBoolean(i);
                               }
                           },
                         callKey("getBoolean", i));
@@ -155,7 +155,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public Integer get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getInt(i);
+                                  return getRealStatement().getInt(i);
                               }
                           },
                         callKey("getInt", i));
@@ -170,7 +170,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public Long get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getLong(i);
+                                  return getRealStatement().getLong(i);
                               }
                           },
                         values -> Long.parseLong(values.iterator().next()),
@@ -187,7 +187,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public Float get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getFloat(i);
+                                  return getRealStatement().getFloat(i);
                               }
                           },
                         values -> Float.parseFloat(values.iterator().next()),
@@ -204,7 +204,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public Double get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getDouble(i);
+                                  return getRealStatement().getDouble(i);
                               }
                           },
                         values -> Double.parseDouble(values.iterator().next()),
@@ -222,7 +222,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public BigDecimal get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getBigDecimal(i, i1);
+                                  return getRealStatement().getBigDecimal(i, i1);
                               }
                           },
                         values -> new BigDecimal(values.iterator().next()),
@@ -239,7 +239,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public byte[] get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getBytes(i);
+                                  return getRealStatement().getBytes(i);
                               }
                           },
                         values -> Base64
@@ -371,7 +371,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                              @Override
                              public Blob get() throws SQLException {
                                  stubConnection.runSql();
-                                 return realCallableStatement.getBlob(i);
+                                 return  getRealStatement().getBlob(i);
                              }
                          },
                         SqlTypeEncoder::decodeBlob,
@@ -477,7 +477,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public URL get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getURL(i);
+                                  return getRealStatement().getURL(i);
                               }
                           },
                         values -> {
@@ -772,7 +772,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public Long get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getLong(s);
+                                  return getRealStatement().getLong(s);
                               }
                           },
                         values -> Long.parseLong(values.iterator().next()),
@@ -789,7 +789,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public Float get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getFloat(s);
+                                  return getRealStatement().getFloat(s);
                               }
                           },
                         values -> Float.parseFloat(values.iterator().next()),
@@ -806,7 +806,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public Double get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getDouble(s);
+                                  return getRealStatement().getDouble(s);
                               }
                           },
                         values -> Double.parseDouble(values.iterator().next()),
@@ -823,7 +823,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public byte[] get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getBytes(s);
+                                  return getRealStatement().getBytes(s);
                               }
                           },
                         values -> Base64
@@ -915,7 +915,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                               @Override
                               public BigDecimal get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getBigDecimal(s);
+                                  return getRealStatement().getBigDecimal(s);
                               }
                           },
                         values -> new BigDecimal(values.iterator().next()),
@@ -955,7 +955,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                              @Override
                              public Blob get() throws SQLException {
                                  stubConnection.runSql();
-                                 return realCallableStatement.getBlob(s);
+                                 return getRealStatement().getBlob(s);
                              }
                          },
                         SqlTypeEncoder::decodeBlob,
@@ -1029,21 +1029,21 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .request2(new Supplier<URL, SQLException>() {
+                .request(new Supplier<URL, SQLException>() {
                               @Override
                               public URL get() throws SQLException {
                                   stubConnection.runSql();
-                                  return realCallableStatement.getURL(s);
+                                  return getRealStatement().getURL(s);
                               }
                           },
                         values -> {
                             try {
-                                return new URL(values.iterator().next());
+                                return new URL(values);
                             } catch (MalformedURLException e) {
                                 throw new NoSuchElementException(e.getMessage());
                             }
                         },
-                        aLong -> singletonList(aLong.toString()),
+                        URL::toString,
                         callKey("getURL", s));
     }
 
@@ -1052,7 +1052,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .request2(new Supplier<RowId, SQLException>() {
+                .request(new Supplier<RowId, SQLException>() {
                               @Override
                               public RowId get() throws SQLException {
                                   stubConnection.runSql();
@@ -1070,7 +1070,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .request2(new Supplier<RowId, SQLException>() {
+                .request(new Supplier<RowId, SQLException>() {
                               @Override
                               public RowId get() throws SQLException {
                                   stubConnection.runSql();
@@ -1183,7 +1183,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                              @Override
                              public String get() throws SQLException {
                                  stubConnection.runSql();
-                                 return realCallableStatement.getNString(i);
+                                 return getRealStatement().getNString(i);
                              }
                          },
                         callKey("getNString", i));
@@ -1198,7 +1198,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                              @Override
                              public String get() throws SQLException {
                                  stubConnection.runSql();
-                                 return realCallableStatement.getNString(s);
+                                 return getRealStatement().getNString(s);
                              }
                          },
                         callKey("getNString", s));
@@ -1226,7 +1226,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public void setBlob(String s, Blob blob) throws SQLException {
-        addCallKeys("setblob", String.valueOf(blob.length()));
+        addCallKeys("setBlob", String.valueOf(blob.length()));
         stubConnection.add(() -> {
             getRealStatement().setBlob(s, blob);
         });

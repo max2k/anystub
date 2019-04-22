@@ -11,7 +11,6 @@ import java.net.URISyntaxException;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Kirill on 9/4/2016.
  */
 public class WorkerEasyTest {
 
@@ -19,12 +18,11 @@ public class WorkerEasyTest {
 
     @Before
     public void createStub() {
-        Base base = BaseManagerImpl.instance().getBase();
+        Base base = BaseManagerImpl.instance().getBase("WorkerEasyTest.yml");
         sourceSystem = new SourceSystem("http://localhost:8080") {
             @Override
             public String get() throws IOException {
-                SourceSystem th = this;
-                return base.request(() -> th.get(),
+                return base.request(() -> super.get(),
                         getPath());
             }
 

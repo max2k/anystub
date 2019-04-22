@@ -1,12 +1,17 @@
 package org.anystub.it_jdbc;
 
 import org.anystub.AnyStubId;
+import org.anystub.RequestMode;
 import org.h2.tools.SimpleResultSet;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.CallableStatementCallback;
+import org.springframework.jdbc.core.CallableStatementCreator;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -21,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Blob;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
@@ -60,6 +66,7 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
+    @AnyStubId(filename = "jdbcStub", requestMode = RequestMode.rmNone)
     public void someTest() {
 
 
@@ -116,8 +123,8 @@ public class JdbcSourceSystemTest {
         assertEquals("HELLO: XX", query.get(0));
     }
 
-    @AnyStubId
     @Test
+    @AnyStubId
     public void blobTest() {
         jdbcTemplate.execute("DROP TABLE BLOBREPORT IF EXISTS");
 
@@ -143,7 +150,7 @@ public class JdbcSourceSystemTest {
 
         assertEquals(1, affRows);
 
-        List<String> query = jdbcTemplate.query("select * from Report where id =?", new Object[]{1},
+        List<String> query = jdbcTemplate.query("select * from BLOBREPORT where id =?", new Object[]{1},
                 (resultSet, i) -> {
                     String s;
                     Blob image = resultSet.getBlob("IMAGE");
@@ -168,7 +175,7 @@ public class JdbcSourceSystemTest {
 
 
     @Test
-    @AnyStubId
+    @AnyStubId(requestMode = RequestMode.rmAll)
     public void integerLongTest() {
         jdbcTemplate.execute("DROP TABLE SOMETYPES IF EXISTS");
 
@@ -206,42 +213,115 @@ public class JdbcSourceSystemTest {
                 preparedStatement.setBoolean(4, true);
                 preparedStatement.setFloat(5, 14);
                 preparedStatement.setDouble(6, 43.124);
-                preparedStatement.setTime(7, new Time(123534534));
-                preparedStatement.setDate(8, new Date(126534534));
+                preparedStatement.setTime(7, Time.valueOf("17:23:54"));
+                preparedStatement.setDate(8, Date.valueOf("2019-04-22"));
                 preparedStatement.setTimestamp(9, new Timestamp(1235385345));
                 return preparedStatement;
             }
         }, holder);
 
-        List<String> query = jdbcTemplate.query("select * from SOMETYPES where id =?", new Object[]{1},
-                (resultSet, i) -> {
-                    String s = String.valueOf(resultSet.getInt(2)) +
-                            String.valueOf(resultSet.getInt("NAME")) +
-                            String.valueOf(resultSet.getLong("C_BIGINT")) +
-                            String.valueOf(resultSet.getShort("C_SMALLINT")) +
-                            String.valueOf(resultSet.getBoolean("C_BOOL")) +
-                            String.valueOf(resultSet.getFloat("C_DECIMAL")) +
-                            String.valueOf(resultSet.getDouble("C_DOUBLE")) +
-                            String.valueOf(resultSet.getTime("C_TIME")) +
-                            String.valueOf(resultSet.getDate("C_DATE")) +
-                            String.valueOf(resultSet.getTimestamp("C_TIMESTAMP")) +
-                            String.valueOf(resultSet.getLong(3)) +
-                            String.valueOf(resultSet.getShort(4)) +
-                            String.valueOf(resultSet.getBoolean(5)) +
-                            String.valueOf(resultSet.getFloat(6)) +
-                            String.valueOf(resultSet.getDouble(7)) +
-                            String.valueOf(resultSet.getTime(8)) +
-                            String.valueOf(resultSet.getDate(9)) +
-                            String.valueOf(resultSet.getTimestamp(10));
+        assertEquals(1, affectedRows);
 
+        List<String> query;
 
-                    return s;
-                }
+        query = jdbcTemplate.query("select * from SOMETYPES where id =?", new Object[]{1},
+                (resultSet, i) -> resultSet.getInt("NAME") + " " +
+                        resultSet.getLong("C_BIGINT") + " " +
+                        resultSet.getFloat("C_DECIMAL") + " " +
+                        resultSet.getFloat("C_BOOL") + " " +
+                        resultSet.getFloat("C_SMALLINT") + " " +
+                        resultSet.getDouble("C_DOUBLE") + " " +
+                        resultSet.getTime("C_TIME") + " " +
+                        resultSet.getDate("C_DATE") + " " +
+                        resultSet.getTimestamp("C_TIMESTAMP").getTime()
         );
 
         assertEquals(1, query.size());
-        assertEquals("112147483648126true14.043.12411:18:551970-01-021970-01-15 08:09:45.3452147483648126true14.043.12411:18:551970-01-021970-01-15 08:09:45.345",
+        assertEquals("1 2147483648 14.0 1.0 126.0 43.124 17:23:54 2019-04-22 1235385345",
                 query.get(0));
+
+
+        query = jdbcTemplate.query("select * from SOMETYPES where id =?", new Object[]{1},
+                (resultSet, i) -> resultSet.getInt(2) + " " +
+                        resultSet.getLong(3) + " " +
+                        resultSet.getShort(4) + " " +
+                        resultSet.getBoolean(5) + " " +
+                        resultSet.getFloat(6) + " " +
+                        resultSet.getDouble(7) + " " +
+                        resultSet.getTime(8) + " " +
+                        resultSet.getDate(9) + " " +
+                        resultSet.getTimestamp(10).getTime()
+        );
+
+        assertEquals(1, query.size());
+        assertEquals("1 2147483648 126 true 14.0 43.124 17:23:54 2019-04-22 1235385345",
+                query.get(0));
+    }
+
+    @Test
+    @Ignore("CallableStatement: Supported only for calling stored procedures. to invent right test")
+    public void integerLongTest1() throws SQLException {
+        jdbcTemplate.execute("DROP TABLE SOMETYPES1 IF EXISTS");
+
+        String sql = "CREATE TABLE SOMETYPES1(\n" +
+                "ID BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "NAME INT NOT NULL,\n" +
+                "C_BIGINT BIGINT, \n" +
+                "C_DECIMAL DECIMAL, \n" +
+                "C_DOUBLE DOUBLE, \n" +
+                "C_TIME TIME, \n" +
+                "C_DATE DATE, \n" +
+                "C_TIMESTAMP TIMESTAMP \n" +
+                ");";
+        jdbcTemplate.execute(sql);
+
+        String sqlI = "insert into SOMETYPES1 (NAME, " +
+                "C_BIGINT," +
+                "C_DECIMAL," +
+                "C_DOUBLE," +
+                "C_TIME," +
+                "C_DATE," +
+                "C_TIMESTAMP) values (?, ?,?, ?,?, ?,?)";
+        CallableStatement execute = jdbcTemplate.execute(new CallableStatementCreator() {
+            @Override
+            public CallableStatement createCallableStatement(Connection connection) throws SQLException {
+                CallableStatement callableStatement = connection.prepareCall(sqlI);
+                callableStatement.setInt("NAME", 1);
+                callableStatement.setDate("C_DATE", new Date(82800000));
+                callableStatement.setLong("C_BIGINT", Integer.MAX_VALUE + 1L);
+                callableStatement.setDouble("C_DOUBLE", 43.124);
+                callableStatement.setTime("C_TIME", new Time(37135000));
+                callableStatement.setFloat("C_DECIMAL", 14);
+                callableStatement.setTimestamp("C_TIMESTAMP", new Timestamp(1235385345));
+                return callableStatement;
+            }
+        }, new CallableStatementCallback<CallableStatement>() {
+            @Override
+            public CallableStatement doInCallableStatement(CallableStatement callableStatement) throws SQLException, DataAccessException {
+                return callableStatement;
+            }
+        });
+
+        while (execute.getMoreResults() || execute.getUpdateCount() != -1) {
+
+        }
+
+        List<String> query = jdbcTemplate.query("select * from SOMETYPES1 where id =?", new Object[]{1},
+                (resultSet, i) -> {
+                    return String.valueOf(resultSet.getInt("NAME")) + " " +
+                            String.valueOf(resultSet.getLong("C_BIGINT")) + " " +
+                            String.valueOf(resultSet.getFloat("C_DECIMAL")) + " " +
+                            String.valueOf(resultSet.getDouble("C_DOUBLE")) + " " +
+                            String.valueOf(resultSet.getTime("C_TIME").getTime()) + " " +
+                            String.valueOf(resultSet.getDate("C_DATE").getTime()) + " " +
+                            String.valueOf(resultSet.getTimestamp("C_TIMESTAMP").getTime());
+                });
+
+
+        assertEquals(1, query.size());
+        assertEquals("1 2147483648 14.0 43.124 37135000 82800000 1235385345",
+                query);
+
     }
 
     private static List<Connection> connections = Collections.synchronizedList(new ArrayList<>());
