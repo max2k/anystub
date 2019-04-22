@@ -106,9 +106,9 @@ public class ResultSetUtil {
 
     public static ResultSet decode(Iterable<String> values) {
         // * support aliases in SimpleResultSet it creates 2nd column, and put copy of the data
-        SimpleResultSet simpleResultSet = new SimpleResultSet();
+        final SimpleResultSet simpleResultSet = new SimpleResultSet();
         // * keeps column numbers, to double values
-        Set<Integer> doubleColumnIndexes = new HashSet<>();
+        final Set<Integer> doubleColumnIndexes = new HashSet<>();
 
         Iterator<String> it = values.iterator();
         if (it.hasNext()) {

@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.anystub.AnyStubId;
 import org.anystub.Base;
+import org.anystub.RequestMode;
 import org.anystub.jdbc.StubDataSource;
 import org.anystub.mgmt.BaseManagerImpl;
 import org.junit.Test;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
@@ -65,23 +67,25 @@ public class HikariJdbcSourceSystemTest {
     }
 
     @Test
-    @AnyStubId(filename = "testcasefile.yml")
+    @AnyStubId(filename = "testcasefile", requestMode = RequestMode.rmNone)
     public void testCaseFileTest() {
-
-
-
-        log.info("Creating tables");
-
         jdbcTemplate.execute("DROP TABLE testcasefile IF EXISTS");
+        assertTrue("no exceptions expected", true);
     }
 
     @Test
-    @AnyStubId()
+    @AnyStubId(requestMode = RequestMode.rmPassThrough)
+    public void passThroughTest() {
+        jdbcTemplate.execute("DROP TABLE testcasefileX IF EXISTS");
+        assertTrue("no exceptions expected", true);
+    }
+
+    @Test
+    @AnyStubId(requestMode = RequestMode.rmTrack)
     public void testCaseNameTest() {
 
-        log.info("Creating tables");
-
         jdbcTemplate.execute("DROP TABLE testcasename IF EXISTS");
+        assertTrue("no exceptions expected", true);
     }
 
     @TestConfiguration
