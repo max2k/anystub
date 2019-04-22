@@ -398,7 +398,7 @@ public class Base {
         }
 
         if (!writeInCache()) {
-            throwNSE();
+            throwNSE(Arrays.toString(keyGenCashed.get()));
         }
 
         // execute
