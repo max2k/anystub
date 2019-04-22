@@ -213,8 +213,8 @@ public class JdbcSourceSystemTest {
                 preparedStatement.setBoolean(4, true);
                 preparedStatement.setFloat(5, 14);
                 preparedStatement.setDouble(6, 43.124);
-                preparedStatement.setTime(7, new Time(34509000));
-                preparedStatement.setDate(8, new Date(1555887600000l));
+                preparedStatement.setTime(7, Time.valueOf("17:23:54"));
+                preparedStatement.setDate(8, Date.valueOf("2019-04-22"));
                 preparedStatement.setTimestamp(9, new Timestamp(1235385345));
                 return preparedStatement;
             }
@@ -225,41 +225,36 @@ public class JdbcSourceSystemTest {
         List<String> query;
 
         query = jdbcTemplate.query("select * from SOMETYPES where id =?", new Object[]{1},
-                (resultSet, i) -> {
-                    return String.valueOf(resultSet.getInt("NAME")) + " " +
-                            String.valueOf(resultSet.getLong("C_BIGINT")) + " " +
-                            String.valueOf(resultSet.getFloat("C_DECIMAL")) + " " +
-                            String.valueOf(resultSet.getFloat("C_BOOL")) + " " +
-                            String.valueOf(resultSet.getFloat("C_SMALLINT")) + " " +
-                            String.valueOf(resultSet.getDouble("C_DOUBLE")) + " " +
-                            String.valueOf(resultSet.getTime("C_TIME").getTime()) + " " +
-                            String.valueOf(resultSet.getDate("C_DATE").getTime()) + " " +
-                            String.valueOf(resultSet.getTimestamp("C_TIMESTAMP").getTime());
-
-                }
+                (resultSet, i) -> resultSet.getInt("NAME") + " " +
+                        resultSet.getLong("C_BIGINT") + " " +
+                        resultSet.getFloat("C_DECIMAL") + " " +
+                        resultSet.getFloat("C_BOOL") + " " +
+                        resultSet.getFloat("C_SMALLINT") + " " +
+                        resultSet.getDouble("C_DOUBLE") + " " +
+                        resultSet.getTime("C_TIME") + " " +
+                        resultSet.getDate("C_DATE") + " " +
+                        resultSet.getTimestamp("C_TIMESTAMP").getTime()
         );
 
         assertEquals(1, query.size());
-        assertEquals("1 2147483648 14.0 1.0 126.0 43.124 34509000 1555887600000 1235385345",
+        assertEquals("1 2147483648 14.0 1.0 126.0 43.124 17:23:54 2019-04-22 1235385345",
                 query.get(0));
 
 
         query = jdbcTemplate.query("select * from SOMETYPES where id =?", new Object[]{1},
-                (resultSet, i) -> {
-                    return String.valueOf(resultSet.getInt(2)) + " " +
-                            String.valueOf(resultSet.getLong(3)) + " " +
-                            String.valueOf(resultSet.getShort(4)) + " " +
-                            String.valueOf(resultSet.getBoolean(5)) + " " +
-                            String.valueOf(resultSet.getFloat(6)) + " " +
-                            String.valueOf(resultSet.getDouble(7)) + " " +
-                            String.valueOf(resultSet.getTime(8).getTime()) + " " +
-                            String.valueOf(resultSet.getDate(9).getTime()) + " " +
-                            String.valueOf(resultSet.getTimestamp(10).getTime());
-                }
+                (resultSet, i) -> resultSet.getInt(2) + " " +
+                        resultSet.getLong(3) + " " +
+                        resultSet.getShort(4) + " " +
+                        resultSet.getBoolean(5) + " " +
+                        resultSet.getFloat(6) + " " +
+                        resultSet.getDouble(7) + " " +
+                        resultSet.getTime(8) + " " +
+                        resultSet.getDate(9) + " " +
+                        resultSet.getTimestamp(10).getTime()
         );
 
         assertEquals(1, query.size());
-        assertEquals("1 2147483648 126 true 14.0 43.124 34509000 1555887600000 1235385345",
+        assertEquals("1 2147483648 126 true 14.0 43.124 17:23:54 2019-04-22 1235385345",
                 query.get(0));
     }
 
