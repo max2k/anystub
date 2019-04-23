@@ -8,7 +8,7 @@ public class AnyStubFileLocator {
     }
 
     public static AnyStubId discoverFile() {
-        String res = null;
+        String filename = null;
         AnyStubId id = null;
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (StackTraceElement s : stackTrace) {
@@ -18,30 +18,32 @@ public class AnyStubFileLocator {
                 id = method.getAnnotation(AnyStubId.class);
 
                 if (id != null) {
-                    res = id.filename().isEmpty() ?
+                    filename = id.filename().isEmpty() ?
                             s.getMethodName() :
                             id.filename();
+                    break;
                 } else {
                     id = aClass.getDeclaredAnnotation(AnyStubId.class);
                     if (id != null) {
-                        res = id.filename().isEmpty() ?
+                        filename = id.filename().isEmpty() ?
                                 aClass.getSimpleName() :
                                 id.filename();
+                        break;
                     }
                 }
             } catch (ClassNotFoundException | NoSuchMethodException ignored) {
                 // it's acceptable that some class/method is not found
                 // need to investigate when that happens
             }
-            if (id != null) {
-                break;
-            }
         }
         if (id == null) {
             return null;
         }
+        if (!filename.endsWith(".yml")) {
+            filename+=".yml";
+        }
 
-        return new AnyStubIdData(res + (res.endsWith(".yml") ? "" : ".yml"),
+        return new AnyStubIdData(filename,
                 id.requestMode());
     }
 

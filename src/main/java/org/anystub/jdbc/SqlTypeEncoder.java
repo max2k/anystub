@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.sql.Blob;
 import java.sql.Clob;
+import java.sql.NClob;
 import java.sql.RowId;
 import java.sql.SQLException;
+import java.sql.SQLXML;
 
 import static java.util.Collections.singletonList;
 
@@ -71,6 +73,14 @@ public class SqlTypeEncoder {
         }
     }
 
+  public static NClob decodeNClob(String next) {
+        return (NClob) decodeClob(next);
+    }
+
+    public static String encodeNClob(NClob clob) {
+        return encodeClob(clob);
+    }
+
 
     public static RowId decodeRowid(String next) {
         byte[] bytes = Util.recoverBinaryData(next);
@@ -79,5 +89,17 @@ public class SqlTypeEncoder {
 
     public static String encodeRowid(RowId rowId) {
         return Util.toCharacterString(rowId.getBytes());
+    }
+
+    public static SQLXML decodeSQLXML(String s) {
+        return null;
+    }
+
+    public static String encodeSQLXML(SQLXML sqlxml) {
+        try {
+            return sqlxml.getString();
+        } catch (SQLException e) {
+            throw new UnsupportedOperationException(e);
+        }
     }
 }
