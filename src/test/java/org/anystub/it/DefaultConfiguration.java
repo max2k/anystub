@@ -60,7 +60,7 @@ public class DefaultConfiguration {
     public HttpClient createHttpClient(Base httpBase) {
 
         HttpClient real = HttpClientBuilder.create().build();
-        StubHttpClient result = new StubHttpClient(real).setFallbackBase(httpBase);
+        StubHttpClient result = StubHttpClient.stub(real).setFallbackBase(httpBase);
 
         return result.addBodyToKeyRules("random/xxx");
 
@@ -84,9 +84,6 @@ public class DefaultConfiguration {
 
         JdbcDataSource ds = new JdbcDataSource();
         ds.setURL("jdbc:h2:./test3;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
-        DataSource stubDataSource = new StubDataSource(ds);
-//        ds.setUser("sa");
-//        ds.setPassword("");
-        return stubDataSource;
+        return StubDataSource.stub(ds);
     }
 }
