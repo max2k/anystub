@@ -2,6 +2,7 @@ package org.anystub.jdbc;
 
 import org.anystub.Supplier;
 
+import javax.sql.rowset.serial.SerialRef;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
@@ -359,7 +360,17 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public Ref getRef(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestSerializable(new Supplier<SerialRef, SQLException>() {
+                    @Override
+                    public SerialRef get() throws SQLException {
+                        stubConnection.runSql();
+                        Ref r = getRealStatement().getRef(i);
+                        return new SerialRef(r);
+                    }
+                }, callKey("getRef", i));
     }
 
     @Override
@@ -371,7 +382,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                              @Override
                              public Blob get() throws SQLException {
                                  stubConnection.runSql();
-                                 return  getRealStatement().getBlob(i);
+                                 return getRealStatement().getBlob(i);
                              }
                          },
                         SqlTypeEncoder::decodeBlob,
@@ -943,7 +954,17 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public Ref getRef(String s) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .requestSerializable(new Supplier<SerialRef, SQLException>() {
+                    @Override
+                    public SerialRef get() throws SQLException {
+                        stubConnection.runSql();
+                        Ref r = getRealStatement().getRef(s);
+                        return new SerialRef(r);
+                    }
+                }, callKey("getRef", s));
     }
 
     @Override
@@ -965,7 +986,19 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public Clob getClob(String s) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<Clob, SQLException>() {
+                             @Override
+                             public Clob get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return getRealStatement().getClob(s);
+                             }
+                         },
+                        SqlTypeEncoder::decodeClob,
+                        SqlTypeEncoder::encodeClob,
+                        callKey("getClob", s));
     }
 
     @Override
@@ -978,15 +1011,15 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .request2(new Supplier<Date, SQLException>() {
-                              @Override
-                              public Date get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealStatement().getDate(s, calendar);
-                              }
-                          },
-                        values -> Date.valueOf(values.iterator().next()),
-                        date -> singletonList(date.toString()),
+                .request(new Supplier<Date, SQLException>() {
+                             @Override
+                             public Date get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return getRealStatement().getDate(s, calendar);
+                             }
+                         },
+                        Date::valueOf,
+                        Date::toString,
                         callKey("getDate", s));
     }
 
@@ -1030,12 +1063,12 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                 .getStubDataSource()
                 .getBase()
                 .request(new Supplier<URL, SQLException>() {
-                              @Override
-                              public URL get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealStatement().getURL(s);
-                              }
-                          },
+                             @Override
+                             public URL get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return getRealStatement().getURL(s);
+                             }
+                         },
                         values -> {
                             try {
                                 return new URL(values);
@@ -1053,12 +1086,12 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                 .getStubDataSource()
                 .getBase()
                 .request(new Supplier<RowId, SQLException>() {
-                              @Override
-                              public RowId get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealStatement().getRowId(i);
-                              }
-                          },
+                             @Override
+                             public RowId get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return getRealStatement().getRowId(i);
+                             }
+                         },
                         SqlTypeEncoder::decodeRowid,
                         SqlTypeEncoder::encodeRowid,
                         callKey("getRowId", i));
@@ -1071,12 +1104,12 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
                 .getStubDataSource()
                 .getBase()
                 .request(new Supplier<RowId, SQLException>() {
-                              @Override
-                              public RowId get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealStatement().getRowId(s);
-                              }
-                          },
+                             @Override
+                             public RowId get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return getRealStatement().getRowId(s);
+                             }
+                         },
                         SqlTypeEncoder::decodeRowid,
                         SqlTypeEncoder::encodeRowid,
                         callKey("getRowId", s));
@@ -1166,12 +1199,36 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
 
     @Override
     public SQLXML getSQLXML(int i) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<SQLXML, SQLException>() {
+                             @Override
+                             public SQLXML get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return getRealStatement().getSQLXML(i);
+                             }
+                         },
+                        SqlTypeEncoder::decodeSQLXML,
+                        SqlTypeEncoder::encodeSQLXML,
+                        callKey("getSQLXML", i));
     }
 
     @Override
     public SQLXML getSQLXML(String s) throws SQLException {
-        return null;
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request(new Supplier<SQLXML, SQLException>() {
+                             @Override
+                             public SQLXML get() throws SQLException {
+                                 stubConnection.runSql();
+                                 return getRealStatement().getSQLXML(s);
+                             }
+                         },
+                        SqlTypeEncoder::decodeSQLXML,
+                        SqlTypeEncoder::encodeSQLXML,
+                        callKey("getSQLXML", s));
     }
 
     @Override

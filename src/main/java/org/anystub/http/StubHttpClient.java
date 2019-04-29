@@ -163,4 +163,8 @@ public class StubHttpClient implements HttpClient {
         return this;
     }
 
+    public static StubHttpClient stub(HttpClient httpClient) {
+        return new StubHttpClient(httpClient);
+    }
+
 }
