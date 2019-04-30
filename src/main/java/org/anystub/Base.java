@@ -392,6 +392,7 @@ public class Base {
             if (documentListTrackIterator.hasNext()) {
                 Document next = documentListTrackIterator.next();
                 if (next.keyEqual_to(keyGenCashed.get())) {
+                    requestHistory.add(next);
                     return decoder.decode(next.getVals());
                 }
             }
