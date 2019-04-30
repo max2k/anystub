@@ -1,5 +1,7 @@
 package org.anystub.mgmt;
 
+import org.anystub.AnyStubFileLocator;
+import org.anystub.AnyStubId;
 import org.anystub.Base;
 
 import java.io.File;
@@ -70,4 +72,22 @@ public class BaseManagerImpl implements BaseManager {
         return new File(path).getPath() + File.separator + new File(filename).getPath();
     }
 
+    public static Base getStub(String filename) {
+        return instance()
+                .getBase(filename);
+    }
+
+    public static Base getStub() {
+        AnyStubId s = AnyStubFileLocator.discoverFile();
+        if (s != null) {
+            return BaseManagerImpl
+                    .instance()
+                    .getBase(s.filename())
+                    .constrain(s.requestMode());
+        }
+
+        return BaseManagerImpl
+                .instance()
+                .getBase();
+    }
 }

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import static org.anystub.mgmt.BaseManagerImpl.getStub;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -85,6 +86,10 @@ public class HikariJdbcSourceSystemTest {
     public void testCaseNameTest() {
 
         jdbcTemplate.execute("DROP TABLE testcasename IF EXISTS");
+        jdbcTemplate.execute("DROP TABLE testcasename IF EXISTS");
+        jdbcTemplate.execute("DROP TABLE testcasename IF EXISTS");
+
+        assertEquals(3, getStub("testCaseNameTest-hikariTest.yml").times());
         assertTrue("no exceptions expected", true);
     }
 
