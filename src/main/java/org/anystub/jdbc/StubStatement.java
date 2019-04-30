@@ -66,7 +66,7 @@ public class StubStatement implements Statement {
 
     @Override
     public ResultSet executeQuery(String s) throws SQLException {
-        return produceResultSet(()->getRealStatement().executeQuery(s), ()->new String[]{s});
+        return produceResultSet(() -> getRealStatement().executeQuery(s), () -> new String[]{s});
 //        !
 //        executedCommand = s;
 //        return stubConnection
@@ -222,9 +222,8 @@ public class StubStatement implements Statement {
 
     @Override
     public ResultSet getResultSet() throws SQLException {
-        return produceResultSet(()->getRealStatement().getResultSet(), ()->callKey("getResultSet"));
+        return produceResultSet(() -> getRealStatement().getResultSet(), () -> callKey("getResultSet"));
     }
-
 
 
     @Override
@@ -641,7 +640,7 @@ public class StubStatement implements Statement {
 
     }
 
-    protected StubResultSet decodeStubResultSet(Supplier<ResultSet, SQLException> rsSupplier){
+    protected StubResultSet decodeStubResultSet(Supplier<ResultSet, SQLException> rsSupplier) {
         try {
             return new StubResultSet(stubConnection, statementId(), rsSupplier);
         } catch (SQLException e) {
@@ -660,6 +659,23 @@ public class StubStatement implements Statement {
     protected ResultSet produceResultSet(Supplier<ResultSet, SQLException> rsSupplier, KeysSupplier keysSupplier) throws SQLException {
         return stubConnection
                 .getStubDataSource()
+                .isStubResultSetMode() ?
+                produceStubResultSet(rsSupplier, keysSupplier) :
+                produceSimpleResultSet(rsSupplier, keysSupplier);
+    }
+
+    /**
+     * returns stubbed resultSet
+     * keeps only header in stub
+     *
+     * @param rsSupplier
+     * @param keysSupplier
+     * @return
+     * @throws SQLException
+     */
+    private ResultSet produceStubResultSet(Supplier<ResultSet, SQLException> rsSupplier, KeysSupplier keysSupplier) throws SQLException {
+        return stubConnection
+                .getStubDataSource()
                 .getBase()
                 .request2(new Supplier<ResultSet, SQLException>() {
                               @Override
@@ -670,7 +686,7 @@ public class StubStatement implements Statement {
                           },
                         new Decoder<ResultSet>() {
                             @Override
-                            public StubResultSet decode(Iterable<String> values) {
+                            public ResultSet decode(Iterable<String> values) {
                                 return decodeStubResultSet(rsSupplier);
                             }
                         },
@@ -678,7 +694,42 @@ public class StubStatement implements Statement {
                             @Override
                             public Iterable<String> encode(ResultSet resultSet) {
                                 return encodeResultSetHeader(resultSet);
-//                                return ResultSetUtil.encode(resultSet);
+                            }
+                        },
+
+                        keysSupplier);
+    }
+
+    /**
+     * returns SimpleResultSet
+     * saves full result set in stub
+     *
+     * @param rsSupplier
+     * @param keysSupplier
+     * @return
+     * @throws SQLException
+     */
+    private ResultSet produceSimpleResultSet(Supplier<ResultSet, SQLException> rsSupplier, KeysSupplier keysSupplier) throws SQLException {
+        return stubConnection
+                .getStubDataSource()
+                .getBase()
+                .request2(new Supplier<ResultSet, SQLException>() {
+                              @Override
+                              public ResultSet get() throws SQLException {
+                                  stubConnection.runSql();
+                                  return rsSupplier.get();
+                              }
+                          },
+                        new Decoder<ResultSet>() {
+                            @Override
+                            public ResultSet decode(Iterable<String> values) {
+                                return ResultSetUtil.decode(values);
+                            }
+                        },
+                        new Encoder<ResultSet>() {
+                            @Override
+                            public Iterable<String> encode(ResultSet resultSet) {
+                                return ResultSetUtil.encode(resultSet);
                             }
                         },
 
