@@ -9,29 +9,39 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import static java.sql.Types.BIGINT;
 import static java.sql.Types.BLOB;
 import static java.sql.Types.BOOLEAN;
+import static java.sql.Types.CHAR;
 import static java.sql.Types.CLOB;
 import static java.sql.Types.DATE;
+import static java.sql.Types.DECIMAL;
 import static java.sql.Types.DOUBLE;
 import static java.sql.Types.FLOAT;
 import static java.sql.Types.INTEGER;
+import static java.sql.Types.LONGVARCHAR;
+import static java.sql.Types.NCHAR;
+import static java.sql.Types.NUMERIC;
+import static java.sql.Types.REAL;
+import static java.sql.Types.ROWID;
 import static java.sql.Types.SMALLINT;
+import static java.sql.Types.SQLXML;
 import static java.sql.Types.TIME;
 import static java.sql.Types.TIMESTAMP;
 import static java.sql.Types.TINYINT;
-import static java.util.Collections.singletonList;
+import static java.sql.Types.VARCHAR;
 
 public class ResultSetUtil {
+
+    private final static Logger LOGGER = Logger.getLogger("ResultSetUtil");
 
     public static List<String> encodeHeader(ResultSetMetaData metaData) throws SQLException {
         ArrayList<String> res = new ArrayList<>();
@@ -57,16 +67,8 @@ public class ResultSetUtil {
         List<String> res = new ArrayList<>();
         while (resultSet.next()) {
             for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
-                if (resultSetMetaData.getColumnType(i) == BLOB) {
-                    String strings = SqlTypeEncoder.encodeBlob(resultSet.getBlob(i));
-                    res.add(strings);
-                } else if (resultSetMetaData.getColumnType(i) == CLOB) {
-                    String strings = SqlTypeEncoder.encodeClob(resultSet.getClob(i));
-                    res.add(strings);
-                } else {
-                    res.add(resultSet.getString(i));
-                }
-
+                String s = encodeValue(resultSet, resultSetMetaData.getColumnType(i), i);
+                res.add(s);
             }
         }
 
@@ -104,7 +106,7 @@ public class ResultSetUtil {
         return encode;
     }
 
-    public static ResultSet decode(Iterable<String> values) {
+    public static SimpleResultSet decode(Iterable<String> values) {
         // * support aliases in SimpleResultSet it creates 2nd column, and put copy of the data
         final SimpleResultSet simpleResultSet = new SimpleResultSet();
         // * keeps column numbers, to double values
@@ -137,7 +139,7 @@ public class ResultSetUtil {
                     String next = it.next();
                     Object item;
                     try {
-                        item = recoverByType(next, simpleResultSet.getColumnType(i + 1));
+                        item = decodeValue(next, simpleResultSet.getColumnType(i + 1));
                     } catch (SQLException e) {
                         item = next;
                     }
@@ -152,15 +154,80 @@ public class ResultSetUtil {
         return simpleResultSet;
     }
 
+    private static String encodeValue(ResultSet resultSet, int columnType, int column) {
+        try {
+            switch (columnType) {
+//            case  BIT = -7;
+                case TINYINT:
+                case SMALLINT:
+                    return String.valueOf(resultSet.getShort(column));
+                case INTEGER:
+                    return String.valueOf(resultSet.getInt(column));
+                case BIGINT:
+                    return String.valueOf(resultSet.getLong(column));
+                case FLOAT:
+                    return String.valueOf(resultSet.getFloat(column));
+                case NUMERIC:
+                case DECIMAL:
+                case REAL:
+                case DOUBLE:
+                    return String.valueOf(resultSet.getDouble(column));
+                case CHAR:
+                    return String.valueOf(resultSet.getString(column));
+                case VARCHAR:
+                case LONGVARCHAR:
+                    return resultSet.getString(column);
+                case DATE:
+                    return resultSet.getDate(column).toString();
+                case TIME:
+                    return resultSet.getTime(column).toString();
+                case TIMESTAMP:
+                    return resultSet.getTimestamp(column).toString();
+//            case  BINARY = -2;
+//            case  VARBINARY = -3;
+//            case  LONGVARBINARY = -4;
+//            case  NULL = 0;
+//            case  OTHER = 1111;
+//            case  JAVA_OBJECT = 2000;
+//            case  DISTINCT = 2001;
+//            case  STRUCT = 2002;
+//            case  ARRAY = 2003;
+                case BLOB:
+                    return SqlTypeEncoder.encodeBlob(resultSet.getBlob(column));
+                case CLOB:
+                    return SqlTypeEncoder.encodeClob(resultSet.getClob(column));
+//            case  REF = 2006;
+//            case  DATALINK = 70;
+                case BOOLEAN:
+                    return String.valueOf(resultSet.getBoolean(column));
+                case ROWID:
+                    return SqlTypeEncoder.encodeRowid(resultSet.getRowId(column));
+                case NCHAR:
+                    return resultSet.getString(column);
+//            case  NVARCHAR = -9;
+//            case  LONGNVARCHAR = -16;
+//            case  NCLOB = 2011;
+                case SQLXML:
+                    return SqlTypeEncoder.encodeSQLXML(resultSet.getSQLXML(column));
+//            case  REF_CURSOR = 2012;
+//            case  TIME_WITH_TIMEZONE = 2013;
+//            case  TIMESTAMP_WITH_TIMEZONE = 2014;
+                default:
+                    return resultSet.getString(column);
+            }
+        } catch (SQLException e) {
+            LOGGER.severe(() -> String.format("Failed encode value on %d of type %d", column, columnType));
+            return "";
+        }
+    }
 
-    private static Object recoverByType(String next, int columnType) {
-//        if (columnType == Types.BLOB) {
-//            return SqlTypeEncoder.decodeBlob(next);
-//        }
+    private static Object decodeValue(String next, int columnType) {
+        if (next == null) {
+            return null;
+        }
         switch (columnType) {
 //            case  BIT = -7;
             case TINYINT:
-                return Short.valueOf(next);
             case SMALLINT:
                 return Short.valueOf(next);
             case INTEGER:
@@ -169,19 +236,21 @@ public class ResultSetUtil {
                 return Long.valueOf(next);
             case FLOAT:
                 return Float.valueOf(next);
-//            case  REAL = 7;
+            case NUMERIC:
+            case DECIMAL:
+            case REAL:
             case DOUBLE:
                 return Double.valueOf(next);
-//            case  NUMERIC = 2;
-//            case  DECIMAL = 3;
-//            case  CHAR = 1;
-//            case  VARCHAR = 12;
-//            case  LONGVARCHAR = -1;
-            case  DATE:
+            case CHAR:
+                return next.charAt(0);
+            case VARCHAR:
+            case LONGVARCHAR:
+                return next;
+            case DATE:
                 return Date.valueOf(next);
-            case  TIME:;
+            case TIME:
                 return Time.valueOf(next);
-            case  TIMESTAMP:;
+            case TIMESTAMP:
                 return Timestamp.valueOf(next);
 //            case  BINARY = -2;
 //            case  VARBINARY = -3;
@@ -200,12 +269,15 @@ public class ResultSetUtil {
 //            case  DATALINK = 70;
             case BOOLEAN:
                 return Boolean.valueOf(next.toLowerCase());
-//            case  ROWID = -8;
-//            case  NCHAR = -15;
+            case ROWID:
+                return SqlTypeEncoder.decodeRowid(next);
+            case NCHAR:
+                return next.charAt(0);
 //            case  NVARCHAR = -9;
 //            case  LONGNVARCHAR = -16;
 //            case  NCLOB = 2011;
-//            case  SQLXML = 2009;
+            case SQLXML:
+                return SqlTypeEncoder.decodeSQLXML(next);
 //            case  REF_CURSOR = 2012;
 //            case  TIME_WITH_TIMEZONE = 2013;
 //            case  TIMESTAMP_WITH_TIMEZONE = 2014;

@@ -14,8 +14,6 @@ import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLXML;
 
-import static java.util.Collections.singletonList;
-
 public class SqlTypeEncoder {
 
     public static final String BASE_64 = "BASE64 ";

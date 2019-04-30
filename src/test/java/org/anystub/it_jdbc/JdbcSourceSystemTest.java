@@ -228,7 +228,7 @@ public class JdbcSourceSystemTest {
                 (resultSet, i) -> resultSet.getInt("NAME") + " " +
                         resultSet.getLong("C_BIGINT") + " " +
                         resultSet.getFloat("C_DECIMAL") + " " +
-                        resultSet.getFloat("C_BOOL") + " " +
+                        resultSet.getBoolean("C_BOOL") + " " +
                         resultSet.getFloat("C_SMALLINT") + " " +
                         resultSet.getDouble("C_DOUBLE") + " " +
                         resultSet.getTime("C_TIME") + " " +
@@ -237,7 +237,7 @@ public class JdbcSourceSystemTest {
         );
 
         assertEquals(1, query.size());
-        assertEquals("1 2147483648 14.0 1.0 126.0 43.124 17:23:54 2019-04-22 1235385345",
+        assertEquals("1 2147483648 14.0 true 126.0 43.124 17:23:54 2019-04-22 1235385345",
                 query.get(0));
 
 

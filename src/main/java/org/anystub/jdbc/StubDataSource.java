@@ -18,6 +18,7 @@ public class StubDataSource implements DataSource {
     private final DataSource realDataSource;
     private Base base = null;
     private String stubSuffix = null;
+    private boolean isStubResultSetMode =false;
 
     public StubDataSource(DataSource realDataSource) {
         this.realDataSource = realDataSource;
@@ -108,5 +109,13 @@ public class StubDataSource implements DataSource {
 
     public static DataSource stub(DataSource ds) {
         return new StubDataSource(ds);
+    }
+
+    public void setStubResultSetMode(boolean stubResultSetMode) {
+        isStubResultSetMode = stubResultSetMode;
+    }
+
+    public boolean isStubResultSetMode() {
+        return isStubResultSetMode;
     }
 }
