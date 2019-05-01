@@ -111,6 +111,7 @@ public class ResultSetUtil {
         final SimpleResultSet simpleResultSet = new SimpleResultSet();
         // * keeps column numbers, to double values
         final Set<Integer> doubleColumnIndexes = new HashSet<>();
+        final List<Integer> decodedValueTypes = new ArrayList<>();
 
         Iterator<String> it = values.iterator();
         if (it.hasNext()) {
@@ -122,7 +123,7 @@ public class ResultSetUtil {
                 int cPrecision = Integer.parseInt(it.next());
                 int cScale = Integer.parseInt(it.next());
 
-
+                decodedValueTypes.add(cType);
                 String[] split = cNameLabel.split("/");
 
                 if (split.length == 2 && split[0] != null && !split[0].equalsIgnoreCase(split[1])) {
@@ -139,7 +140,7 @@ public class ResultSetUtil {
                     String next = it.next();
                     Object item;
                     try {
-                        item = decodeValue(next, simpleResultSet.getColumnType(i + 1));
+                        item = decodeValue(next, simpleResultSet.getColumnType(decodedValueTypes.get(i)));
                     } catch (SQLException e) {
                         item = next;
                     }
@@ -173,7 +174,6 @@ public class ResultSetUtil {
                 case DOUBLE:
                     return String.valueOf(resultSet.getDouble(column));
                 case CHAR:
-                    return String.valueOf(resultSet.getString(column));
                 case VARCHAR:
                 case LONGVARCHAR:
                     return resultSet.getString(column);
@@ -242,7 +242,6 @@ public class ResultSetUtil {
             case DOUBLE:
                 return Double.valueOf(next);
             case CHAR:
-                return next.charAt(0);
             case VARCHAR:
             case LONGVARCHAR:
                 return next;
