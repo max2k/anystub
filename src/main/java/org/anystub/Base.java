@@ -109,6 +109,9 @@ public class Base {
                     } else {
                         documentListTrackIterator = documentList.iterator();
                     }
+                    break;
+                default:
+                    break;
             }
         } else {
             if (this.requestMode != requestMode) {
