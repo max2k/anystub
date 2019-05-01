@@ -100,6 +100,51 @@ public class JdbcSourceSystemTest {
         assertEquals("Long", query.get(1).last_name);
 
     }
+    @Test
+    @AnyStubId
+    public void selectwithaliasTest() {
+
+
+        log.info("Creating tables");
+
+        jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
+        jdbcTemplate.execute("CREATE TABLE customers(" +
+                "id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
+
+        // Split up the array of whole names into an array of first/last names
+        List<Object[]> splitUpNames = Arrays.asList("John Woo", "Jeff Dean", "Josh Bloch", "Josh Long").stream()
+                .map(name -> name.split(" "))
+                .collect(Collectors.toList());
+
+        // Use a Java 8 stream to print out each tuple of the list
+        splitUpNames.forEach(name -> log.info(String.format("Inserting customer record for %s %s", name[0], name[1])));
+
+        // Uses JdbcTemplate's batchUpdate operation to bulk load data
+        jdbcTemplate.batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)", splitUpNames);
+
+        log.info("Querying for customer records where first_name = 'Josh':");
+        List<Customer> query = jdbcTemplate.query(
+                "SELECT id idx, first_name first_nameX, last_name last_nameX FROM customers WHERE first_name = ?", new Object[]{"Josh"},
+                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
+        );
+
+        assertEquals(2, query.size());
+        assertEquals(3L, query.get(0).id);
+        assertEquals("Bloch", query.get(0).last_name);
+        assertEquals("Long", query.get(1).last_name);
+
+        query = jdbcTemplate.query(
+                "SELECT id idx, first_name first_nameX, last_name last_nameX FROM customers WHERE first_name = ?", new Object[]{"Josh"},
+                (rs, rowNum) -> new Customer(rs.getLong("idx"), rs.getString("first_nameX"), rs.getString("last_nameX"))
+        );
+
+        assertEquals(2, query.size());
+        assertEquals(3L, query.get(0).id);
+        assertEquals("Bloch", query.get(0).last_name);
+        assertEquals("Long", query.get(1).last_name);
+        assertEquals(4L, query.get(1).id);
+
+    }
 
 
     @Test
