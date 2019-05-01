@@ -2,6 +2,7 @@ package org.anystub.jdbc;
 
 import org.h2.tools.SimpleResultSet;
 
+import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -139,11 +140,7 @@ public class ResultSetUtil {
                 for (int i = 0; i < columnCount; i++) {
                     String next = it.next();
                     Object item;
-                    try {
-                        item = decodeValue(next, simpleResultSet.getColumnType(decodedValueTypes.get(i)));
-                    } catch (SQLException e) {
-                        item = next;
-                    }
+                    item = decodeValue(next, decodedValueTypes.get(i));
                     row.add(item);
                     if (doubleColumnIndexes.contains(i)) {
                         row.add(item);
@@ -165,7 +162,7 @@ public class ResultSetUtil {
                 case INTEGER:
                     return String.valueOf(resultSet.getInt(column));
                 case BIGINT:
-                    return String.valueOf(resultSet.getLong(column));
+                    return resultSet.getBigDecimal(column).toString();
                 case FLOAT:
                     return String.valueOf(resultSet.getFloat(column));
                 case NUMERIC:
@@ -233,7 +230,7 @@ public class ResultSetUtil {
             case INTEGER:
                 return Integer.valueOf(next);
             case BIGINT:
-                return Long.valueOf(next);
+                return new BigInteger(next);
             case FLOAT:
                 return Float.valueOf(next);
             case NUMERIC:
