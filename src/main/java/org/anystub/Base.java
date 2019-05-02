@@ -32,17 +32,13 @@ import static org.anystub.RequestMode.rmPassThrough;
 import static org.anystub.RequestMode.rmTrack;
 
 /**
- * provide basic access to stub-file
+ * provides basic access to stub-file
  * <p>
  * methods put/get* allow work with in-memory cache
  * methods request* allow get/keep data in file
  * <p>
- * you can control case of using file-cache by constrain:
- * - rmNew  first seek in cache if failed make real request
- * - rmNone  first seek in cache if failed throw {@link NoSuchElementException}
- * - rmAll  makes real request without seeking in cache (use it for logging), keep all requests in the stub
+ * Check {@link RequestMode} to find options to control get access to external system and store requests strategy
  * <p>
- * * most of the methods return this to cascading operations
  */
 public class Base {
 
@@ -66,7 +62,7 @@ public class Base {
      * * new Base("./stub.yml") uses file in current dir
      * * new Base("stub.yml") uses src/test/resources/anystub/stub.yml
      * <p>
-     * Note: Consider using BaseManagerImpl instead
+     * Note: Consider using {@link BaseManagerImpl} instead
      *
      * @param filename used file name
      */
@@ -76,6 +72,8 @@ public class Base {
     }
 
     /**
+     * Note: Consider using {@link BaseManagerImpl} instead
+     *
      * @param path     dir
      * @param filename file
      */
@@ -86,8 +84,7 @@ public class Base {
 
 
     /**
-     * set constrains for using local cache
-     * * if set rmNone loading of file occurs immediately
+     * set constrains for using cache and getting access a source system
      *
      * @param requestMode {@link RequestMode}
      * @return this to cascade operations
@@ -138,7 +135,7 @@ public class Base {
 
     /**
      * Creates and keeps a new Document in cache.
-     * considers keysAndValue[0..count-1] as keys of new Document, the last element as a value
+     * treat keysAndValue[0..count-1] as keys of new Document, the last element as the value of the Document
      *
      * @param keysAndValue keys for request2
      * @return new Document
@@ -150,7 +147,7 @@ public class Base {
 
     /**
      * Creates and keeps a new Document in cache.
-     * Document includes request and exception as  a response
+     * Document includes request and exception as a response.
      *
      * @param ex   exception is kept in document
      * @param keys key for the document
@@ -161,8 +158,10 @@ public class Base {
     }
 
     /**
-     * Finds document with given keys. if document is found then returns the 1st value from it's response.
-     * If document is not found then returns empty Optional. If found document contains exception the exception will be
+     * Finds document with given keys.
+     * if document is found then it returns an Optional containing the first value from the response.
+     * If document is not found then it returns empty Optional.
+     * If found document contains an exception the exception will be
      * raised.
      *
      * @param keys for search of the document
@@ -180,7 +179,7 @@ public class Base {
     }
 
     /**
-     * Finds document with given key. If document found then returns iterator to values from the document
+     * Finds document with the given key. If document found then returns iterator to the values from the document
      *
      * @param keys for search document
      * @return values of requested document
@@ -199,10 +198,10 @@ public class Base {
     }
 
     /**
-     * Requests string from stub.
+     * Requests a string from stub.
      * If this document is absent in cache throws {@link NoSuchElementException}
      *
-     * @param keys keys for searching response in stub
+     * @param keys keys for searching response in a stub-file
      * @return requested response
      * @throws NoSuchElementException if document if not found in cache
      */
@@ -215,8 +214,9 @@ public class Base {
     }
 
     /**
-     * Requests string. looking Document in cache. If it is not found then gets value using supplier.
-     * Use supplier to request real system. Use this method if response just a {@link String}
+     * Requests a string. It looks for a Document in a stub-file
+     * If it is not found then requests the value from the supplier.
+     * supplier could request the string from an external system.
      *
      * @param supplier method to obtain response
      * @param keys     keys for document and parameters for request real system
@@ -231,6 +231,15 @@ public class Base {
                 keys);
     }
 
+    /**
+     * Requests Boolean
+     *
+     * @param supplier
+     * @param keys
+     * @param <E>
+     * @return
+     * @throws E
+     */
     public <E extends Exception> Boolean requestB(Supplier<Boolean, E> supplier, String... keys) throws E {
         return request(supplier,
                 Boolean::parseBoolean,
@@ -238,6 +247,15 @@ public class Base {
                 keys);
     }
 
+    /**
+     * requests Integer
+     *
+     * @param supplier
+     * @param keys
+     * @param <E>
+     * @return
+     * @throws E
+     */
     public <E extends Exception> Integer requestI(Supplier<Integer, E> supplier, String... keys) throws E {
         return request(supplier,
                 Integer::parseInt,
@@ -246,7 +264,7 @@ public class Base {
     }
 
     /**
-     * requests serializable object
+     * Requests serializable object
      *
      * @param supplier provides requested object
      * @param keys     keys for document and parameters for request real system
@@ -263,7 +281,7 @@ public class Base {
     }
 
     /**
-     * Requests array of string from stub.
+     * Requests an array of string from stub.
      * If this document is absent in cache throws {@link NoSuchElementException}
      *
      * @param keys keys for searching response in stub
@@ -280,8 +298,7 @@ public class Base {
     }
 
     /**
-     * Requests array of string. looking Document in cache. If it is not found then gets value using supplier.
-     * Use supplier to request real system. Use this method if response String[]
+     * Requests an array of string.
      *
      * @param supplier provide string array from system
      * @param keys     keys for request
@@ -298,7 +315,7 @@ public class Base {
     }
 
     /**
-     * Requests from stub.
+     * Requests an Object from stub-file.
      * If Document is found uses {@link DecoderSimple} to build result. It could build object of any class
      * If this document is absent in cache throws {@link NoSuchElementException}
      *
@@ -320,7 +337,7 @@ public class Base {
 
 
     /**
-     * use the method to serialize object to one line
+     * Requests an Object which is could be kept in stub-file as a single string
      *
      * @param supplier provide real answer
      * @param decoder  create object from one line
@@ -343,7 +360,8 @@ public class Base {
     }
 
     /**
-     * use the method to request real system and serialize/deserialize object to multi values
+     * Looks for an Object in stub-file or gets it from the supplier. Uses encoder and decoder to convert the request
+     * and results in the stub-file. Uses keys to match the request in the stub-files
      *
      * @param supplier provide real answer
      * @param decoder  create object from values
@@ -364,6 +382,19 @@ public class Base {
                 () -> keys);
     }
 
+    /**
+     * Looks for an Object in stub-file or gets it from the supplier. Uses encoder and decoder to convert the request
+     * and results in the stub-file. Uses keysGen to get keys to match the request in the stub-files
+     *
+     * @param supplier - provides the value from an external system
+     * @param decoder  - recovers result from stub
+     * @param encoder  - converts result to strings for stub-file
+     * @param keyGen   - provides keys to match requested document
+     * @param <T>      - type of requested object
+     * @param <E>      - allowed exception
+     * @return an object from stub or an external system
+     * @throws E generates the exception if an external system generated it
+     */
     public <T, E extends Throwable> T request2(Supplier<T, E> supplier,
                                                Decoder<T> decoder,
                                                Encoder<T> encoder,
@@ -447,7 +478,7 @@ public class Base {
 
 
     /**
-     * reload stub-file - IOException exceptions are suppressed
+     * reloads stub-file - IOException exceptions are suppressed
      */
     private void init() {
         try {
@@ -482,7 +513,7 @@ public class Base {
 
 
     /**
-     * rewrite stub-file
+     * rewrites stub-file
      *
      * @throws IOException due to file access error
      */
@@ -515,9 +546,9 @@ public class Base {
     }
 
     /**
-     * during invoke requests correspondent file is loaded. if load is successful - isNew returns false
+     * if previous load() is successful then isNew returns false
      *
-     * @return true if buffer is clean, file isn't loaded and no data keeps in it
+     * @return true if the stub-file is not load in memory
      */
     public boolean isNew() {
         return isNew;
@@ -534,7 +565,7 @@ public class Base {
     }
 
     /**
-     * use it instead of {@link EncoderSimple}
+     * equal to: throw new NoSuchElementException(e.toString());
      *
      * @param e   nothing
      * @param <T> nothing
@@ -546,7 +577,7 @@ public class Base {
     }
 
     /**
-     * use it instead of your {@link java.util.function.Supplier} in requests
+     * throw new NoSuchElementException(e.toString());
      *
      * @param <T> type for matching
      * @return nothing
@@ -574,11 +605,11 @@ public class Base {
     }
 
     /**
-     * requests with given keys
-     * * if no keys then amount of all requests.
-     * * key could be skipped if you set correspondent value to null.
-     * * times(null) and times(null,null) are different, cause looking for requests with
-     * amount of keys no less then in keys array.
+     * finds requests in the stub-file by keys keys
+     * * if no keys provided then it returns all requests.
+     * * one or more of the keys could be null. That means the matching by the key is omitted.
+     * * match(null) and match(null,null) are different, match(null) searches requests with at least one string as the key
+     * match(null, null) looks requests with at least two strings as the key
      *
      * @param keys keys for matching requests
      * @return stream of matched requests
@@ -592,7 +623,7 @@ public class Base {
     }
 
     /**
-     * requests with given keys, requests match using regexp
+     * finds requests in the stub-file by keys keys. the same as {#match } but matches each string in the key using regex
      *
      * @param keys keys for matching
      * @return stream of matched documents from history
@@ -606,7 +637,7 @@ public class Base {
     }
 
     /**
-     * requests with given keys, requests match using regexp
+     * finds requests in the stub-file, the same as {#matchEx} but uses keys and result fields to match
      *
      * @param keys   keys for matching
      * @param values keys for matching
@@ -618,8 +649,8 @@ public class Base {
     }
 
     /**
-     * amount of requests with given keys
-     * * if no keys then amount of all requests.
+     * number of requests with given keys
+     * * if no keys provided then number of all requests.
      * * key could be skipped if you set correspondent value to null.
      * * times(null) and times(null,null) are different, cause looking for requests with
      * amount of keys no less then in keys array.
@@ -633,8 +664,8 @@ public class Base {
     }
 
     /**
-     * amount of requests with given keys
-     * * if no keys then amount of all requests.
+     * number of requests with given keys
+     * * if no keys provided then number of all requests.
      * * key could be skipped if you set correspondent value to null.
      * * times(null) and times(null,null) are different, cause looking for requests with
      * amount of keys no less then in keys array.
@@ -648,7 +679,7 @@ public class Base {
     }
 
     /**
-     * amount of requests with given keys
+     * number of requests with given keys
      * * if no keys then amount of all requests.
      * * key could be skipped if you set correspondent value to null.
      * * times(null) and times(null,null) are different, cause looking for requests with
