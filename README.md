@@ -15,7 +15,7 @@ Install from Maven Central
     <dependency>
       <groupId>org.anystub</groupId>
       <artifactId>anystub</artifactId>
-      <version>0.1.20</version>
+      <version>0.2.22</version>
       <scope>test</scope>
     </dependency>
 ```
