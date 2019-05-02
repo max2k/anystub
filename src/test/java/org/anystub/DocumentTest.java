@@ -12,7 +12,6 @@ import static org.junit.Assert.*;
 
 /**
  * test for document class
- * Created by Kirill on 9/2/2016.
  */
 public class DocumentTest {
 
