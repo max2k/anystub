@@ -77,6 +77,10 @@ public class BaseManagerImpl implements BaseManager {
                 .getBase(filename);
     }
 
+    /**
+     * returns stub for current test
+     * @return stub for current test
+     */
     public static Base getStub() {
         AnyStubId s = AnyStubFileLocator.discoverFile();
         if (s != null) {

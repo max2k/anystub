@@ -107,6 +107,11 @@ public class StubDataSource implements DataSource {
         return this;
     }
 
+    /**
+     * wraps datasource with a stub
+     * @param ds
+     * @return
+     */
     public static DataSource stub(DataSource ds) {
         return new StubDataSource(ds);
     }

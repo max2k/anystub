@@ -109,32 +109,6 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
         });
 
         return produceResultSet(rsSupplier, this::useCallKeys);
-//        return stubConnection
-//                .getStubDataSource()
-//                .getBase()
-//                .request2(new Supplier<ResultSet, SQLException>() {
-//                              @Override
-//                              public ResultSet get() throws SQLException {
-//                                  stubConnection.runSql();
-//                                  return rsSupplier.get();
-//                              }
-//                          },
-//                        new Decoder<ResultSet>() {
-//                            @Override
-//                            public StubResultSet decode(Iterable<String> values) {
-//                                return decodeStubResultSet(rsSupplier);
-//                            }
-//                        },
-//                        new Encoder<ResultSet>() {
-//                            @Override
-//                            public Iterable<String> encode(ResultSet resultSet) {
-//                                return encodeResultSetHeader(resultSet);
-////                                return ResultSetUtil.encode(resultSet);
-//                            }
-//                        },
-//
-//                        this::useCallKeys);
-
     }
 
     @Override
