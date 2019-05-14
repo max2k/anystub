@@ -136,6 +136,11 @@ public class StubHttpClient implements HttpClient {
         return encode(httpRequest, addBodyRules).toArray(new String[0]);
     }
 
+    /**
+     * if requested URL includes partOfUrl stub will include body of the request
+     * @param partOfUrl
+     * @return
+     */
     public StubHttpClient addBodyToKeyRules(String partOfUrl) {
         this.addBodyRules = Arrays.copyOf(this.addBodyRules, addBodyRules.length + 1);
         this.addBodyRules[this.addBodyRules.length - 1] = partOfUrl;

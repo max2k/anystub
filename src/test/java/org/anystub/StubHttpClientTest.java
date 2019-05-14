@@ -6,11 +6,14 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.anystub.mgmt.BaseManagerImpl.getStub;
 import static org.junit.Assert.assertEquals;
 
 public class StubHttpClientTest {
@@ -60,6 +63,25 @@ public class StubHttpClientTest {
 
 
         assertEquals(200, response);
+    }
+
+    @Test
+    @AnyStubId
+    public void executePostTest() throws IOException {
+
+        HttpClient real = HttpClients.createDefault();
+        StubHttpClient result = new StubHttpClient(real).addBodyToKeyRules("randomX");
+
+        HttpPost httpUriRequest = new HttpPost("https://gturnquist-quoters.cfapps.io:443/api/randomX");
+        ByteArrayEntity byteArrayEntity = new ByteArrayEntity("{\"a\":1}".getBytes());
+        httpUriRequest.setEntity(byteArrayEntity);
+        int response = result.execute(httpUriRequest,
+                httpResponse -> httpResponse.getStatusLine().getStatusCode());
+
+
+        assertEquals(405, response);
+        assertEquals(1, getStub().times());
+        assertEquals(1, getStub().times(null,null,null,"{\"a\":1}"));
 
     }
 

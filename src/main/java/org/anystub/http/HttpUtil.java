@@ -120,6 +120,7 @@ public class HttpUtil {
 
 
             } else if (entity instanceof ByteArrayEntity) {
+                // comes from org.springframework.web.client.RestTemplate
                 ByteArrayEntity byteArrayEntity = (ByteArrayEntity) entity;
                 try (ByteArrayOutputStream byteArray = new ByteArrayOutputStream()) {
                     byteArrayEntity.writeTo(byteArray);
