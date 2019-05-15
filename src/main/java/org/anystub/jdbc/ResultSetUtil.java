@@ -42,7 +42,11 @@ import static java.sql.Types.VARCHAR;
 
 public class ResultSetUtil {
 
-    private final static Logger LOGGER = Logger.getLogger("ResultSetUtil");
+    private static final Logger LOGGER = Logger.getLogger("ResultSetUtil");
+
+    private ResultSetUtil() {
+
+    }
 
     public static List<String> encodeHeader(ResultSetMetaData metaData) throws SQLException {
         ArrayList<String> res = new ArrayList<>();
