@@ -11,7 +11,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import static org.anystub.http.StubHttpClient.addBodyRule;
+import static org.anystub.http.StubHttpClient.addHeaderRule;
+import static org.anystub.http.StubHttpClient.addHeadersRule;
+import static org.anystub.mgmt.BaseManagerImpl.getStub;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
@@ -36,6 +42,40 @@ public class HttpSourceSystemTest {
 
     }
 
+    @Test
+    @AnyStubId
+    public void getWithHeaders() {
+
+        addHeadersRule("random");
+        ResponseEntity<String> forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api/random", String.class);
+        assertEquals(200, forEntity.getStatusCodeValue());
+
+        assertEquals(1, getStub().times());
+        assertTrue(getStub().match().findFirst().get().getKey(2).startsWith("Accept:"));
+
+
+        forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api", String.class);
+        assertEquals(200, forEntity.getStatusCodeValue());
+        assertEquals(1, getStub().timesEx(null, null, "https.*"));
+    }
+
+    @Test
+    @AnyStubId
+    public void getWithHeader() {
+
+        addHeaderRule("Accept","random");
+        ResponseEntity<String> forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api/random", String.class);
+        assertEquals(200, forEntity.getStatusCodeValue());
+
+        assertEquals(1, getStub().times());
+        assertTrue(getStub().match().findFirst().get().getKey(2).startsWith("Accept:"));
+
+
+        forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api", String.class);
+        assertEquals(200, forEntity.getStatusCodeValue());
+        assertEquals(1, getStub().timesEx(null, null, "https.*"));
+    }
+
     @Test(expected = HttpClientErrorException.class)
     public void postTest() {
         restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random", null, String.class);
@@ -43,6 +83,7 @@ public class HttpSourceSystemTest {
 
     @Test(expected = HttpClientErrorException.class)
     public void postBodyTest() {
+        addBodyRule("random/xxx");
         restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random/xxx", "{test}", String.class);
     }
 

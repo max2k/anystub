@@ -60,9 +60,7 @@ public class DefaultConfiguration {
     public HttpClient createHttpClient(Base httpBase) {
 
         HttpClient real = HttpClientBuilder.create().build();
-        StubHttpClient result = StubHttpClient.stub(real).setFallbackBase(httpBase);
-
-        return result.addBodyToKeyRules("random/xxx");
+        return StubHttpClient.stub(real).setFallbackBase(httpBase);
 
     }
 

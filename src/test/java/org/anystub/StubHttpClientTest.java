@@ -68,9 +68,10 @@ public class StubHttpClientTest {
     @Test
     @AnyStubId
     public void executePostTest() throws IOException {
+        StubHttpClient.addBodyRule("randomX");
 
         HttpClient real = HttpClients.createDefault();
-        StubHttpClient result = new StubHttpClient(real).addBodyToKeyRules("randomX");
+        StubHttpClient result = new StubHttpClient(real);
 
         HttpPost httpUriRequest = new HttpPost("https://gturnquist-quoters.cfapps.io:443/api/randomX");
         ByteArrayEntity byteArrayEntity = new ByteArrayEntity("{\"a\":1}".getBytes());

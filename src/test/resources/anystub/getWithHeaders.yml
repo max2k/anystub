@@ -1,0 +1,36 @@
+request0:
+  exception: []
+  keys: [GET, HTTP/1.1, 'Accept: text/plain, application/json, application/*+json,
+      */*', 'https://gturnquist-quoters.cfapps.io/api/random']
+  values: [HTTP/1.1, '200', OK, 'Content-Type: application/json;charset=UTF-8', 'Date:
+      Wed, 15 May 2019 01:53:54 GMT', 'X-Vcap-Request-Id: 7582b849-0cb6-4377-68e5-d0bcbdd459d4',
+    'Content-Length: 214', 'Connection: keep-alive', '{"type":"success","value":{"id":8,"quote":"I
+      don''t worry about my code scaling. Boot allows the developer to peel back the
+      layers and customize when it''s appropriate while keeping the conventions that
+      just work."}}']
+request1:
+  exception: []
+  keys: [GET, HTTP/1.1, 'https://gturnquist-quoters.cfapps.io/api']
+  values: [HTTP/1.1, '200', OK, 'Content-Type: application/json;charset=UTF-8', 'Date:
+      Wed, 15 May 2019 01:53:54 GMT', 'X-Vcap-Request-Id: 4a8ef2f6-0f19-45a3-6fa2-3d071aff124a',
+    'Content-Length: 1918', 'Connection: keep-alive', '[{"type":"success","value":{"id":1,"quote":"Working
+      with Spring Boot is like pair-programming with the Spring developers."}},{"type":"success","value":{"id":2,"quote":"With
+      Boot you deploy everywhere you can find a JVM basically."}},{"type":"success","value":{"id":3,"quote":"Spring
+      has come quite a ways in addressing developer enjoyment and ease of use since
+      the last time I built an application using it."}},{"type":"success","value":{"id":4,"quote":"Previous
+      to Spring Boot, I remember XML hell, confusing set up, and many hours of frustration."}},{"type":"success","value":{"id":5,"quote":"Spring
+      Boot solves this problem. It gets rid of XML and wires up common components
+      for me, so I don''t have to spend hours scratching my head just to figure out
+      how it''s all pieced together."}},{"type":"success","value":{"id":6,"quote":"It
+      embraces convention over configuration, providing an experience on par with
+      frameworks that excel at early stage development, such as Ruby on Rails."}},{"type":"success","value":{"id":7,"quote":"The
+      real benefit of Boot, however, is that it''s just Spring. That means any direction
+      the code takes, regardless of complexity, I know it''s a safe bet."}},{"type":"success","value":{"id":8,"quote":"I
+      don''t worry about my code scaling. Boot allows the developer to peel back the
+      layers and customize when it''s appropriate while keeping the conventions that
+      just work."}},{"type":"success","value":{"id":9,"quote":"So easy it is to switch
+      container in #springboot."}},{"type":"success","value":{"id":10,"quote":"Really
+      loving Spring Boot, makes stand alone Spring apps easy."}},{"type":"success","value":{"id":11,"quote":"I
+      have two hours today to build an app from scratch. @springboot to the rescue!"}},{"type":"success","value":{"id":12,"quote":"@springboot
+      with @springframework is pure productivity! Who said in #java one has to write
+      double the code than in other langs? #newFavLib"}}]']

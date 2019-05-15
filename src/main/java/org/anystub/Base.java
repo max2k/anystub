@@ -19,11 +19,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.anystub.RequestMode.rmAll;
 import static org.anystub.RequestMode.rmNew;
@@ -49,6 +51,7 @@ public class Base {
     private final String filePath;
     private boolean isNew = true;
     private RequestMode requestMode = rmNew;
+    private List<Document> properties = new ArrayList<>();
 
     public Base() {
         filePath = BaseManagerImpl.getFilePath();
@@ -141,8 +144,12 @@ public class Base {
      * @return new Document
      */
     public Document put(String... keysAndValue) {
-        return put(new Document(Arrays.copyOf(keysAndValue, keysAndValue.length - 1))
-                .setValues(keysAndValue[keysAndValue.length - 1]));
+        return put(documentFromArray(keysAndValue));
+    }
+
+    public static Document documentFromArray(String... keysAndValue) {
+        return new Document(Arrays.copyOf(keysAndValue, keysAndValue.length - 1))
+                .setValues(keysAndValue[keysAndValue.length - 1]);
     }
 
     /**
@@ -562,6 +569,7 @@ public class Base {
         documentList.clear();
         requestHistory.clear();
         isNew = true;
+        properties.clear();
     }
 
     /**
@@ -710,5 +718,20 @@ public class Base {
 
     private boolean isTrackCache() {
         return requestMode == rmTrack && documentListTrackIterator != null;
+    }
+
+    public Stream<Document> getProperty(String... keys) {
+        return properties
+                .stream()
+                .filter(x -> x.match_to(keys));
+
+    }
+
+    /**
+     * adds property as a document,
+     * @param property
+     */
+    public void addProperty(String... property) {
+        this.properties.add(documentFromArray(property));
     }
 }

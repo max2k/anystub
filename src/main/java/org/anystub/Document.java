@@ -91,6 +91,10 @@ public class Document {
         return nullValue;
     }
 
+    /**
+     * returns the first value from value array
+     * @return
+     */
     public String get() {
         return getVals().iterator().next();
     }
@@ -132,14 +136,29 @@ public class Document {
      * @return true if document is matched
      */
     public boolean match_to(String... keys) {
-        if (this.keys.size() < keys.length) {
+        return Document.match_to(this.keys, keys);
+    }
+
+    /**
+     * exact matching a List to given matchedKeys.
+     * the baseList is not matched to 'matchedKeys' if:
+     * - it has less values in then matchedKeys
+     * - it has at least one value in its key that's not equal to correspondent non-null value in matchedKeys
+     * * null values in matchedKeys aren't used for matching
+     *
+     * @param baseList
+     * @param matchedKeys for matching (null values are skipped from matching but length of key is compared)
+     * @return true if document is matched
+     */
+    public static boolean match_to(List<String> baseList, String[] matchedKeys) {
+        if (baseList.size() < matchedKeys.length) {
             return false;
         }
-        for (int i = 0; i < keys.length; i++) {
-            if (keys[i] == null) {
+        for (int i = 0; i < matchedKeys.length; i++) {
+            if (matchedKeys[i] == null) {
                 continue;
             }
-            if (!keys[i].equals(this.keys.get(i))) {
+            if (!matchedKeys[i].equals(baseList.get(i))) {
                 return false;
             }
         }
@@ -253,6 +272,10 @@ public class Document {
                     + key_to_string();
         }
         throw new AssertionError(msg);
+    }
+
+    public String getKey(int pos) {
+        return this.keys.get(pos);
     }
 
     public String key_to_string() {
