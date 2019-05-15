@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.lang.Integer.parseInt;
@@ -426,6 +427,35 @@ public class BaseTest {
     }
 
 
+    @Test
+    @AnyStubId
+    public void propertyTest() {
+        Base stub = BaseManagerImpl.getStub();
+
+        stub.addProperty("test", "1", "a");
+        stub.addProperty("test", "1", "b");
+        stub.addProperty("xxx", "2");
+
+
+        Document xxx = stub.getProperty("xxx").findFirst().get();
+        assertEquals("2", xxx.getVals().iterator().next());
+        List<Document> test = stub.getProperty("test", "1").collect(Collectors.toList());
+        assertEquals(2, test.size());
+        assertEquals("a", test.get(0).getVals().iterator().next());
+        assertEquals("b", test.get(1).getVals().iterator().next());
+
+        test = stub.getProperty("test", "1", "a").collect(Collectors.toList());
+        assertEquals(1, test.size());
+        assertFalse(test.get(0).getVals().iterator().hasNext());
+
+        test = stub.getProperty("xxx", "2").collect(Collectors.toList());
+        assertEquals(1, test.size());
+        assertFalse(test.get(0).getVals().iterator().hasNext());
+
+        test = stub.getProperty("test", "1", "X").collect(Collectors.toList());
+        assertTrue(test.isEmpty());
+
+    }
 
 
 }

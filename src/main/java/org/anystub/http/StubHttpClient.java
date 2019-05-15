@@ -21,6 +21,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import static org.anystub.http.HttpUtil.HTTP_PROPERTY;
+import static org.anystub.http.HttpUtil.HTTP_PROPERTY_All_HEADERS;
+import static org.anystub.http.HttpUtil.HTTP_PROPERTY_BODY;
+import static org.anystub.http.HttpUtil.HTTP_PROPERTY_HEADER;
 import static org.anystub.http.HttpUtil.encode;
 
 
@@ -138,7 +142,7 @@ public class StubHttpClient implements HttpClient {
 
     /**
      * if requested URL includes partOfUrl stub will include body of the request
-     * @param partOfUrl
+     * @param partOfUrl part of URL to match request to add body
      * @return
      */
     public StubHttpClient addBodyToKeyRules(String partOfUrl) {
@@ -177,4 +181,18 @@ public class StubHttpClient implements HttpClient {
         return new StubHttpClient(httpClient);
     }
 
+
+    /**
+     * adds all headers to requests with URL
+     */
+    public static void addHeaders(String partOfUrl) {
+        BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_All_HEADERS, partOfUrl);
+    }
+    public static void addHeader(String header, String partOfUrl) {
+        BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_HEADER, header, partOfUrl);
+    }
+    public static void addBody(String partOfURL) {
+        BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY, partOfURL);
+
+    }
 }

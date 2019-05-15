@@ -51,7 +51,7 @@ public class Base {
     private final String filePath;
     private boolean isNew = true;
     private RequestMode requestMode = rmNew;
-    private List<List<String>> properties = new ArrayList<>();
+    private List<Document> properties = new ArrayList<>();
 
     public Base() {
         filePath = BaseManagerImpl.getFilePath();
@@ -144,8 +144,12 @@ public class Base {
      * @return new Document
      */
     public Document put(String... keysAndValue) {
-        return put(new Document(Arrays.copyOf(keysAndValue, keysAndValue.length - 1))
-                .setValues(keysAndValue[keysAndValue.length - 1]));
+        return put(documentFromArray(keysAndValue));
+    }
+
+    public static Document documentFromArray(String... keysAndValue) {
+        return new Document(Arrays.copyOf(keysAndValue, keysAndValue.length - 1))
+                .setValues(keysAndValue[keysAndValue.length - 1]);
     }
 
     /**
@@ -716,21 +720,18 @@ public class Base {
         return requestMode == rmTrack && documentListTrackIterator != null;
     }
 
-    /**
-     * add property as a do
-     * @param keys
-     */
-    public Stream<Iterable<String>> getProperty(String... keys) {
+    public Stream<Document> getProperty(String... keys) {
         return properties
                 .stream()
-                .filter(x -> Document.match_to(x, keys))
-                .map(rule -> rule
-                        .stream()
-                        .skip(keys.length)
-                        .collect(Collectors.toList()));
+                .filter(x -> x.match_to(keys));
+
     }
 
-    public void setProperty(String... property) {
-        this.properties.add(asList(property));
+    /**
+     * adds property as a document,
+     * @param property
+     */
+    public void addProperty(String... property) {
+        this.properties.add(documentFromArray(property));
     }
 }

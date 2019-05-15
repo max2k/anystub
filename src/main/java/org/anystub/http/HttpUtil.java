@@ -1,12 +1,14 @@
 package org.anystub.http;
 
 import org.anystub.Util;
+import org.anystub.mgmt.BaseManagerImpl;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
@@ -16,21 +18,26 @@ import org.apache.http.message.BasicHttpResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
 
 public class HttpUtil {
 
     private static final Logger LOGGER = Logger.getLogger(HttpUtil.class.getName());
+    public static final String HTTP_PROPERTY = "http";
+    public static final String HTTP_PROPERTY_All_HEADERS = "allHeader";
+    public static final String HTTP_PROPERTY_HEADER = "header";
+    public static final String HTTP_PROPERTY_BODY = "body";
 
     private HttpUtil() {
     }
@@ -153,6 +160,8 @@ public class HttpUtil {
         strings.add(httpRequest.getRequestLine().getProtocolVersion().toString());
 
         String fullUrl = httpRequest.getRequestLine().getUri();
+        encodeHeaders(httpRequest, fullUrl);
+
         if (httpHost != null && !httpRequest.getRequestLine().getUri().contains(httpHost.toString())) {
             if (!fullUrl.contains(httpHost.toString())) {
                 fullUrl = httpHost.toString() + fullUrl;
@@ -175,6 +184,9 @@ public class HttpUtil {
         strings.add(httpRequest.getRequestLine().getMethod());
         strings.add(httpRequest.getRequestLine().getProtocolVersion().toString());
         String fullUrl = httpRequest.getRequestLine().getUri();
+
+        strings.addAll(encodeHeaders(httpRequest, fullUrl));
+
         strings.add(fullUrl);
 
 
@@ -185,7 +197,45 @@ public class HttpUtil {
         return strings;
     }
 
+    public static List<String> encodeHeaders(HttpRequest httpRequest, String fullUrl) {
+        ArrayList<String> strings = new ArrayList<>();
+
+        Header[] allHeaders = httpRequest.getAllHeaders();
+        Arrays.sort(allHeaders, Comparator.comparing(NameValuePair::getName));
+
+        boolean matchAll = BaseManagerImpl.getStub()
+                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_All_HEADERS)
+                .anyMatch(d -> fullUrl.contains(d.get()));
+
+        if (matchAll) {
+            for (Header h : allHeaders) {
+                strings.add(String.format("%s: %s", h.getName(), h.getValue()));
+            }
+            return strings;
+        }
+
+        Set<String> headersToAdd = BaseManagerImpl.getStub()
+                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_HEADER)
+                .filter(d -> fullUrl.contains(d.get()))
+                .map(d -> d.getKey(2))
+                .collect(Collectors.toSet());
+
+        if (!headersToAdd.isEmpty()) {
+            for (Header h : allHeaders) {
+                if(headersToAdd.contains(h.getName())) {
+                    strings.add(String.format("%s: %s", h.getName(), h.getValue()));
+                }
+            }
+        }
+
+        return strings;
+    }
+
     private static Optional<String> matchBodyRule(String url, String[] addBodyRules) {
+//        BaseManagerImpl.getStub()
+//                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY)
+//                .anyMatch(d->url.contains(d.get()));
+
         if (addBodyRules == null) {
             return Optional.empty();
         }
