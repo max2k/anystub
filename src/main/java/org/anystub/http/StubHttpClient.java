@@ -37,7 +37,6 @@ public class StubHttpClient implements HttpClient {
 
     private Base base=null;
     private final HttpClient httpClient;
-    private String[] addBodyRules = {};
 
     public StubHttpClient(HttpClient httpClient) {
         this.httpClient = httpClient;
@@ -95,7 +94,7 @@ public class StubHttpClient implements HttpClient {
                           },
                         new DecoderHttpResponse(),
                         new EncoderHttpResponse(),
-                        HttpUtil.encode(httpRequest, httpHost, addBodyRules).toArray(new String[0]));
+                        HttpUtil.encode(httpRequest, httpHost).toArray(new String[0]));
     }
 
     @Override
@@ -137,19 +136,10 @@ public class StubHttpClient implements HttpClient {
     }
 
     private String[] keys(HttpRequest httpRequest) {
-        return encode(httpRequest, addBodyRules).toArray(new String[0]);
+        return encode(httpRequest).toArray(new String[0]);
     }
 
-    /**
-     * if requested URL includes partOfUrl stub will include body of the request
-     * @param partOfUrl part of URL to match request to add body
-     * @return
-     */
-    public StubHttpClient addBodyToKeyRules(String partOfUrl) {
-        this.addBodyRules = Arrays.copyOf(this.addBodyRules, addBodyRules.length + 1);
-        this.addBodyRules[this.addBodyRules.length - 1] = partOfUrl;
-        return this;
-    }
+
 
     private Base getBase() {
         AnyStubId s = AnyStubFileLocator.discoverFile();
@@ -185,13 +175,13 @@ public class StubHttpClient implements HttpClient {
     /**
      * adds all headers to requests with URL
      */
-    public static void addHeaders(String partOfUrl) {
+    public static void addHeadersRule(String partOfUrl) {
         BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_All_HEADERS, partOfUrl);
     }
-    public static void addHeader(String header, String partOfUrl) {
+    public static void addHeaderRule(String header, String partOfUrl) {
         BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_HEADER, header, partOfUrl);
     }
-    public static void addBody(String partOfURL) {
+    public static void addBodyRule(String partOfURL) {
         BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY, partOfURL);
 
     }

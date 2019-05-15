@@ -153,32 +153,32 @@ public class HttpUtil {
         return result == null || result.isEmpty() ? Optional.empty() : Optional.of(result);
     }
 
-    public static List<String> encode(HttpRequest httpRequest, HttpHost httpHost, String[] addBodyRules) {
+    public static List<String> encode(HttpRequest httpRequest, HttpHost httpHost) {
         ArrayList<String> strings = new ArrayList<>();
 
         strings.add(httpRequest.getRequestLine().getMethod());
         strings.add(httpRequest.getRequestLine().getProtocolVersion().toString());
 
         String fullUrl = httpRequest.getRequestLine().getUri();
-        encodeHeaders(httpRequest, fullUrl);
 
         if (httpHost != null && !httpRequest.getRequestLine().getUri().contains(httpHost.toString())) {
             if (!fullUrl.contains(httpHost.toString())) {
                 fullUrl = httpHost.toString() + fullUrl;
-                strings.add(fullUrl);
             }
-        } else {
-            strings.add(fullUrl);
         }
 
-        matchBodyRule(fullUrl, addBodyRules)
-                .ifPresent(x -> extractEntity(httpRequest)
-                        .ifPresent(strings::add));
+        encodeHeaders(httpRequest, fullUrl);
+        strings.add(fullUrl);
+
+        if (matchBodyRule(fullUrl)) {
+            extractEntity(httpRequest)
+                    .ifPresent(strings::add);
+        }
 
         return strings;
     }
 
-    public static List<String> encode(HttpRequest httpRequest, String[] addBodyRules) {
+    public static List<String> encode(HttpRequest httpRequest) {
         ArrayList<String> strings = new ArrayList<>();
 
         strings.add(httpRequest.getRequestLine().getMethod());
@@ -190,9 +190,10 @@ public class HttpUtil {
         strings.add(fullUrl);
 
 
-        matchBodyRule(fullUrl, addBodyRules)
-                .ifPresent(x -> extractEntity(httpRequest)
-                        .ifPresent(strings::add));
+        if (matchBodyRule(fullUrl)) {
+            extractEntity(httpRequest)
+                    .ifPresent(strings::add);
+        }
 
         return strings;
     }
@@ -222,7 +223,7 @@ public class HttpUtil {
 
         if (!headersToAdd.isEmpty()) {
             for (Header h : allHeaders) {
-                if(headersToAdd.contains(h.getName())) {
+                if (headersToAdd.contains(h.getName())) {
                     strings.add(String.format("%s: %s", h.getName(), h.getValue()));
                 }
             }
@@ -231,17 +232,10 @@ public class HttpUtil {
         return strings;
     }
 
-    private static Optional<String> matchBodyRule(String url, String[] addBodyRules) {
-//        BaseManagerImpl.getStub()
-//                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY)
-//                .anyMatch(d->url.contains(d.get()));
-
-        if (addBodyRules == null) {
-            return Optional.empty();
-        }
-        return Arrays.stream(addBodyRules)
-                .filter(url::contains)
-                .findFirst();
+    private static boolean matchBodyRule(String url) {
+        return BaseManagerImpl.getStub()
+                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY)
+                .anyMatch(d -> url.contains(d.get()));
     }
 
 }
