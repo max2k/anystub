@@ -19,11 +19,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.anystub.RequestMode.rmAll;
 import static org.anystub.RequestMode.rmNew;
@@ -49,6 +51,7 @@ public class Base {
     private final String filePath;
     private boolean isNew = true;
     private RequestMode requestMode = rmNew;
+    private List<List<String>> properties = new ArrayList<>();
 
     public Base() {
         filePath = BaseManagerImpl.getFilePath();
@@ -562,6 +565,7 @@ public class Base {
         documentList.clear();
         requestHistory.clear();
         isNew = true;
+        properties.clear();
     }
 
     /**
@@ -710,5 +714,23 @@ public class Base {
 
     private boolean isTrackCache() {
         return requestMode == rmTrack && documentListTrackIterator != null;
+    }
+
+    /**
+     * add property as a do
+     * @param keys
+     */
+    public Stream<Iterable<String>> getProperty(String... keys) {
+        return properties
+                .stream()
+                .filter(x -> Document.match_to(x, keys))
+                .map(rule -> rule
+                        .stream()
+                        .skip(keys.length)
+                        .collect(Collectors.toList()));
+    }
+
+    public void setProperty(String... property) {
+        this.properties.add(asList(property));
     }
 }
