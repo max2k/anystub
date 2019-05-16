@@ -19,7 +19,7 @@ request2:
 request3:
   exception: []
   keys: ['insert into BLOBREPORT (NAME, IMAGE) values (?, ?)', getGeneratedKeys]
-  values: '0'
+  values: ['1', ID, BIGINT, '-5', '19', '0', '1']
 request4:
   exception: []
   keys: ['select * from BLOBREPORT where id =?', setObject, '1']

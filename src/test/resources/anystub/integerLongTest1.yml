@@ -1,0 +1,43 @@
+request0:
+  exception: []
+  keys: DROP ALIAS SP_HELLO2 if Exists
+  values: 'false'
+request1:
+  exception: []
+  keys: |-
+    CREATE ALIAS SP_HELLO2 AS $$
+    String spHello(String value) {
+        return "HELLO: "+value;
+    }
+    $$;
+  values: 'false'
+request2:
+  exception: []
+  keys: ['call  SP_HELLO2(?);', '1', attempt 1]
+  values: 'true'
+request3:
+  exception: []
+  keys: ['call  SP_HELLO2(?);', getUpdateCount]
+  values: '-1'
+request4:
+  exception: []
+  keys: ['call  SP_HELLO2(?);', getResultSet]
+  values: ['1', 'PUBLIC.SP_HELLO2(?1)', VARCHAR, '12', '2147483647', '0', 'HELLO:
+      attempt 1']
+request5:
+  exception: []
+  keys: ['call  SP_HELLO2(?);', getMoreResults]
+  values: 'false'
+request6:
+  exception: []
+  keys: ['call  SP_HELLO2(?);', getUpdateCount, '#1']
+  values: '-1'
+request7:
+  exception: []
+  keys: ['call SP_HELLO2(?);', '1', xx]
+  values: 'true'
+request8:
+  exception: []
+  keys: ['call SP_HELLO2(?);', getResultSet]
+  values: ['1', 'PUBLIC.SP_HELLO2(?1)', VARCHAR, '12', '2147483647', '0', 'HELLO:
+      xx']

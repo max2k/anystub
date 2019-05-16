@@ -281,6 +281,8 @@ public class ResultSetUtil {
 //            case  REF_CURSOR = 2012;
 //            case  TIME_WITH_TIMEZONE = 2013;
 //            case  TIMESTAMP_WITH_TIMEZONE = 2014;
+            default:
+                break;
         }
         return next;
     }

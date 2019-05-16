@@ -19,13 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.anystub.RequestMode.rmAll;
 import static org.anystub.RequestMode.rmNew;

@@ -3,7 +3,6 @@ package org.anystub.it_jdbc;
 import org.anystub.AnyStubId;
 import org.anystub.RequestMode;
 import org.h2.tools.SimpleResultSet;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -15,6 +14,7 @@ import org.springframework.jdbc.core.CallableStatementCreator;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -41,10 +41,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import static java.sql.Types.VARCHAR;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
@@ -100,6 +104,7 @@ public class JdbcSourceSystemTest {
         assertEquals("Long", query.get(1).last_name);
 
     }
+
     @Test
     @AnyStubId
     public void selectwithaliasTest() {
@@ -304,68 +309,71 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
-    @Ignore("CallableStatement: Supported only for calling stored procedures. to invent right test")
+    @AnyStubId
     public void integerLongTest1() throws SQLException {
-        jdbcTemplate.execute("DROP TABLE SOMETYPES1 IF EXISTS");
+        jdbcTemplate.execute("DROP ALIAS SP_HELLO2 if Exists");
+        jdbcTemplate.execute("CREATE ALIAS SP_HELLO2 AS $$\n" +
+                "String spHello(String value) {\n" +
+                "    return \"HELLO: \"+value;\n" +
+                "}\n" +
+                "$$;");
 
-        String sql = "CREATE TABLE SOMETYPES1(\n" +
-                "ID BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
-                "NAME INT NOT NULL,\n" +
-                "C_BIGINT BIGINT, \n" +
-                "C_DECIMAL DECIMAL, \n" +
-                "C_DOUBLE DOUBLE, \n" +
-                "C_TIME TIME, \n" +
-                "C_DATE DATE, \n" +
-                "C_TIMESTAMP TIMESTAMP \n" +
-                ");";
-        jdbcTemplate.execute(sql);
+        List<SqlParameter> l = new ArrayList<>();
+        SqlParameter sqlParameter = new SqlParameter("XX", VARCHAR);
+        l.add(sqlParameter);
 
-        String sqlI = "insert into SOMETYPES1 (NAME, " +
-                "C_BIGINT," +
-                "C_DECIMAL," +
-                "C_DOUBLE," +
-                "C_TIME," +
-                "C_DATE," +
-                "C_TIMESTAMP) values (?, ?,?, ?,?, ?,?)";
-        CallableStatement execute = jdbcTemplate.execute(new CallableStatementCreator() {
+        Map<String, Object> res = jdbcTemplate.call(new CallableStatementCreator() {
             @Override
             public CallableStatement createCallableStatement(Connection connection) throws SQLException {
-                CallableStatement callableStatement = connection.prepareCall(sqlI);
-                callableStatement.setInt("NAME", 1);
-                callableStatement.setDate("C_DATE", new Date(82800000));
-                callableStatement.setLong("C_BIGINT", Integer.MAX_VALUE + 1L);
-                callableStatement.setDouble("C_DOUBLE", 43.124);
-                callableStatement.setTime("C_TIME", new Time(37135000));
-                callableStatement.setFloat("C_DECIMAL", 14);
-                callableStatement.setTimestamp("C_TIMESTAMP", new Timestamp(1235385345));
+                CallableStatement callableStatement = connection.prepareCall("call  SP_HELLO2(?);");
+                callableStatement.setString(1, "attempt 1");
+                return  callableStatement;
+            }
+        }, l);
+        assertNotNull(res);
+
+        ResultSet rs;
+        rs = jdbcTemplate.execute(new CallableStatementCreator() {
+            @Override
+            public CallableStatement createCallableStatement(Connection connection) throws SQLException {
+                CallableStatement callableStatement = connection.prepareCall("call SP_HELLO2(?);");
+                callableStatement.setString(1, "xx");
                 return callableStatement;
             }
-        }, new CallableStatementCallback<CallableStatement>() {
+        }, new CallableStatementCallback<ResultSet>() {
             @Override
-            public CallableStatement doInCallableStatement(CallableStatement callableStatement) throws SQLException, DataAccessException {
-                return callableStatement;
+            public ResultSet doInCallableStatement(CallableStatement callableStatement) throws SQLException, DataAccessException {
+                callableStatement.execute();
+                return callableStatement.getResultSet();
             }
         });
 
-        while (execute.getMoreResults() || execute.getUpdateCount() != -1) {
+        assertTrue(rs.next());
+        assertEquals("HELLO: xx", rs.getString(1));
 
-        }
+        // invent a test with callableStatement.setString("xx", "attempt 2");
+        // org.springframework.jdbc.BadSqlGrammarException: CallableStatementCallback; bad SQL grammar []; nested exception is org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CALL SP_HELLO2(:[*]XX); "; expected "), NOT, EXISTS, INTERSECTS"; SQL statement:
+        //call SP_HELLO2(:xx); [42001-199]
 
-        List<String> query = jdbcTemplate.query("select * from SOMETYPES1 where id =?", new Object[]{1},
-                (resultSet, i) -> {
-                    return String.valueOf(resultSet.getInt("NAME")) + " " +
-                            String.valueOf(resultSet.getLong("C_BIGINT")) + " " +
-                            String.valueOf(resultSet.getFloat("C_DECIMAL")) + " " +
-                            String.valueOf(resultSet.getDouble("C_DOUBLE")) + " " +
-                            String.valueOf(resultSet.getTime("C_TIME").getTime()) + " " +
-                            String.valueOf(resultSet.getDate("C_DATE").getTime()) + " " +
-                            String.valueOf(resultSet.getTimestamp("C_TIMESTAMP").getTime());
-                });
+//        rs = jdbcTemplate.execute(new CallableStatementCreator() {
+//            @Override
+//            public CallableStatement createCallableStatement(Connection connection) throws SQLException {
+//                CallableStatement callableStatement = connection.prepareCall("call SP_HELLO2(:xx);");
+//
+//                return callableStatement;
+//            }
+//        }, new CallableStatementCallback<ResultSet>() {
+//            @Override
+//            public ResultSet doInCallableStatement(CallableStatement callableStatement) throws SQLException, DataAccessException {
+//                callableStatement.setString("xx", "attempt 2");
+//                callableStatement.execute();
+//                return callableStatement.getResultSet();
+//            }
+//        });
 
+//        assertTrue(rs.next());
+//        assertEquals("HELLO: attempt 2", rs.getString(1));
 
-        assertEquals(1, query.size());
-        assertEquals("1 2147483648 14.0 43.124 37135000 82800000 1235385345",
-                query);
 
     }
 
@@ -374,7 +382,6 @@ public class JdbcSourceSystemTest {
     private static List<DatabaseMetaData> metaData = Collections.synchronizedList(new ArrayList<>());
 
     public void after() {
-        log.info("!!!!!!!!!!!!!!!!!!!!!!!");
         Mockito.mockingDetails(dataSource)
                 .getInvocations()
                 .forEach(x -> {

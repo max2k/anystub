@@ -77,6 +77,10 @@ public class StubDataSource implements DataSource {
     }
 
 
+    /**
+     * returns the most appropriate stub file correspondent to current position related to the datasource
+     * @return stub file
+     */
     public Base getBase() {
 
         AnyStubId s = AnyStubFileLocator.discoverFile(stubSuffix);
@@ -109,8 +113,8 @@ public class StubDataSource implements DataSource {
 
     /**
      * wraps datasource with a stub
-     * @param ds
-     * @return
+     * @param ds real DataSource
+     * @return stubbed DataSource
      */
     public static DataSource stub(DataSource ds) {
         return new StubDataSource(ds);

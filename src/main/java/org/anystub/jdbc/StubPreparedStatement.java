@@ -1,8 +1,6 @@
 package org.anystub.jdbc;
 
 import org.anystub.Base;
-import org.anystub.Decoder;
-import org.anystub.Encoder;
 import org.anystub.Supplier;
 import org.anystub.SupplierCached;
 
@@ -29,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -371,7 +368,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     @Override
     public void setArray(int parameterIndex, Array array) throws SQLException {
 
-        // TODO: investigate
+        // TODO: investigate Array
         addCallKeys("setArray", String.valueOf(parameterIndex), array.getBaseTypeName());
 
         stubConnection.add(() -> {
@@ -612,6 +609,7 @@ public class StubPreparedStatement extends StubStatement implements PreparedStat
     }
 
 
+    @Override
     protected String[] useCallKeys() {
         List<String> res = new ArrayList<>();
 

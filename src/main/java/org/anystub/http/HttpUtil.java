@@ -86,7 +86,7 @@ public class HttpUtil {
         strings.add(httpResponse.getStatusLine().getReasonPhrase());
 
         for (Header h : httpResponse.getAllHeaders()) {
-            strings.add(String.format("%s: %s", h.getName(), h.getValue()));
+            strings.add(headerToString(h));
         }
 
         extractEntity(httpResponse.getEntity())
@@ -161,13 +161,11 @@ public class HttpUtil {
 
         String fullUrl = httpRequest.getRequestLine().getUri();
 
-        if (httpHost != null && !httpRequest.getRequestLine().getUri().contains(httpHost.toString())) {
-            if (!fullUrl.contains(httpHost.toString())) {
-                fullUrl = httpHost.toString() + fullUrl;
-            }
+        if (httpHost != null && !fullUrl.contains(httpHost.toString())) {
+            fullUrl = httpHost.toString() + fullUrl;
         }
 
-        encodeHeaders(httpRequest, fullUrl);
+        strings.addAll(encodeHeaders(httpRequest, fullUrl));
         strings.add(fullUrl);
 
         if (matchBodyRule(fullUrl)) {
@@ -179,23 +177,7 @@ public class HttpUtil {
     }
 
     public static List<String> encode(HttpRequest httpRequest) {
-        ArrayList<String> strings = new ArrayList<>();
-
-        strings.add(httpRequest.getRequestLine().getMethod());
-        strings.add(httpRequest.getRequestLine().getProtocolVersion().toString());
-        String fullUrl = httpRequest.getRequestLine().getUri();
-
-        strings.addAll(encodeHeaders(httpRequest, fullUrl));
-
-        strings.add(fullUrl);
-
-
-        if (matchBodyRule(fullUrl)) {
-            extractEntity(httpRequest)
-                    .ifPresent(strings::add);
-        }
-
-        return strings;
+        return encode(httpRequest, null);
     }
 
     public static List<String> encodeHeaders(HttpRequest httpRequest, String fullUrl) {
@@ -210,7 +192,7 @@ public class HttpUtil {
 
         if (matchAll) {
             for (Header h : allHeaders) {
-                strings.add(String.format("%s: %s", h.getName(), h.getValue()));
+                strings.add(headerToString(h));
             }
             return strings;
         }
@@ -224,7 +206,7 @@ public class HttpUtil {
         if (!headersToAdd.isEmpty()) {
             for (Header h : allHeaders) {
                 if (headersToAdd.contains(h.getName())) {
-                    strings.add(String.format("%s: %s", h.getName(), h.getValue()));
+                    strings.add(headerToString(h));
                 }
             }
         }
@@ -236,6 +218,10 @@ public class HttpUtil {
         return BaseManagerImpl.getStub()
                 .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY)
                 .anyMatch(d -> url.contains(d.get()));
+    }
+
+    public static String headerToString(Header h) {
+        return String.format("%s: %s", h.getName(), h.getValue());
     }
 
 }

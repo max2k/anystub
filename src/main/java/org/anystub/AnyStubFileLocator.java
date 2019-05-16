@@ -7,6 +7,12 @@ public class AnyStubFileLocator {
     private AnyStubFileLocator() {
     }
 
+    /**
+     * looks for runtime data about current stub file in the call point.
+     * If you call it in some functions it tracks stackTrace up to the first method or class annotated
+     * with @AnystubId and extracts its parameters
+     * @return runtime data, if no annotation found returns null
+     */
     public static AnyStubId discoverFile() {
         String filename = null;
         AnyStubId id = null;
@@ -47,6 +53,12 @@ public class AnyStubFileLocator {
                 id.requestMode());
     }
 
+    /**
+     * looks for runtime data about current stub file in the call point with discoverFile().
+     * if the runtime data found update the filename with given suffix
+     * @param stubSuffix suffix to be added to stub's filename
+     * @return runtime data with filename added suffix, null if no metadata found
+     */
     public static AnyStubId discoverFile(String stubSuffix) {
         AnyStubId s = discoverFile();
 
