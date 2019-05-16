@@ -42,7 +42,11 @@ import static java.sql.Types.VARCHAR;
 
 public class ResultSetUtil {
 
-    private final static Logger LOGGER = Logger.getLogger("ResultSetUtil");
+    private static final Logger LOGGER = Logger.getLogger("ResultSetUtil");
+
+    private ResultSetUtil() {
+
+    }
 
     public static List<String> encodeHeader(ResultSetMetaData metaData) throws SQLException {
         ArrayList<String> res = new ArrayList<>();
@@ -277,6 +281,8 @@ public class ResultSetUtil {
 //            case  REF_CURSOR = 2012;
 //            case  TIME_WITH_TIMEZONE = 2013;
 //            case  TIMESTAMP_WITH_TIMEZONE = 2014;
+            default:
+                break;
         }
         return next;
     }

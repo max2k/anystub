@@ -18,7 +18,6 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import static org.anystub.http.HttpUtil.HTTP_PROPERTY;

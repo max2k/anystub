@@ -16,13 +16,12 @@ import java.sql.SQLXML;
 
 public class SqlTypeEncoder {
 
-    public static final String BASE_64 = "BASE64 ";
+
 
     private SqlTypeEncoder() {
     }
 
     public static Blob decodeBlob(String next) {
-//        String next = values.iterator().next();
         byte[] bytes = Util.recoverBinaryData(next);
         try {
             return new SerialBlob(bytes);

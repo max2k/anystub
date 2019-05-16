@@ -32,7 +32,7 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
     private CallableStatement realCallableStatement = null;
 
     public StubCallableStatement(StubConnection stubConnection, String sql) throws SQLException {
-        super(stubConnection, sql);
+        super(true, stubConnection, sql);
 
         stubConnection.add(() -> {
             realCallableStatement = stubConnection.getRealConnection().prepareCall(sql);
@@ -583,10 +583,10 @@ public class StubCallableStatement extends StubPreparedStatement implements Call
     }
 
     @Override
-    public void setString(String s, String s1) throws SQLException {
-        addCallKeys(s, s1);
+    public void setString(String parameterName, String s1) throws SQLException {
+        addCallKeys(parameterName, s1);
         stubConnection.add(() -> {
-            realCallableStatement.setString(s, s1);
+            realCallableStatement.setString(parameterName, s1);
         });
     }
 

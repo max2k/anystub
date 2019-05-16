@@ -12,6 +12,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class Util {
+    public static final String BASE64_PREFIX = "BASE64 ";
+    public static final String TEXT_PREFIX = "TEXT ";
+
     private Util() {
     }
 
@@ -40,13 +43,13 @@ public class Util {
         if (Util.isText(bytes)) {
             String bodyText = new String(bytes, StandardCharsets.UTF_8);
             if (bodyText.startsWith("TEXT") || bodyText.startsWith("BASE")) {
-                result = "TEXT " + bodyText;
+                result = TEXT_PREFIX + bodyText;
             } else {
                 result = bodyText;
             }
         } else {
             String encode = Base64.getEncoder().encodeToString(bytes);
-            result = "BASE64 " + encode;
+            result = BASE64_PREFIX + encode;
         }
         return result;
     }
@@ -59,10 +62,10 @@ public class Util {
      * @return
      */
     public static byte[] recoverBinaryData(String in) {
-        if (in.startsWith("TEXT ")) {
-            return in.substring(5).getBytes();
-        } else if (in.startsWith("BASE64 ")) {
-            String base64Entity = in.substring(7);
+        if (in.startsWith(TEXT_PREFIX)) {
+            return in.substring(TEXT_PREFIX.length()).getBytes();
+        } else if (in.startsWith(BASE64_PREFIX)) {
+            String base64Entity = in.substring(BASE64_PREFIX.length());
             return Base64.getDecoder().decode(base64Entity);
         } else {
             return in.getBytes();
