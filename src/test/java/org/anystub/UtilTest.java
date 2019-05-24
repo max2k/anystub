@@ -2,25 +2,35 @@ package org.anystub;
 
 import org.junit.Test;
 
+import static org.anystub.Util.escapeCharacterString;
+import static org.anystub.Util.isText;
 import static org.junit.Assert.*;
 
 public class UtilTest {
 
     @Test
     public void isTextTest() {
-        assertTrue(Util.isText("thisistextline"));
-        assertTrue(Util.isText("{\"this is\": \'text' }; line"));
-        assertFalse(Util.isText("thisistextline" + (char) 0x03));
+        assertTrue(isText("thisistextline"));
+        assertTrue(isText("{\"this is\": \'text' }; line"));
+        assertFalse(isText("thisistextline" + (char) 0x03));
+
+        assertTrue(isText(""));
+        assertTrue(isText("\n\n\n"));
+        assertTrue(isText("123\n123"));
+        assertTrue(isText("123\n\n\n\n123"));
     }
 
 
     @Test
     public void isText1() {
 
-        assertTrue(Util.isText("thisistextline".getBytes()));
-        assertTrue(Util.isText("{\"this is\": \'text' }; line".getBytes()));
-        assertFalse(Util.isText(("thisistextline" + (char) 0x03).getBytes()));
-
+        assertTrue(isText("thisistextline".getBytes()));
+        assertTrue(isText("{\"this is\": \'text' }; line".getBytes()));
+        assertFalse(isText(("thisistextline" + (char) 0x03).getBytes()));
+        assertTrue(isText("".getBytes()));
+        assertTrue(isText("\n\n\n".getBytes()));
+        assertTrue(isText("123\n123".getBytes()));
+        assertTrue(isText("123\n\n\n\n123".getBytes()));
     }
 
     @Test
@@ -33,4 +43,13 @@ public class UtilTest {
         s = Util.toCharacterString(("thisistextline" + (char) 0x03).getBytes());
         assertTrue( s.startsWith("BASE64 "));
     }
+
+    @Test
+    public void escapeTest() {
+        assertEquals("", escapeCharacterString(""));
+        assertEquals("TEXT TEXT", escapeCharacterString("TEXT"));
+        assertEquals("TEXT BASE", escapeCharacterString("BASE"));
+        assertEquals("BAS", escapeCharacterString("BAS"));
+    }
+
 }

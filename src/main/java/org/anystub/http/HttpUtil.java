@@ -18,6 +18,7 @@ import org.apache.http.message.BasicHttpResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -25,11 +26,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
+import static org.anystub.Util.escapeCharacterString;
 
 public class HttpUtil {
 
@@ -38,6 +41,7 @@ public class HttpUtil {
     public static final String HTTP_PROPERTY_All_HEADERS = "allHeader";
     public static final String HTTP_PROPERTY_HEADER = "header";
     public static final String HTTP_PROPERTY_BODY = "body";
+    public static final String HTTP_PROPERTY_MASK_BODY = "maskBody";
 
     private HttpUtil() {
     }
@@ -96,23 +100,30 @@ public class HttpUtil {
     }
 
 
-    public static Optional<String> extractEntity(HttpRequest httpRequest) {
+    public static byte[] extractEntity(HttpRequest httpRequest) {
 
         if (httpRequest instanceof HttpEntityEnclosingRequest) {
             HttpEntityEnclosingRequest request = (HttpEntityEnclosingRequest) httpRequest;
-            return extractEntity(request.getEntity());
+            return extractEntityData(request.getEntity());
         }
-        return Optional.empty();
+        return null;
     }
 
     public static Optional<String> extractEntity(HttpEntity entity) {
+        byte[] bytes = extractEntityData(entity);
+        return bytes != null ?
+                Optional.of(Util.toCharacterString(bytes)) :
+                Optional.empty();
+    }
+
+    public static byte[] extractEntityData(HttpEntity entity) {
         if (entity == null) {
-            return Optional.empty();
+            return null;
         }
-        String result = null;
+
+        byte[] bytes = null;
 
         try {
-            byte[] bytes = null;
 
             if (entity instanceof BasicHttpEntity) {
                 BasicHttpEntity basicHttpEntity = (BasicHttpEntity) entity;
@@ -143,14 +154,11 @@ public class HttpUtil {
                 LOGGER.warning(() -> String.format("content: unavailable %s %s", entity.getClass().getName(), entity));
             }
 
-            if (bytes != null) {
-                result = Util.toCharacterString(bytes);
 
-            }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Stringify entity failed", e);
         }
-        return result == null || result.isEmpty() ? Optional.empty() : Optional.of(result);
+        return bytes;
     }
 
     public static List<String> encode(HttpRequest httpRequest, HttpHost httpHost) {
@@ -159,18 +167,28 @@ public class HttpUtil {
         strings.add(httpRequest.getRequestLine().getMethod());
         strings.add(httpRequest.getRequestLine().getProtocolVersion().toString());
 
-        String fullUrl = httpRequest.getRequestLine().getUri();
-
-        if (httpHost != null && !fullUrl.contains(httpHost.toString())) {
-            fullUrl = httpHost.toString() + fullUrl;
-        }
+        String fullUrl =
+                ((Function<String, String>) o -> {
+                    if (httpHost != null && !o.contains(httpHost.toString())) {
+                        return httpHost.toString() + o;
+                    }
+                    return o;
+                }).apply(httpRequest.getRequestLine().getUri());
 
         strings.addAll(encodeHeaders(httpRequest, fullUrl));
         strings.add(fullUrl);
 
         if (matchBodyRule(fullUrl)) {
-            extractEntity(httpRequest)
-                    .ifPresent(strings::add);
+            byte[] bytes = extractEntity(httpRequest);
+            if (Util.isText(bytes)) {
+                String bodyText = maskBody(fullUrl, new String(bytes, StandardCharsets.UTF_8));
+                strings.add(escapeCharacterString(bodyText));
+
+            } else {
+                // omit changes fot binary data
+                // TODO: implement search substring for binary data
+                strings.add(Util.toCharacterString(bytes));
+            }
         }
 
         return strings;
@@ -218,6 +236,15 @@ public class HttpUtil {
         return BaseManagerImpl.getStub()
                 .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY)
                 .anyMatch(d -> url.contains(d.get()));
+    }
+
+    private static String maskBody(String url, String s) {
+        return BaseManagerImpl.getStub()
+                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_MASK_BODY)
+                .filter(d -> url.contains(d.getKey(2)))
+                .map(d -> s.replaceAll(d.get(), "..."))
+                .findFirst()
+                .orElse(s);
     }
 
     public static String headerToString(Header h) {

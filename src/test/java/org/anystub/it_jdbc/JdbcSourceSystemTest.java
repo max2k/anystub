@@ -2,6 +2,7 @@ package org.anystub.it_jdbc;
 
 import org.anystub.AnyStubId;
 import org.anystub.RequestMode;
+import org.anystub.mgmt.BaseManagerImpl;
 import org.h2.tools.SimpleResultSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -109,46 +110,47 @@ public class JdbcSourceSystemTest {
     @AnyStubId
     public void selectwithaliasTest() {
 
+        for (int i=0; i<2; i++) {
 
-        log.info("Creating tables");
+            log.info("Creating tables");
 
-        jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
-        jdbcTemplate.execute("CREATE TABLE customers(" +
-                "id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
+            jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
+            jdbcTemplate.execute("CREATE TABLE customers(" +
+                    "id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
 
-        // Split up the array of whole names into an array of first/last names
-        List<Object[]> splitUpNames = Arrays.asList("John Woo", "Jeff Dean", "Josh Bloch", "Josh Long").stream()
-                .map(name -> name.split(" "))
-                .collect(Collectors.toList());
+            // Split up the array of whole names into an array of first/last names
+            List<Object[]> splitUpNames = Arrays.asList("John Woo", "Jeff Dean", "Josh Bloch", "Josh Long").stream()
+                    .map(name -> name.split(" "))
+                    .collect(Collectors.toList());
 
-        // Use a Java 8 stream to print out each tuple of the list
-        splitUpNames.forEach(name -> log.info(String.format("Inserting customer record for %s %s", name[0], name[1])));
+            // Use a Java 8 stream to print out each tuple of the list
+            splitUpNames.forEach(name -> log.info(String.format("Inserting customer record for %s %s", name[0], name[1])));
 
-        // Uses JdbcTemplate's batchUpdate operation to bulk load data
-        jdbcTemplate.batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)", splitUpNames);
+            // Uses JdbcTemplate's batchUpdate operation to bulk load data
+            jdbcTemplate.batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)", splitUpNames);
 
-        log.info("Querying for customer records where first_name = 'Josh':");
-        List<Customer> query = jdbcTemplate.query(
-                "SELECT id idx, first_name first_nameX, last_name last_nameX FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
-        );
+            log.info("Querying for customer records where first_name = 'Josh':");
+            List<Customer> query = jdbcTemplate.query(
+                    "SELECT id idx, first_name first_nameX, last_name last_nameX FROM customers WHERE first_name = ?", new Object[]{"Josh"},
+                    (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
+            );
 
-        assertEquals(2, query.size());
-        assertEquals(3L, query.get(0).id);
-        assertEquals("Bloch", query.get(0).last_name);
-        assertEquals("Long", query.get(1).last_name);
+            assertEquals(2, query.size());
+            assertEquals(3L, query.get(0).id);
+            assertEquals("Bloch", query.get(0).last_name);
+            assertEquals("Long", query.get(1).last_name);
 
-        query = jdbcTemplate.query(
-                "SELECT id idx, first_name first_nameX, last_name last_nameX FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                (rs, rowNum) -> new Customer(rs.getLong("idx"), rs.getString("first_nameX"), rs.getString("last_nameX"))
-        );
+            query = jdbcTemplate.query(
+                    "SELECT id idx, first_name first_nameX, last_name last_nameX FROM customers WHERE first_name = ?", new Object[]{"Josh"},
+                    (rs, rowNum) -> new Customer(rs.getLong("idx"), rs.getString("first_nameX"), rs.getString("last_nameX"))
+            );
 
-        assertEquals(2, query.size());
-        assertEquals(3L, query.get(0).id);
-        assertEquals("Bloch", query.get(0).last_name);
-        assertEquals("Long", query.get(1).last_name);
-        assertEquals(4L, query.get(1).id);
-
+            assertEquals(2, query.size());
+            assertEquals(3L, query.get(0).id);
+            assertEquals("Bloch", query.get(0).last_name);
+            assertEquals("Long", query.get(1).last_name);
+            assertEquals(4L, query.get(1).id);
+        }
     }
 
 
@@ -176,51 +178,53 @@ public class JdbcSourceSystemTest {
     @Test
     @AnyStubId
     public void blobTest() {
-        jdbcTemplate.execute("DROP TABLE BLOBREPORT IF EXISTS");
+        for (int ii=0; ii<2; ii++) {
+            jdbcTemplate.execute("DROP TABLE BLOBREPORT IF EXISTS");
 
-        jdbcTemplate.execute("CREATE TABLE BLOBREPORT(\n" +
-                "ID BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
-                "NAME VARCHAR(255) NOT NULL,\n" +
-                "IMAGE BLOB\n" +
-                ");");
+            jdbcTemplate.execute("CREATE TABLE BLOBREPORT(\n" +
+                    "ID BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
+                    "NAME VARCHAR(255) NOT NULL,\n" +
+                    "IMAGE BLOB\n" +
+                    ");");
 
-        String sql = "insert into BLOBREPORT (NAME, IMAGE) values (?, ?)";
-        KeyHolder holder = new GeneratedKeyHolder();
-        int affRows = jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection)
-                    throws SQLException {
-                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, "TEXT");
-                ByteArrayInputStream inputStream = new ByteArrayInputStream("blob content".getBytes());
-                ps.setBlob(2, inputStream);
-                return ps;
-            }
-        }, holder);
-
-        assertEquals(1, affRows);
-
-        List<String> query = jdbcTemplate.query("select * from BLOBREPORT where id =?", new Object[]{1},
-                (resultSet, i) -> {
-                    String s;
-                    Blob image = resultSet.getBlob("IMAGE");
-                    try (InputStream binaryStream = image.getBinaryStream();
-                         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                        int r;
-                        while ((r = binaryStream.read()) != -1) {
-                            byteArrayOutputStream.write(r);
-                        }
-                        s = new String(byteArrayOutputStream.toByteArray(), StandardCharsets.UTF_8);
-
-                    } catch (IOException e) {
-                        s = null;
-                    }
-                    return s;
+            String sql = "insert into BLOBREPORT (NAME, IMAGE) values (?, ?)";
+            KeyHolder holder = new GeneratedKeyHolder();
+            int affRows = jdbcTemplate.update(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection connection)
+                        throws SQLException {
+                    PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setString(1, "TEXT");
+                    ByteArrayInputStream inputStream = new ByteArrayInputStream("blob content".getBytes());
+                    ps.setBlob(2, inputStream);
+                    return ps;
                 }
-        );
+            }, holder);
 
-        assertEquals(1, query.size());
-        assertEquals("blob content", query.get(0));
+            assertEquals(1, affRows);
+
+            List<String> query = jdbcTemplate.query("select * from BLOBREPORT where id =?", new Object[]{1},
+                    (resultSet, i) -> {
+                        String s;
+                        Blob image = resultSet.getBlob("IMAGE");
+                        try (InputStream binaryStream = image.getBinaryStream();
+                             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                            int r;
+                            while ((r = binaryStream.read()) != -1) {
+                                byteArrayOutputStream.write(r);
+                            }
+                            s = new String(byteArrayOutputStream.toByteArray(), StandardCharsets.UTF_8);
+
+                        } catch (IOException e) {
+                            s = null;
+                        }
+                        return s;
+                    }
+            );
+
+            assertEquals(1, query.size());
+            assertEquals("blob content", query.get(0));
+        }
     }
 
 
@@ -311,49 +315,50 @@ public class JdbcSourceSystemTest {
     @Test
     @AnyStubId
     public void integerLongTest1() throws SQLException {
-        jdbcTemplate.execute("DROP ALIAS SP_HELLO2 if Exists");
-        jdbcTemplate.execute("CREATE ALIAS SP_HELLO2 AS $$\n" +
-                "String spHello(String value) {\n" +
-                "    return \"HELLO: \"+value;\n" +
-                "}\n" +
-                "$$;");
+        for (int i=0; i<2; i++) {
+            jdbcTemplate.execute("DROP ALIAS SP_HELLO2 if Exists");
+            jdbcTemplate.execute("CREATE ALIAS SP_HELLO2 AS $$\n" +
+                    "String spHello(String value) {\n" +
+                    "    return \"HELLO: \"+value;\n" +
+                    "}\n" +
+                    "$$;");
 
-        List<SqlParameter> l = new ArrayList<>();
-        SqlParameter sqlParameter = new SqlParameter("XX", VARCHAR);
-        l.add(sqlParameter);
+            List<SqlParameter> l = new ArrayList<>();
+            SqlParameter sqlParameter = new SqlParameter("XX", VARCHAR);
+            l.add(sqlParameter);
 
-        Map<String, Object> res = jdbcTemplate.call(new CallableStatementCreator() {
-            @Override
-            public CallableStatement createCallableStatement(Connection connection) throws SQLException {
-                CallableStatement callableStatement = connection.prepareCall("call  SP_HELLO2(?);");
-                callableStatement.setString(1, "attempt 1");
-                return  callableStatement;
-            }
-        }, l);
-        assertNotNull(res);
+            Map<String, Object> res = jdbcTemplate.call(new CallableStatementCreator() {
+                @Override
+                public CallableStatement createCallableStatement(Connection connection) throws SQLException {
+                    CallableStatement callableStatement = connection.prepareCall("call  SP_HELLO2(?);");
+                    callableStatement.setString(1, "attempt 1");
+                    return callableStatement;
+                }
+            }, l);
+            assertNotNull(res);
 
-        ResultSet rs;
-        rs = jdbcTemplate.execute(new CallableStatementCreator() {
-            @Override
-            public CallableStatement createCallableStatement(Connection connection) throws SQLException {
-                CallableStatement callableStatement = connection.prepareCall("call SP_HELLO2(?);");
-                callableStatement.setString(1, "xx");
-                return callableStatement;
-            }
-        }, new CallableStatementCallback<ResultSet>() {
-            @Override
-            public ResultSet doInCallableStatement(CallableStatement callableStatement) throws SQLException, DataAccessException {
-                callableStatement.execute();
-                return callableStatement.getResultSet();
-            }
-        });
+            ResultSet rs;
+            rs = jdbcTemplate.execute(new CallableStatementCreator() {
+                @Override
+                public CallableStatement createCallableStatement(Connection connection) throws SQLException {
+                    CallableStatement callableStatement = connection.prepareCall("call SP_HELLO2(?);");
+                    callableStatement.setString(1, "xx");
+                    return callableStatement;
+                }
+            }, new CallableStatementCallback<ResultSet>() {
+                @Override
+                public ResultSet doInCallableStatement(CallableStatement callableStatement) throws SQLException, DataAccessException {
+                    callableStatement.execute();
+                    return callableStatement.getResultSet();
+                }
+            });
 
-        assertTrue(rs.next());
-        assertEquals("HELLO: xx", rs.getString(1));
+            assertTrue(rs.next());
+            assertEquals("HELLO: xx", rs.getString(1));
 
-        // invent a test with callableStatement.setString("xx", "attempt 2");
-        // org.springframework.jdbc.BadSqlGrammarException: CallableStatementCallback; bad SQL grammar []; nested exception is org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CALL SP_HELLO2(:[*]XX); "; expected "), NOT, EXISTS, INTERSECTS"; SQL statement:
-        //call SP_HELLO2(:xx); [42001-199]
+            // invent a test with callableStatement.setString("xx", "attempt 2");
+            // org.springframework.jdbc.BadSqlGrammarException: CallableStatementCallback; bad SQL grammar []; nested exception is org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CALL SP_HELLO2(:[*]XX); "; expected "), NOT, EXISTS, INTERSECTS"; SQL statement:
+            //call SP_HELLO2(:xx); [42001-199]
 
 //        rs = jdbcTemplate.execute(new CallableStatementCreator() {
 //            @Override
@@ -373,7 +378,7 @@ public class JdbcSourceSystemTest {
 
 //        assertTrue(rs.next());
 //        assertEquals("HELLO: attempt 2", rs.getString(1));
-
+        }
 
     }
 

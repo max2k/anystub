@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class Util {
@@ -20,12 +21,13 @@ public class Util {
 
 
     public static boolean isText(String text) {
-        return text.matches("\\p{Print}*");
+        return Arrays.stream(text.split("\n"))
+                .allMatch(s -> s.matches("\\p{Print}*"));
     }
 
     public static boolean isText(byte[] symbols) {
         for (byte b : symbols) {
-            if (b < 0x20 || b > 0x7E) {
+            if ((b < 0x20 || b > 0x7E) && (b !=(byte) 0x0A && b != (byte) 0x0D)) {
                 return false;
             }
         }
@@ -42,11 +44,7 @@ public class Util {
         String result;
         if (Util.isText(bytes)) {
             String bodyText = new String(bytes, StandardCharsets.UTF_8);
-            if (bodyText.startsWith("TEXT") || bodyText.startsWith("BASE")) {
-                result = TEXT_PREFIX + bodyText;
-            } else {
-                result = bodyText;
-            }
+            result = escapeCharacterString(bodyText);
         } else {
             String encode = Base64.getEncoder().encodeToString(bytes);
             result = BASE64_PREFIX + encode;
@@ -54,6 +52,12 @@ public class Util {
         return result;
     }
 
+    public static String escapeCharacterString(String bodyText) {
+        if (bodyText.startsWith("TEXT") || bodyText.startsWith("BASE")) {
+            return TEXT_PREFIX + bodyText;
+        }
+        return bodyText;
+    }
 
     /**
      * recover binary data from string from stub file
@@ -72,10 +76,10 @@ public class Util {
         }
     }
 
-    public static String toCharacterString(InputStream in)  {
-        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()){
+    public static String toCharacterString(InputStream in) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             int r;
-            while ((r=in.read())!=-1){
+            while ((r = in.read()) != -1) {
                 byteArrayOutputStream.write(r);
             }
             return toCharacterString(byteArrayOutputStream.toByteArray());
@@ -83,6 +87,7 @@ public class Util {
             throw new UnsupportedOperationException("failed save InputStream");
         }
     }
+
     public static InputStream recoverInputStream(String in) {
         byte[] bytes = recoverBinaryData(in);
         return new ByteArrayInputStream(bytes);
@@ -109,10 +114,10 @@ public class Util {
         }
     }
 
-    public static String toCharacterString(Reader in)  {
-        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()){
+    public static String toCharacterString(Reader in) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             int r;
-            while ((r=in.read())!=-1){
+            while ((r = in.read()) != -1) {
                 byteArrayOutputStream.write(r);
             }
             return toCharacterString(byteArrayOutputStream.toByteArray());

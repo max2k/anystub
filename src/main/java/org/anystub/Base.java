@@ -560,14 +560,14 @@ public class Base {
     }
 
     /**
-     * clear buffer, set isNew to true
-     * doesn't touch appropriate file (a note: just remove a file you need to remove manually )
+     * clears buffer, set isNew to true
+     * doesn't touch appropriate file (a note: just remove a file you need to remove manually)
+     * doesn't clean properties
      */
     public void clear() {
         documentList.clear();
         requestHistory.clear();
         isNew = true;
-        properties.clear();
     }
 
     /**
