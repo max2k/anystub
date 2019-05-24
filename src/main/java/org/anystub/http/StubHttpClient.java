@@ -24,6 +24,7 @@ import static org.anystub.http.HttpUtil.HTTP_PROPERTY;
 import static org.anystub.http.HttpUtil.HTTP_PROPERTY_All_HEADERS;
 import static org.anystub.http.HttpUtil.HTTP_PROPERTY_BODY;
 import static org.anystub.http.HttpUtil.HTTP_PROPERTY_HEADER;
+import static org.anystub.http.HttpUtil.HTTP_PROPERTY_MASK_BODY;
 import static org.anystub.http.HttpUtil.encode;
 
 
@@ -172,16 +173,37 @@ public class StubHttpClient implements HttpClient {
 
 
     /**
-     * adds all headers to requests with URL
+     * adds all headers to a request key with URL which includes the mask
      */
     public static void addHeadersRule(String partOfUrl) {
         BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_All_HEADERS, partOfUrl);
     }
+
+    /**
+     * add the header to a request key with URL which includes the mask
+     * @param header
+     * @param partOfUrl
+     */
     public static void addHeaderRule(String header, String partOfUrl) {
         BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_HEADER, header, partOfUrl);
     }
+
+    /**
+     * adds a request body to a request key with URL which includes the mask
+     * @param partOfURL
+     */
     public static void addBodyRule(String partOfURL) {
         BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY, partOfURL);
+    }
+
+    /**
+     * sets the rule to replace unwanted text in body
+     * * works only for text data. if the body recognized as binary it skips any replacement
+     * @param partOfURL
+     * @param regex
+     */
+    public static void addBodyMaskRule(String partOfURL, String regex) {
+        BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_MASK_BODY, partOfURL, regex);
 
     }
 }
