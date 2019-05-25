@@ -120,8 +120,9 @@ public class StubDataSource implements DataSource {
         return new StubDataSource(ds);
     }
 
-    public void setStubResultSetMode(boolean stubResultSetMode) {
+    public StubDataSource setStubResultSetMode(boolean stubResultSetMode) {
         isStubResultSetMode = stubResultSetMode;
+        return this;
     }
 
     public boolean isStubResultSetMode() {

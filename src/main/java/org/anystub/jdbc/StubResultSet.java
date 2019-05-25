@@ -47,9 +47,7 @@ public class StubResultSet implements ResultSet {
     public StubResultSet(StubConnection stubConnection, String[] statementId, Supplier<ResultSet, SQLException> resultSetSQLExceptionSupplier) throws SQLException {
         this.stubConnection = stubConnection;
         this.statementId = statementId;
-        stubConnection.add(() -> {
-            realResultSet = resultSetSQLExceptionSupplier.get();
-        });
+        stubConnection.add(() -> realResultSet = resultSetSQLExceptionSupplier.get());
     }
 
 
@@ -866,13 +864,7 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestB(new Supplier<Boolean, SQLException>() {
-                              @Override
-                              public Boolean get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().absolute(i);
-                              }
-                          },
+                .requestB(supplier(() ->getRealResultSet().absolute(i)),
                         callKey("absolute", i));
     }
 
@@ -881,13 +873,7 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestB(new Supplier<Boolean, SQLException>() {
-                              @Override
-                              public Boolean get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().relative(i);
-                              }
-                          },
+                .requestB(supplier(() -> getRealResultSet().relative(i)),
                         callKey("relative", i));
     }
 
@@ -896,21 +882,13 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestB(new Supplier<Boolean, SQLException>() {
-                              @Override
-                              public Boolean get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().previous();
-                              }
-                          },
+                .requestB(supplier(() -> getRealResultSet().previous()),
                         callKey("previous"));
     }
 
     @Override
     public void setFetchDirection(int i) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().setFetchDirection(i);
-        });
+        stubConnection.add(() -> getRealResultSet().setFetchDirection(i));
     }
 
     @Override
@@ -918,21 +896,14 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestI(new Supplier<Integer, SQLException>() {
-                              @Override
-                              public Integer get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().getFetchDirection();
-                              }
-                          },
+                .requestI(supplier(() -> getRealResultSet().getFetchDirection()),
                         callKey("getFetchDirection"));
     }
 
     @Override
     public void setFetchSize(int i) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().setFetchSize(i);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().setFetchSize(i));
     }
 
     @Override
@@ -940,13 +911,7 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestI(new Supplier<Integer, SQLException>() {
-                              @Override
-                              public Integer get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().getFetchSize();
-                              }
-                          },
+                .requestI(supplier(() -> getRealResultSet().getFetchSize()),
                         callKey("getFetchSize"));
     }
 
@@ -955,13 +920,7 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestI(new Supplier<Integer, SQLException>() {
-                              @Override
-                              public Integer get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().getType();
-                              }
-                          },
+                .requestI(supplier(() -> getRealResultSet().getType()),
                         callKey("getType"));
     }
 
@@ -970,13 +929,7 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestI(new Supplier<Integer, SQLException>() {
-                              @Override
-                              public Integer get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().getConcurrency();
-                              }
-                          },
+                .requestI(supplier(() -> getRealResultSet().getConcurrency()),
                         callKey("getConcurrency"));
     }
 
@@ -985,13 +938,7 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestB(new Supplier<Boolean, SQLException>() {
-                              @Override
-                              public Boolean get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().rowUpdated();
-                              }
-                          },
+                .requestB(supplier(() -> getRealResultSet().rowUpdated()),
                         callKey("rowUpdated"));
     }
 
@@ -1000,13 +947,7 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestB(new Supplier<Boolean, SQLException>() {
-                              @Override
-                              public Boolean get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().rowInserted();
-                              }
-                          },
+                .requestB(supplier(() -> getRealResultSet().rowInserted()),
                         callKey("rowInserted"));
     }
 
@@ -1015,329 +956,245 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestB(new Supplier<Boolean, SQLException>() {
-                              @Override
-                              public Boolean get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().rowDeleted();
-                              }
-                          },
+                .requestB(supplier(() -> getRealResultSet().rowDeleted()),
                         callKey("rowDeleted"));
     }
 
+
     @Override
     public void updateNull(int i) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNull(i);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNull(i));
     }
 
     @Override
     public void updateBoolean(int i, boolean b) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBoolean(i, b);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBoolean(i, b));
     }
 
     @Override
     public void updateByte(int i, byte b) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateByte(i, b);
-        });
+        stubConnection.add(() -> getRealResultSet().updateByte(i, b));
     }
 
     @Override
     public void updateShort(int i, short i1) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateShort(i, i1);
-        });
+        stubConnection.add(() -> getRealResultSet().updateShort(i, i1));
     }
 
     @Override
     public void updateInt(int i, int i1) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateInt(i, i1);
-        });
+        stubConnection.add(() -> getRealResultSet().updateInt(i, i1));
     }
 
     @Override
     public void updateLong(int i, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateLong(i, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateLong(i, l));
     }
 
     @Override
     public void updateFloat(int i, float v) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateFloat(i, v);
-        });
+        stubConnection.add(() -> getRealResultSet().updateFloat(i, v));
     }
 
     @Override
     public void updateDouble(int i, double v) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateDouble(i, v);
-        });
+        stubConnection.add(() -> getRealResultSet().updateDouble(i, v));
     }
 
     @Override
     public void updateBigDecimal(int i, BigDecimal bigDecimal) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBigDecimal(i, bigDecimal);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBigDecimal(i, bigDecimal));
     }
 
     @Override
     public void updateString(int i, String s) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateString(i, s);
-        });
+        stubConnection.add(() -> getRealResultSet().updateString(i, s));
     }
 
     @Override
     public void updateBytes(int i, byte[] bytes) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBytes(i, bytes);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBytes(i, bytes));
     }
 
     @Override
     public void updateDate(int i, Date date) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateDate(i, date);
-        });
+        stubConnection.add(() -> getRealResultSet().updateDate(i, date));
     }
 
     @Override
     public void updateTime(int i, Time time) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateTime(i, time);
-        });
+        stubConnection.add(() -> getRealResultSet().updateTime(i, time));
     }
 
     @Override
     public void updateTimestamp(int i, Timestamp timestamp) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateTimestamp(i, timestamp);
-        });
+        stubConnection.add(() -> getRealResultSet().updateTimestamp(i, timestamp));
     }
 
     @Override
     public void updateAsciiStream(int i, InputStream inputStream, int i1) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateAsciiStream(i, inputStream, i1);
-        });
+        stubConnection.add(() -> getRealResultSet().updateAsciiStream(i, inputStream, i1));
     }
 
     @Override
     public void updateBinaryStream(int i, InputStream inputStream, int i1) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBinaryStream(i, inputStream, i1);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBinaryStream(i, inputStream, i1));
     }
 
     @Override
     public void updateCharacterStream(int i, Reader reader, int i1) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateCharacterStream(i, reader, i1);
-        });
+        stubConnection.add(() -> getRealResultSet().updateCharacterStream(i, reader, i1));
     }
 
     @Override
     public void updateObject(int i, Object o, int i1) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateObject(i, o, i1);
-        });
+        stubConnection.add(() -> getRealResultSet().updateObject(i, o, i1));
     }
 
     @Override
     public void updateObject(int i, Object o) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateObject(i, o);
-        });
+        stubConnection.add(() -> getRealResultSet().updateObject(i, o));
     }
 
     @Override
     public void updateNull(String s) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNull(s);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateNull(s));
     }
 
     @Override
     public void updateBoolean(String s, boolean b) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBoolean(s, b);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateBoolean(s, b));
     }
 
     @Override
     public void updateByte(String s, byte b) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateByte(s, b);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateByte(s, b));
     }
 
     @Override
     public void updateShort(String s, short i) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateShort(s, i);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateShort(s, i));
     }
 
     @Override
     public void updateInt(String s, int i) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateInt(s, i);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateInt(s, i));
     }
 
     @Override
     public void updateLong(String s, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateLong(s, l);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateLong(s, l));
     }
 
     @Override
     public void updateFloat(String s, float v) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateFloat(s, v);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateFloat(s, v));
     }
 
     @Override
     public void updateDouble(String s, double v) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateDouble(s, v);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateDouble(s, v));
     }
 
     @Override
     public void updateBigDecimal(String s, BigDecimal bigDecimal) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBigDecimal(s, bigDecimal);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateBigDecimal(s, bigDecimal));
     }
 
     @Override
     public void updateString(String s, String s1) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateString(s, s1);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateString(s, s1));
     }
 
     @Override
     public void updateBytes(String s, byte[] bytes) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBytes(s, bytes);
-        });
+        stubConnection.add(() ->
+                getRealResultSet().updateBytes(s, bytes));
     }
 
     @Override
     public void updateDate(String s, Date date) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateDate(s, date);
-        });
+        stubConnection.add(() -> getRealResultSet().updateDate(s, date));
     }
 
     @Override
     public void updateTime(String s, Time time) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateTime(s, time);
-        });
+        stubConnection.add(() -> getRealResultSet().updateTime(s, time));
     }
 
     @Override
     public void updateTimestamp(String s, Timestamp timestamp) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateTimestamp(s, timestamp);
-        });
+        stubConnection.add(() -> getRealResultSet().updateTimestamp(s, timestamp));
     }
 
     @Override
     public void updateAsciiStream(String s, InputStream inputStream, int i) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateAsciiStream(s, inputStream, i);
-        });
+        stubConnection.add(() -> getRealResultSet().updateAsciiStream(s, inputStream, i));
     }
 
     @Override
     public void updateBinaryStream(String s, InputStream inputStream, int i) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBinaryStream(s, inputStream, i);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBinaryStream(s, inputStream, i));
     }
 
     @Override
     public void updateCharacterStream(String s, Reader reader, int i) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateCharacterStream(s, reader, i);
-        });
+        stubConnection.add(() -> getRealResultSet().updateCharacterStream(s, reader, i));
     }
 
     @Override
     public void updateObject(String s, Object o, int i) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateObject(s, o, i);
-        });
+        stubConnection.add(() -> getRealResultSet().updateObject(s, o, i));
     }
 
     @Override
     public void updateObject(String s, Object o) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateObject(s, o);
-        });
+        stubConnection.add(() -> getRealResultSet().updateObject(s, o));
     }
 
     @Override
     public void insertRow() throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().insertRow();
-        });
+        stubConnection.add(() -> getRealResultSet().insertRow());
     }
 
     @Override
     public void updateRow() throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateRow();
-        });
+        stubConnection.add(() -> getRealResultSet().updateRow());
     }
 
     @Override
     public void deleteRow() throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().deleteRow();
-        });
+        stubConnection.add(() -> getRealResultSet().deleteRow());
     }
 
     @Override
     public void refreshRow() throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().refreshRow();
-        });
+        stubConnection.add(() -> getRealResultSet().refreshRow());
     }
 
     @Override
     public void cancelRowUpdates() throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().cancelRowUpdates();
-        });
+        stubConnection.add(() -> getRealResultSet().cancelRowUpdates());
     }
 
     @Override
     public void moveToInsertRow() throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().moveToInsertRow();
-        });
+        stubConnection.add(() -> getRealResultSet().moveToInsertRow());
     }
 
     @Override
     public void moveToCurrentRow() throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().moveToCurrentRow();
-        });
+        stubConnection.add(() -> getRealResultSet().moveToCurrentRow());
     }
 
     @Override
@@ -1614,58 +1471,42 @@ public class StubResultSet implements ResultSet {
 
     @Override
     public void updateRef(int i, Ref ref) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateRef(i, ref);
-        });
+        stubConnection.add(() -> getRealResultSet().updateRef(i, ref));
     }
 
     @Override
     public void updateRef(String s, Ref ref) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateRef(s, ref);
-        });
+        stubConnection.add(() -> getRealResultSet().updateRef(s, ref));
     }
 
     @Override
     public void updateBlob(int i, Blob blob) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBlob(i, blob);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBlob(i, blob));
     }
 
     @Override
     public void updateBlob(String s, Blob blob) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBlob(s, blob);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBlob(s, blob));
     }
 
     @Override
     public void updateClob(int i, Clob clob) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateClob(i, clob);
-        });
+        stubConnection.add(() -> getRealResultSet().updateClob(i, clob));
     }
 
     @Override
     public void updateClob(String s, Clob clob) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateClob(s, clob);
-        });
+        stubConnection.add(() -> getRealResultSet().updateClob(s, clob));
     }
 
     @Override
     public void updateArray(int i, Array array) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateArray(i, array);
-        });
+        stubConnection.add(() -> getRealResultSet().updateArray(i, array));
     }
 
     @Override
     public void updateArray(String s, Array array) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateArray(s, array);
-        });
+        stubConnection.add(() -> getRealResultSet().updateArray(s, array));
     }
 
     @Override
@@ -1704,16 +1545,12 @@ public class StubResultSet implements ResultSet {
 
     @Override
     public void updateRowId(int i, RowId rowId) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateRowId(i, rowId);
-        });
+        stubConnection.add(() -> getRealResultSet().updateRowId(i, rowId));
     }
 
     @Override
     public void updateRowId(String s, RowId rowId) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateRowId(s, rowId);
-        });
+        stubConnection.add(() -> getRealResultSet().updateRowId(s, rowId));
     }
 
     @Override
@@ -1748,30 +1585,22 @@ public class StubResultSet implements ResultSet {
 
     @Override
     public void updateNString(int i, String s) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNString(i, s);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNString(i, s));
     }
 
     @Override
     public void updateNString(String s, String s1) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNString(s, s1);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNString(s, s1));
     }
 
     @Override
     public void updateNClob(int i, NClob nClob) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNClob(i, nClob);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNClob(i, nClob));
     }
 
     @Override
     public void updateNClob(String s, NClob nClob) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNClob(s, nClob);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNClob(s, nClob));
     }
 
     @Override
@@ -1844,16 +1673,12 @@ public class StubResultSet implements ResultSet {
 
     @Override
     public void updateSQLXML(int i, SQLXML sqlxml) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateSQLXML(i, sqlxml);
-        });
+        stubConnection.add(() -> getRealResultSet().updateSQLXML(i, sqlxml));
     }
 
     @Override
     public void updateSQLXML(String s, SQLXML sqlxml) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateSQLXML(s, sqlxml);
-        });
+        stubConnection.add(() -> getRealResultSet().updateSQLXML(s, sqlxml));
     }
 
     @Override
@@ -1896,198 +1721,142 @@ public class StubResultSet implements ResultSet {
 
     @Override
     public void updateNCharacterStream(int i, Reader reader, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNCharacterStream(i, reader, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNCharacterStream(i, reader, l));
     }
 
     @Override
     public void updateNCharacterStream(String s, Reader reader, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNCharacterStream(s, reader, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNCharacterStream(s, reader, l));
     }
 
     @Override
     public void updateAsciiStream(int i, InputStream inputStream, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateAsciiStream(i, inputStream, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateAsciiStream(i, inputStream, l));
     }
 
     @Override
     public void updateBinaryStream(int i, InputStream inputStream, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBinaryStream(i, inputStream, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBinaryStream(i, inputStream, l));
     }
 
     @Override
     public void updateCharacterStream(int i, Reader reader, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateCharacterStream(i, reader, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateCharacterStream(i, reader, l));
     }
 
     @Override
     public void updateAsciiStream(String s, InputStream inputStream, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateAsciiStream(s, inputStream, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateAsciiStream(s, inputStream, l));
     }
 
     @Override
     public void updateBinaryStream(String s, InputStream inputStream, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBinaryStream(s, inputStream, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBinaryStream(s, inputStream, l));
     }
 
     @Override
     public void updateCharacterStream(String s, Reader reader, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateCharacterStream(s, reader, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateCharacterStream(s, reader, l));
     }
 
     @Override
     public void updateBlob(int i, InputStream inputStream, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBlob(i, inputStream, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBlob(i, inputStream, l));
     }
 
     @Override
     public void updateBlob(String s, InputStream inputStream, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBlob(s, inputStream, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBlob(s, inputStream, l));
     }
 
     @Override
     public void updateClob(int i, Reader reader, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateClob(i, reader, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateClob(i, reader, l));
     }
 
     @Override
     public void updateClob(String s, Reader reader, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateClob(s, reader, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateClob(s, reader, l));
     }
 
     @Override
     public void updateNClob(int i, Reader reader, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateClob(i, reader, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateClob(i, reader, l));
     }
 
     @Override
     public void updateNClob(String s, Reader reader, long l) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNClob(s, reader, l);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNClob(s, reader, l));
     }
 
     @Override
     public void updateNCharacterStream(int i, Reader reader) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNCharacterStream(i, reader);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNCharacterStream(i, reader));
     }
 
     @Override
     public void updateNCharacterStream(String s, Reader reader) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNCharacterStream(s, reader);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNCharacterStream(s, reader));
     }
 
     @Override
     public void updateAsciiStream(int i, InputStream inputStream) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateAsciiStream(i, inputStream);
-        });
+        stubConnection.add(() -> getRealResultSet().updateAsciiStream(i, inputStream));
     }
 
     @Override
     public void updateBinaryStream(int i, InputStream inputStream) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBinaryStream(i, inputStream);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBinaryStream(i, inputStream));
     }
 
     @Override
     public void updateCharacterStream(int i, Reader reader) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateCharacterStream(i, reader);
-        });
+        stubConnection.add(() -> getRealResultSet().updateCharacterStream(i, reader));
     }
 
     @Override
     public void updateAsciiStream(String s, InputStream inputStream) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateAsciiStream(s, inputStream);
-        });
+        stubConnection.add(() -> getRealResultSet().updateAsciiStream(s, inputStream));
     }
 
     @Override
     public void updateBinaryStream(String s, InputStream inputStream) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBinaryStream(s, inputStream);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBinaryStream(s, inputStream));
     }
 
     @Override
     public void updateCharacterStream(String s, Reader reader) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateCharacterStream(s, reader);
-        });
+        stubConnection.add(() -> getRealResultSet().updateCharacterStream(s, reader));
     }
 
     @Override
     public void updateBlob(int i, InputStream inputStream) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBlob(i, inputStream);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBlob(i, inputStream));
     }
 
     @Override
     public void updateBlob(String s, InputStream inputStream) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateBlob(s, inputStream);
-        });
+        stubConnection.add(() -> getRealResultSet().updateBlob(s, inputStream));
     }
 
     @Override
     public void updateClob(int i, Reader reader) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateClob(i, reader);
-        });
+        stubConnection.add(() -> getRealResultSet().updateClob(i, reader));
     }
 
     @Override
     public void updateClob(String s, Reader reader) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateClob(s, reader);
-        });
+        stubConnection.add(() -> getRealResultSet().updateClob(s, reader));
     }
 
     @Override
     public void updateNClob(int i, Reader reader) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNClob(i, reader);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNClob(i, reader));
     }
 
     @Override
     public void updateNClob(String s, Reader reader) throws SQLException {
-        stubConnection.add(() -> {
-            getRealResultSet().updateNClob(s, reader);
-        });
+        stubConnection.add(() -> getRealResultSet().updateNClob(s, reader));
     }
 
     @Override
@@ -2110,13 +1879,7 @@ public class StubResultSet implements ResultSet {
         return stubConnection
                 .getStubDataSource()
                 .getBase()
-                .requestB(new Supplier<Boolean, SQLException>() {
-                              @Override
-                              public Boolean get() throws SQLException {
-                                  stubConnection.runSql();
-                                  return getRealResultSet().isWrapperFor(aClass);
-                              }
-                          },
+                .requestB(supplier(() -> getRealResultSet().isWrapperFor(aClass)),
                         callKey("isWrapperFor", aClass.getCanonicalName()));
     }
 
@@ -2137,6 +1900,14 @@ public class StubResultSet implements ResultSet {
                 .collect(Collectors.toList()));
 
         return stubConnection.callKey(callKey.toArray(new String[0]));
+    }
+
+
+    private <T> Supplier<T, SQLException> supplier(Supplier<T, SQLException> s) {
+        return () -> {
+            stubConnection.runSql();
+            return s.get();
+        };
     }
 
 }
