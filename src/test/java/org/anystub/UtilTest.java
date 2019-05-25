@@ -18,6 +18,7 @@ public class UtilTest {
         assertTrue(isText("\n\n\n"));
         assertTrue(isText("123\n123"));
         assertTrue(isText("123\n\n\n\n123"));
+        assertFalse(isText("123" + (char) 0x01 + "\n\n\n\n123"));
     }
 
 
@@ -41,7 +42,7 @@ public class UtilTest {
         s = Util.toCharacterString("BASE".getBytes());
         assertEquals("TEXT BASE", s);
         s = Util.toCharacterString(("thisistextline" + (char) 0x03).getBytes());
-        assertTrue( s.startsWith("BASE64 "));
+        assertTrue(s.startsWith("BASE64 "));
     }
 
     @Test
