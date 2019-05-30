@@ -2,7 +2,10 @@ package org.anystub;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -296,7 +299,7 @@ public class Document {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("[");
-        stringBuilder.append(stream(keys).collect(Collectors.joining(", ")));
+        stringBuilder.append(String.join(", ", keys));
         stringBuilder.append("]");
         return stringBuilder.toString();
     }

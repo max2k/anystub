@@ -410,7 +410,7 @@ public class Base {
         }
         KeysSupplier keyGenCashed = new KeysSupplierCashed(keyGen);
 
-        log.finest(() -> String.format("request executing: %s", Arrays.stream(keyGenCashed.get()).collect(Collectors.joining(","))));
+        log.finest(() -> String.format("request executing: %s", String.join(",", keyGenCashed.get())));
 
         if (isNew()) {
             init();
