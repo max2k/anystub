@@ -11,17 +11,24 @@ public class AnyStubFileLocator {
      * looks for runtime data about current stub file in the call point.
      * If you call it in some functions it tracks stackTrace up to the first method or class annotated
      * with @AnystubId and extracts its parameters
+     *
      * @return runtime data, if no annotation found returns null
      */
     public static AnyStubId discoverFile() {
         String filename = null;
         AnyStubId id = null;
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        for (StackTraceElement s : stackTrace) {
+        for (StackTraceElement s : stackTrace)
             try {
                 Class<?> aClass = Class.forName(s.getClassName());
-                Method method = aClass.getMethod(s.getMethodName());
-                id = method.getAnnotation(AnyStubId.class);
+
+                try {
+                    Method method;
+                    method = aClass.getMethod(s.getMethodName());
+                    id = method.getAnnotation(AnyStubId.class);
+                } catch (NoSuchMethodException ignored) {
+                    id = null;
+                }
 
                 if (id != null) {
                     filename = id.filename().isEmpty() ?
@@ -37,16 +44,15 @@ public class AnyStubFileLocator {
                         break;
                     }
                 }
-            } catch (ClassNotFoundException | NoSuchMethodException ignored) {
+            } catch (ClassNotFoundException ignored) {
                 // it's acceptable that some class/method is not found
                 // need to investigate when that happens
             }
-        }
         if (id == null) {
             return null;
         }
         if (!filename.endsWith(".yml")) {
-            filename+=".yml";
+            filename += ".yml";
         }
 
         return new AnyStubIdData(filename,
@@ -56,6 +62,7 @@ public class AnyStubFileLocator {
     /**
      * looks for runtime data about current stub file in the call point with discoverFile().
      * if the runtime data found update the filename with given suffix
+     *
      * @param stubSuffix suffix to be added to stub's filename
      * @return runtime data with filename added suffix, null if no metadata found
      */
