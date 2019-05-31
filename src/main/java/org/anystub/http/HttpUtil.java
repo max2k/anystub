@@ -38,7 +38,7 @@ public class HttpUtil {
 
     private static final Logger LOGGER = Logger.getLogger(HttpUtil.class.getName());
     public static final String HTTP_PROPERTY = "http";
-    public static final String HTTP_PROPERTY_All_HEADERS = "allHeader";
+    public static final String HTTP_PROPERTY_ALL_HEADERS = "allHeader";
     public static final String HTTP_PROPERTY_HEADER = "header";
     public static final String HTTP_PROPERTY_BODY = "body";
     public static final String HTTP_PROPERTY_MASK_BODY = "maskBody";
@@ -205,7 +205,7 @@ public class HttpUtil {
         Arrays.sort(allHeaders, Comparator.comparing(NameValuePair::getName));
 
         boolean matchAll = BaseManagerImpl.getStub()
-                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_All_HEADERS)
+                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_ALL_HEADERS)
                 .anyMatch(d -> fullUrl.contains(d.get()));
 
         if (matchAll) {

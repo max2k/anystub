@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import static org.anystub.http.HttpUtil.HTTP_PROPERTY;
-import static org.anystub.http.HttpUtil.HTTP_PROPERTY_All_HEADERS;
+import static org.anystub.http.HttpUtil.HTTP_PROPERTY_ALL_HEADERS;
 import static org.anystub.http.HttpUtil.HTTP_PROPERTY_BODY;
 import static org.anystub.http.HttpUtil.HTTP_PROPERTY_HEADER;
 import static org.anystub.http.HttpUtil.HTTP_PROPERTY_MASK_BODY;
@@ -176,7 +176,7 @@ public class StubHttpClient implements HttpClient {
      * adds all headers to a request key with URL which includes the mask
      */
     public static void addHeadersRule(String partOfUrl) {
-        BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_All_HEADERS, partOfUrl);
+        BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_ALL_HEADERS, partOfUrl);
     }
 
     /**
