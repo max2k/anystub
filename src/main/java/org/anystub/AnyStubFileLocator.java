@@ -18,7 +18,7 @@ public class AnyStubFileLocator {
         String filename = null;
         AnyStubId id = null;
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        for (StackTraceElement s : stackTrace)
+        for (StackTraceElement s : stackTrace) {
             try {
                 Class<?> aClass = Class.forName(s.getClassName());
 
@@ -48,6 +48,7 @@ public class AnyStubFileLocator {
                 // it's acceptable that some class/method is not found
                 // need to investigate when that happens
             }
+        }
         if (id == null) {
             return null;
         }
