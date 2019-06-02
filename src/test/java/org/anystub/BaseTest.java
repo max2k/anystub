@@ -439,14 +439,14 @@ public class BaseTest {
 
         Document xxx;
         List<Document> test;
-        xxx = stub.getProperty("xxx").findFirst().get();
+        xxx = stub.getProperties("xxx").findFirst().get();
         assertEquals("2", xxx.getVals().iterator().next());
-        test = stub.getProperty("test", "1").collect(Collectors.toList());
+        test = stub.getProperties("test", "1").collect(Collectors.toList());
         assertEquals(2, test.size());
         assertEquals("a", test.get(0).getVals().iterator().next());
         assertEquals("b", test.get(1).getVals().iterator().next());
 
-        test = stub.getProperty("test", "1", "X").collect(Collectors.toList());
+        test = stub.getProperties("test", "1", "X").collect(Collectors.toList());
         assertTrue(test.isEmpty());
 
     }

@@ -49,7 +49,7 @@ public class Base {
     private final String filePath;
     private boolean isNew = true;
     private RequestMode requestMode = rmNew;
-    private List<Document> properties = new ArrayList<>();
+    private final PropertyContainer propertyContainer = new PropertyContainer();
 
     public Base() {
         filePath = BaseManagerImpl.getFilePath();
@@ -136,18 +136,13 @@ public class Base {
 
     /**
      * Creates and keeps a new Document in cache.
-     * treat keysAndValue[0..count-1] as keys of new Document, the last element as the value of the Document
+     * treats to keysAndValue[0..count-1] as keys of new Document, the last element as the value of the Document
      *
      * @param keysAndValue keys for request2
      * @return new Document
      */
     public Document put(String... keysAndValue) {
-        return put(documentFromArray(keysAndValue));
-    }
-
-    public static Document documentFromArray(String... keysAndValue) {
-        return new Document(Arrays.copyOf(keysAndValue, keysAndValue.length - 1))
-                .setValues(keysAndValue[keysAndValue.length - 1]);
+        return put(Document.fromArray(keysAndValue));
     }
 
     /**
@@ -458,15 +453,19 @@ public class Base {
         }
 
         // keep values
-        Document retrievedDocument = new Document(keyGenCashed.get());
+        Document retrievedDocument ;//= new Document(keyGenCashed.get());
 
         Iterable<String> responseData;
         if (res == null) {
             responseData = null;
-            retrievedDocument.setNull();
+            retrievedDocument = new Document(keyGenCashed.get(), new String[]{null});
         } else {
             responseData = encoder.encode(res);
-            retrievedDocument.setValues(responseData);
+            ArrayList<String> values = new ArrayList<>();
+            for (String responseDatum : responseData) {
+                values.add(responseDatum);
+            }
+            retrievedDocument = new Document(keyGenCashed.get(), values.toArray(new String[0]));
         }
         put(retrievedDocument);
         requestHistory.add(retrievedDocument);
@@ -718,18 +717,11 @@ public class Base {
         return requestMode == rmTrack && documentListTrackIterator != null;
     }
 
-    public Stream<Document> getProperty(String... keys) {
-        return properties
-                .stream()
-                .filter(x -> x.match_to(keys));
-
+    public Stream<Document> getProperties(String... keys) {
+        return propertyContainer.getProperty(keys);
     }
 
-    /**
-     * adds property as a document,
-     * @param property
-     */
     public void addProperty(String... property) {
-        this.properties.add(documentFromArray(property));
+        propertyContainer.addProperty(property);
     }
 }

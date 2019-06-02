@@ -3,12 +3,12 @@ package org.anystub;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
@@ -18,11 +18,11 @@ import static java.util.Arrays.stream;
  */
 public class Document {
 
-    private static Logger logger = Logger.getLogger(Document.class.getName());
+    private static final Logger logger = Logger.getLogger(Document.class.getName());
     private final List<String> keys = new ArrayList<>();
     private final List<String> exception = new ArrayList<>();
     private final List<String> values = new ArrayList<>();
-    private boolean nullValue = false;
+//    private boolean nullValue = false;
 
     public Document() {
         // just an explicit declaration. to be consistent
@@ -45,57 +45,43 @@ public class Document {
         this.assign(document);
     }
 
+    public Document(String[] keys, String[] values) {
+        this.keys.addAll(asList(keys));
+        this.values.addAll(asList(values));
+    }
+
+    /**
+     * Creates new Document.
+     * * treats to keysAndValue[0..count-1] as keys of new Document, the last element as the value of the Document
+     *
+     * @param keysAndValue
+     * @return
+     */
+    public static Document fromArray(String... keysAndValue) {
+        return new Document(Arrays.copyOf(keysAndValue, keysAndValue.length - 1), Arrays.copyOfRange(keysAndValue, keysAndValue.length - 1, keysAndValue.length));
+    }
+
     /**
      * for internal use
      *
      * @return description of Exception
      */
-    public List<String> getException() {
+    public Iterable<String> getException() {
         return exception;
     }
 
-    /**
-     * for internal use
-     *
-     * @param exception exception's description. the description consist of
-     *                  one or two elements, the 1st is type of the exception,
-     *                  the 2nd is message of the exception
-     */
-    public void setException(List<String> exception) {
-        this.exception.clear();
-        this.exception.addAll(exception);
-    }
-
-    public Document setValues(String... values) {
-        nullValue = false;
-        this.values.clear();
-        stream(values)
-                .forEach(this.values::add);
-
-        return this;
-    }
-
-    public Document setValues(Iterable<String> values) {
-        nullValue = false;
-        this.values.clear();
-        values
-                .forEach(this.values::add);
-
-        return this;
-    }
-
-    public Document setNull() {
-        nullValue = true;
+    private Document setNull() {
         this.values.clear();
         return this;
     }
 
     public boolean isNullValue() {
-        return nullValue;
+        return this.values.isEmpty()  && this.exception.isEmpty();
     }
 
     /**
      * returns the first value from value array
+     *
      * @return
      */
     public String get() {
@@ -104,7 +90,7 @@ public class Document {
 
     public <E extends Throwable> Iterable<String> getVals() throws E {
         if (exception.isEmpty()) {
-            if (nullValue) {
+            if (isNullValue()) {
                 return null;
             }
             return values;
@@ -202,7 +188,7 @@ public class Document {
      * @return true if document is matched
      */
     public boolean matchEx_to(String[] keys, String[] values) {
-        if (this.nullValue) {
+        if (isNullValue()) {
             return values == null;
         }
 
@@ -228,16 +214,18 @@ public class Document {
             fail(keys);
         }
     }
+
     public void assertEx_to(String... keys) {
         if (!matchEx_to(keys)) {
             fail(keys);
         }
     }
+
     public void assertEx_to(String[] keys, String[] values) {
-        if (!matchEx_to(keys,values)) {
-            if(!matchEx_to(keys)){
+        if (!matchEx_to(keys, values)) {
+            if (!matchEx_to(keys)) {
                 fail(keys);
-            }else {
+            } else {
                 fail_value(values);
             }
         }
@@ -282,7 +270,7 @@ public class Document {
     }
 
     public String key_to_string() {
-        if (nullValue) {
+        if (isNullValue()) {
             return "null";
         }
         return key_to_string(keys.toArray(new String[0]));
@@ -324,7 +312,8 @@ public class Document {
     }
 
     /**
-     * return an array of strings
+     * returns an array of strings
+     * if keys is null or an empty array return an empty array
      *
      * @param keys values of array
      * @return array of string
@@ -335,6 +324,14 @@ public class Document {
         }
         return keys;
     }
+
+    /**
+     * @return a single element array with the element null
+     */
+    public static String[] arsNull() {
+        return new String[]{null};
+    }
+
 
     /**
      * return array of string
@@ -370,7 +367,7 @@ public class Document {
             res.put("keys", keys);
         }
 
-        if (nullValue) {
+        if (isNullValue()) {
             res.put("values", null);
         } else if (values.size() == 1 && values.get(0) != null) {
             res.put("values", values.get(0));
