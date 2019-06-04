@@ -156,4 +156,9 @@ public class DocumentTest {
         assertTrue(document.keyEqual_to("11", "22"));
 
     }
+
+    @Test
+    public void isNullValueTest() {
+        assertTrue(new Document("1","2").isNullValue());
+    }
 }
