@@ -1,6 +1,5 @@
 package org.anystub;
 
-import org.anystub.mgmt.BaseManagerImpl;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -51,38 +50,20 @@ public class Base {
     private RequestMode requestMode = rmNew;
     private final PropertyContainer propertyContainer = new PropertyContainer();
 
-    public Base() {
-        filePath = BaseManagerImpl.getFilePath();
-        BaseManagerImpl.instance().register(this);
-
-    }
-
     /**
-     * if filename holds only filename (without path) then creates file in src/test/resources/anystub/
-     * examples:
-     * * new Base("./stub.yml") uses file in current dir
-     * * new Base("stub.yml") uses src/test/resources/anystub/stub.yml
+     * creates stub by specific path.
+     * in your test you do not need to create it directly. Use org.anystub.mgmt.BaseManagerFactory.getStub()
+     * to get stub related to your context
+     *
      * <p>
-     * Note: Consider using {@link BaseManagerImpl} instead
+     * Note: Consider using  instead
      *
-     * @param filename used file name
+     * @param path the path to stub file if filename holds only filename (without path) then creates file in src/test/resources/anystub/
+     * examples: new Base("./stub.yml") uses/creates file in current/work dir, new Base("stub.yml") uses/creates src/test/resources/anystub/stub.yml;
      */
-    public Base(String filename) {
-        this.filePath = BaseManagerImpl.getFilePath(filename);
-        BaseManagerImpl.instance().register(this);
+    public Base(String path) {
+        this.filePath = path;
     }
-
-    /**
-     * Note: Consider using {@link BaseManagerImpl} instead
-     *
-     * @param path     dir
-     * @param filename file
-     */
-    public Base(String path, String filename) {
-        this.filePath = BaseManagerImpl.getFilePath(path, filename);
-        BaseManagerImpl.instance().register(this);
-    }
-
 
     /**
      * set constrains for using cache and getting access a source system

@@ -12,41 +12,48 @@ import java.util.function.Supplier;
 
 public class BaseManagerImpl implements BaseManager {
     private static BaseManagerImpl baseManager = new BaseManagerImpl();
-    private final List<Base> list = new ArrayList<>();
+    private List<Base> list = new ArrayList<>();
+    public static final String defaultStubPath = new File("src/test/resources/anystub/stub.yml").getPath();
+    public static final String defaultPath = new File("src/test/resources/anystub").getPath();
 
     public static BaseManagerImpl instance() {
         return baseManager;
     }
 
-    private BaseManagerImpl() {
+    protected BaseManagerImpl() {
 
     }
 
-
+    /**
+     * returns default stub
+     *
+     * @return
+     */
     public Base getBase() {
-        return getBase(getFilePath());
+        return getBase(defaultStubPath);
     }
 
+    /**
+     * returns stub with specific path
+     *
+     * @param filename
+     * @return
+     */
     public Base getBase(String filename) {
 
         String fullPath = filename == null || filename.isEmpty() ?
-                getFilePath() :
+                defaultStubPath :
                 getFilePath(filename);
 
         return get(fullPath).orElseGet(new Supplier<Base>() {
             @Override
             public Base get() {
-                return new Base(fullPath);
+                Base base = new Base(fullPath);
+                stubInitialization(base);
+                list.add(base);
+                return base;
             }
         });
-    }
-
-    public void register(Base base) {
-        if (get(base.getFilePath()).isPresent()) {
-            throw new StubFileAlreadyCreatedException("Stub is already used. Consider to use BaseManager.getBase(name)", base.getFilePath());
-        }
-        list.add(base);
-
     }
 
     private Optional<Base> get(String fullFileName) {
@@ -56,42 +63,37 @@ public class BaseManagerImpl implements BaseManager {
                 .findFirst();
     }
 
-    public static String getFilePath() {
-        return new File("src/test/resources/anystub/stub.yml").getPath();
-    }
-
+    /**
+     * returns path for default stub
+     *
+     * @return
+     */
     public static String getFilePath(String filename) {
         File file = new File(filename);
         if (file.getParentFile() == null || file.getParent().isEmpty()) {
-            return new File("src/test/resources/anystub").getPath() + File.separator + file.getPath();
+            return defaultPath + File.separator + file.getPath();
         }
         return file.getPath();
     }
 
-    public static String getFilePath(String path, String filename) {
-        return new File(path).getPath() + File.separator + new File(filename).getPath();
-    }
-
-    public static Base getStub(String filename) {
-        return instance()
-                .getBase(filename);
-    }
 
     /**
      * returns stub for current test
+     *
      * @return stub for current test
      */
-    public static Base getStub() {
+    public Base getStub() {
         AnyStubId s = AnyStubFileLocator.discoverFile();
         if (s != null) {
-            return BaseManagerImpl
-                    .instance()
-                    .getBase(s.filename())
+            return getBase(s.filename())
                     .constrain(s.requestMode());
         }
 
-        return BaseManagerImpl
-                .instance()
-                .getBase();
+        return getBase();
     }
+
+    protected void stubInitialization(Base newStub) {
+
+    }
+
 }

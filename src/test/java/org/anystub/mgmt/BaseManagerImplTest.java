@@ -14,20 +14,12 @@ public class BaseManagerImplTest {
 
         BaseManagerImpl.instance().getBase("test.yml");
 
-        boolean expectedError;
-        try {
-            new Base("test.yml");
-            expectedError = false;
-        } catch (StubFileAlreadyCreatedException e) {
-            expectedError = true;
-        }
 
-        assertTrue(expectedError);
         BaseManagerImpl.instance().getBase("test.yml");
         BaseManagerImpl.instance().getBase("test.yml");
         BaseManagerImpl.instance().getBase("test1.yml");
 
-        new Base("test2.yml");
+        new Base( "test2.yml");
         BaseManagerImpl.instance().getBase("test2.yml");
 
     }

@@ -5,7 +5,7 @@ import org.anystub.AnyStubFileLocator;
 import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.Supplier;
-import org.anystub.mgmt.BaseManagerImpl;
+import org.anystub.mgmt.BaseManagerFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -35,7 +35,7 @@ public class StubHttpClient implements HttpClient {
 
     private static final Logger LOGGER = Logger.getLogger(StubHttpClient.class.getName());
 
-    private Base base=null;
+    private Base base = null;
     private final HttpClient httpClient;
 
     public StubHttpClient(HttpClient httpClient) {
@@ -140,20 +140,19 @@ public class StubHttpClient implements HttpClient {
     }
 
 
-
     private Base getBase() {
         AnyStubId s = AnyStubFileLocator.discoverFile();
         if (s != null) {
-            return BaseManagerImpl
-                    .instance()
+            return BaseManagerFactory
+                    .getBaseManager()
                     .getBase(s.filename())
                     .constrain(s.requestMode());
         }
         if (base != null) {
             return base;
         }
-        return BaseManagerImpl
-                .instance()
+        return BaseManagerFactory
+                .getBaseManager()
                 .getBase();
     }
 
@@ -164,6 +163,7 @@ public class StubHttpClient implements HttpClient {
 
     /**
      * wraps httpClient with a stub
+     *
      * @param httpClient
      * @return
      */
@@ -173,37 +173,85 @@ public class StubHttpClient implements HttpClient {
 
 
     /**
-     * adds all headers to a request key with URL which includes the mask
+     * sets property in current stub to add all headers to request keys with URL which includes the mask
      */
     public static void addHeadersRule(String partOfUrl) {
-        BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_ALL_HEADERS, partOfUrl);
+        addHeadersRule(getStub(), partOfUrl);
+    }
+
+    private static Base getStub() {
+        return BaseManagerFactory.getBaseManager().getStub();
     }
 
     /**
-     * add the header to a request key with URL which includes the mask
+     * sets property in given stub
+     *
+     * @param stub
+     * @param partOfUrl
+     */
+    public static void addHeadersRule(Base stub, String partOfUrl) {
+        stub.addProperty(HTTP_PROPERTY, HTTP_PROPERTY_ALL_HEADERS, partOfUrl);
+    }
+
+    /**
+     * sets property in current stub to add the header to request keys with URL which includes the mask
+     *
      * @param header
      * @param partOfUrl
      */
     public static void addHeaderRule(String header, String partOfUrl) {
-        BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_HEADER, header, partOfUrl);
+        addHeaderRule(getStub(), header, partOfUrl);
     }
 
     /**
-     * adds a request body to a request key with URL which includes the mask
+     * sets property in given stub
+     *
+     * @param stub
+     * @param header
+     * @param partOfUrl
+     */
+    public static void addHeaderRule(Base stub, String header, String partOfUrl) {
+        stub.addProperty(HTTP_PROPERTY, HTTP_PROPERTY_HEADER, header, partOfUrl);
+    }
+
+    /**
+     * sets property in current stub to add a request body to a request key with URL which includes the mask
+     *
      * @param partOfURL
      */
     public static void addBodyRule(String partOfURL) {
-        BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY, partOfURL);
+        addBodyRule(getStub(), partOfURL);
+    }
+
+    /**
+     * sets property in given stub
+     *
+     * @param stub
+     * @param partOfURL
+     */
+    public static void addBodyRule(Base stub, String partOfURL) {
+        stub.addProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY, partOfURL);
     }
 
     /**
      * sets the rule to replace unwanted text in body
      * * works only for text data. if the body recognized as binary it skips any replacement
+     *
      * @param partOfURL
      * @param regex
      */
     public static void addBodyMaskRule(String partOfURL, String regex) {
-        BaseManagerImpl.getStub().addProperty(HTTP_PROPERTY, HTTP_PROPERTY_MASK_BODY, partOfURL, regex);
+        addBodyMaskRule(getStub(), partOfURL, regex);
+    }
 
+    /**
+     * sets property in given stub
+     *
+     * @param stub
+     * @param partOfURL
+     * @param regex
+     */
+    public static void addBodyMaskRule(Base stub, String partOfURL, String regex) {
+        stub.addProperty(HTTP_PROPERTY, HTTP_PROPERTY_MASK_BODY, partOfURL, regex);
     }
 }

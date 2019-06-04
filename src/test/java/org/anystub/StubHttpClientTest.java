@@ -1,7 +1,7 @@
 package org.anystub;
 
 import org.anystub.http.StubHttpClient;
-import org.anystub.mgmt.BaseManagerImpl;
+import org.anystub.mgmt.BaseManagerFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.anystub.mgmt.BaseManagerImpl.getStub;
 import static org.junit.Assert.assertEquals;
 
 public class StubHttpClientTest {
@@ -50,7 +49,7 @@ public class StubHttpClientTest {
     @Test
     public void executeResponseHandlerTest() throws IOException {
 
-        Base base = BaseManagerImpl.instance().getBase("httpStub-static.yml")
+        Base base = BaseManagerFactory.getBaseManager().getBase("httpStub-static.yml")
                 .constrain(RequestMode.rmNone);
         base.clear();
 
@@ -81,8 +80,8 @@ public class StubHttpClientTest {
 
 
         assertEquals(405, response);
-        assertEquals(1, getStub().times());
-        assertEquals(1, getStub().times(null,null,null,"{\"a\":1}"));
+        assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times());
+        assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times(null, null, null, "{\"a\":1}"));
 
     }
 

@@ -3,7 +3,7 @@ package org.anystub.jdbc;
 import org.anystub.AnyStubFileLocator;
 import org.anystub.AnyStubId;
 import org.anystub.Base;
-import org.anystub.mgmt.BaseManagerImpl;
+import org.anystub.mgmt.BaseManagerFactory;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -18,7 +18,7 @@ public class StubDataSource implements DataSource {
     private final DataSource realDataSource;
     private Base base = null;
     private String stubSuffix = null;
-    private boolean isStubResultSetMode =false;
+    private boolean isStubResultSetMode = false;
 
     public StubDataSource(DataSource realDataSource) {
         this.realDataSource = realDataSource;
@@ -79,21 +79,22 @@ public class StubDataSource implements DataSource {
 
     /**
      * returns the most appropriate stub file correspondent to current position related to the datasource
+     *
      * @return stub file
      */
     public Base getBase() {
 
         AnyStubId s = AnyStubFileLocator.discoverFile(stubSuffix);
         if (s != null) {
-            return BaseManagerImpl
-                    .instance()
+            return BaseManagerFactory
+                    .getBaseManager()
                     .getBase(s.filename())
                     .constrain(s.requestMode());
         }
         if (base != null) {
             return base;
         }
-        return BaseManagerImpl.instance().getBase();
+        return BaseManagerFactory.getBaseManager().getBase();
 
     }
 
@@ -113,6 +114,7 @@ public class StubDataSource implements DataSource {
 
     /**
      * wraps datasource with a stub
+     *
      * @param ds real DataSource
      * @return stubbed DataSource
      */

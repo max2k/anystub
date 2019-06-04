@@ -1,7 +1,7 @@
 package org.anystub.http;
 
 import org.anystub.Util;
-import org.anystub.mgmt.BaseManagerImpl;
+import org.anystub.mgmt.BaseManagerFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -38,7 +38,7 @@ public class HttpUtil {
 
     private static final Logger LOGGER = Logger.getLogger(HttpUtil.class.getName());
     public static final String HTTP_PROPERTY = "http";
-    public static final String HTTP_PROPERTY_ALL_HEADERS = "allHeader";
+    public static final String HTTP_PROPERTY_ALL_HEADERS = "allHeaders";
     public static final String HTTP_PROPERTY_HEADER = "header";
     public static final String HTTP_PROPERTY_BODY = "body";
     public static final String HTTP_PROPERTY_MASK_BODY = "maskBody";
@@ -180,14 +180,15 @@ public class HttpUtil {
 
         if (matchBodyRule(fullUrl)) {
             byte[] bytes = extractEntity(httpRequest);
-            if (Util.isText(bytes)) {
-                String bodyText = maskBody(fullUrl, new String(bytes, StandardCharsets.UTF_8));
-                strings.add(escapeCharacterString(bodyText));
-
-            } else {
-                // omit changes fot binary data
-                // TODO: implement search substring for binary data
-                strings.add(Util.toCharacterString(bytes));
+            if (bytes != null) {
+                if (Util.isText(bytes)) {
+                    String bodyText = maskBody(fullUrl, new String(bytes, StandardCharsets.UTF_8));
+                    strings.add(escapeCharacterString(bodyText));
+                } else {
+                    // omit changes fot binary data
+                    // TODO: implement search substring for binary data
+                    strings.add(Util.toCharacterString(bytes));
+                }
             }
         }
 
@@ -204,19 +205,19 @@ public class HttpUtil {
         Header[] allHeaders = httpRequest.getAllHeaders();
         Arrays.sort(allHeaders, Comparator.comparing(NameValuePair::getName));
 
-        boolean matchAll = BaseManagerImpl.getStub()
-                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_ALL_HEADERS)
+        boolean matchAllHeaders = BaseManagerFactory.getBaseManager().getStub()
+                .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_ALL_HEADERS)
                 .anyMatch(d -> fullUrl.contains(d.get()));
 
-        if (matchAll) {
+        if (matchAllHeaders) {
             for (Header h : allHeaders) {
                 strings.add(headerToString(h));
             }
             return strings;
         }
 
-        Set<String> headersToAdd = BaseManagerImpl.getStub()
-                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_HEADER)
+        Set<String> headersToAdd = BaseManagerFactory.getBaseManager().getStub()
+                .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_HEADER)
                 .filter(d -> fullUrl.contains(d.get()))
                 .map(d -> d.getKey(2))
                 .collect(Collectors.toSet());
@@ -233,14 +234,14 @@ public class HttpUtil {
     }
 
     private static boolean matchBodyRule(String url) {
-        return BaseManagerImpl.getStub()
-                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_BODY)
+        return BaseManagerFactory.getBaseManager().getStub()
+                .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_BODY)
                 .anyMatch(d -> url.contains(d.get()));
     }
 
     private static String maskBody(String url, String s) {
-        return BaseManagerImpl.getStub()
-                .getProperty(HTTP_PROPERTY, HTTP_PROPERTY_MASK_BODY)
+        return BaseManagerFactory.getBaseManager().getStub()
+                .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_MASK_BODY)
                 .filter(d -> url.contains(d.getKey(2)))
                 .map(d -> s.replaceAll(d.get(), "..."))
                 .findFirst()
