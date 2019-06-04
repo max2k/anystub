@@ -92,11 +92,10 @@ public class Base {
                 default:
                     break;
             }
-        } else {
-            if (this.requestMode != requestMode) {
-                log.warning(() -> String.format("Stub constrains change after creation for %s. Consider to split stub-files", filePath));
-            }
+        } else if (this.requestMode != requestMode) {
+            log.warning(() -> String.format("Stub constrains change after creation for %s. Consider to split stub-files", filePath));
             this.requestMode = requestMode;
+
         }
         return this;
     }
