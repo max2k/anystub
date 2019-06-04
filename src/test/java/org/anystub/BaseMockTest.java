@@ -1,7 +1,6 @@
 package org.anystub;
 
-import org.anystub.mgmt.BaseManagerImpl;
-import org.junit.Ignore;
+import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -21,7 +20,7 @@ public class BaseMockTest {
         MockSupplier upstream = mock(MockSupplier.class);
 
 
-        Base base = BaseManagerImpl.instance()
+        Base base = BaseManagerFactory.getBaseManager()
                 .getBase("passthrough.yml")
                 .constrain(RequestMode.rmPassThrough);
 

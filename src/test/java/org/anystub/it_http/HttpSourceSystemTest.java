@@ -12,13 +12,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-
 import static org.anystub.http.StubHttpClient.addBodyMaskRule;
 import static org.anystub.http.StubHttpClient.addBodyRule;
 import static org.anystub.http.StubHttpClient.addHeaderRule;
 import static org.anystub.http.StubHttpClient.addHeadersRule;
-import static org.anystub.mgmt.BaseManagerImpl.getStub;
+import static org.anystub.mgmt.BaseManagerFactory.getStub;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

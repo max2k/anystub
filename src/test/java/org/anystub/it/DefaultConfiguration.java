@@ -3,7 +3,7 @@ package org.anystub.it;
 import org.anystub.Base;
 import org.anystub.http.StubHttpClient;
 import org.anystub.jdbc.StubDataSource;
-import org.anystub.mgmt.BaseManagerImpl;
+import org.anystub.mgmt.BaseManagerFactory;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.h2.jdbcx.JdbcDataSource;
@@ -29,7 +29,9 @@ public class DefaultConfiguration {
 
     @Bean
     Base base() {
-        return BaseManagerImpl.instance().getBase();
+        return BaseManagerFactory
+                .getBaseManager()
+                .getBase();
     }
 
     @Bean

@@ -1,7 +1,7 @@
 package org.anystub.it;
 
 import org.anystub.Base;
-import org.anystub.mgmt.BaseManagerImpl;
+import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import static org.junit.Assert.assertEquals;
 
 /**
+ *
  */
 public class WorkerEasyTest {
 
@@ -18,7 +19,7 @@ public class WorkerEasyTest {
 
     @Before
     public void createStub() {
-        Base base = BaseManagerImpl.instance().getBase("WorkerEasyTest.yml");
+        Base base = BaseManagerFactory.getBaseManager().getBase("WorkerEasyTest.yml");
         sourceSystem = new SourceSystem("http://localhost:8080") {
             @Override
             public String get() throws IOException {

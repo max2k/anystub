@@ -4,7 +4,7 @@ import org.anystub.Base;
 import org.anystub.Decoder;
 import org.anystub.Encoder;
 import org.anystub.KeysSupplier;
-import org.anystub.mgmt.BaseManagerImpl;
+import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ public class StubStatementTest {
         StubConnection connection = mock(StubConnection.class);
         StubDataSource dataSource = mock(StubDataSource.class);
         when(connection.getStubDataSource()).thenReturn(dataSource);
-        Base base = spy(BaseManagerImpl.instance().getBase("executeQueryTest.yml"));
+        Base base = spy(BaseManagerFactory.getBaseManager().getBase("executeQueryTest.yml"));
         when(dataSource.getBase()).thenReturn(base);
 
         StubStatement stubStatement = spy(new StubStatement(connection));

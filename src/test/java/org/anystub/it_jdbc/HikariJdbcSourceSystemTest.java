@@ -6,7 +6,7 @@ import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.RequestMode;
 import org.anystub.jdbc.StubDataSource;
-import org.anystub.mgmt.BaseManagerImpl;
+import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static org.anystub.mgmt.BaseManagerImpl.getStub;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -31,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 @AnyStubId
 public class HikariJdbcSourceSystemTest {
     private final static Logger log = Logger.getLogger("test");
+    
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -89,7 +89,9 @@ public class HikariJdbcSourceSystemTest {
         jdbcTemplate.execute("DROP TABLE testcasename IF EXISTS");
         jdbcTemplate.execute("DROP TABLE testcasename IF EXISTS");
 
-        assertEquals(3, getStub("testCaseNameTest-hikariTest.yml").times());
+        assertEquals(3, BaseManagerFactory
+                .getBaseManager()
+                .getBase("testCaseNameTest-hikariTest.yml").times());
         assertTrue("no exceptions expected", true);
     }
 
@@ -99,7 +101,9 @@ public class HikariJdbcSourceSystemTest {
         @Bean
         DataSource dataSource() {
 
-            Base base = BaseManagerImpl.instance().getBase("jdbcStub-hk.yml");
+            Base base = BaseManagerFactory
+                    .getBaseManager()
+                    .getBase("jdbcStub-hk.yml");
 
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:h2:./test4;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");

@@ -1,6 +1,5 @@
 package org.anystub;
 
-import org.anystub.mgmt.BaseManagerImpl;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -49,40 +48,22 @@ public class Base {
     private final String filePath;
     private boolean isNew = true;
     private RequestMode requestMode = rmNew;
-    private List<Document> properties = new ArrayList<>();
-
-    public Base() {
-        filePath = BaseManagerImpl.getFilePath();
-        BaseManagerImpl.instance().register(this);
-
-    }
+    private final PropertyContainer propertyContainer = new PropertyContainer();
 
     /**
-     * if filename holds only filename (without path) then creates file in src/test/resources/anystub/
-     * examples:
-     * * new Base("./stub.yml") uses file in current dir
-     * * new Base("stub.yml") uses src/test/resources/anystub/stub.yml
+     * creates stub by specific path.
+     * in your test you do not need to create it directly. Use org.anystub.mgmt.BaseManagerFactory.getStub()
+     * to get stub related to your context
+     *
      * <p>
-     * Note: Consider using {@link BaseManagerImpl} instead
+     * Note: Consider using  instead
      *
-     * @param filename used file name
+     * @param path the path to stub file if filename holds only filename (without path) then creates file in src/test/resources/anystub/
+     * examples: new Base("./stub.yml") uses/creates file in current/work dir, new Base("stub.yml") uses/creates src/test/resources/anystub/stub.yml;
      */
-    public Base(String filename) {
-        this.filePath = BaseManagerImpl.getFilePath(filename);
-        BaseManagerImpl.instance().register(this);
+    public Base(String path) {
+        this.filePath = path;
     }
-
-    /**
-     * Note: Consider using {@link BaseManagerImpl} instead
-     *
-     * @param path     dir
-     * @param filename file
-     */
-    public Base(String path, String filename) {
-        this.filePath = BaseManagerImpl.getFilePath(path, filename);
-        BaseManagerImpl.instance().register(this);
-    }
-
 
     /**
      * set constrains for using cache and getting access a source system
@@ -136,18 +117,13 @@ public class Base {
 
     /**
      * Creates and keeps a new Document in cache.
-     * treat keysAndValue[0..count-1] as keys of new Document, the last element as the value of the Document
+     * treats to keysAndValue[0..count-1] as keys of new Document, the last element as the value of the Document
      *
      * @param keysAndValue keys for request2
      * @return new Document
      */
     public Document put(String... keysAndValue) {
-        return put(documentFromArray(keysAndValue));
-    }
-
-    public static Document documentFromArray(String... keysAndValue) {
-        return new Document(Arrays.copyOf(keysAndValue, keysAndValue.length - 1))
-                .setValues(keysAndValue[keysAndValue.length - 1]);
+        return put(Document.fromArray(keysAndValue));
     }
 
     /**
@@ -410,7 +386,7 @@ public class Base {
         }
         KeysSupplier keyGenCashed = new KeysSupplierCashed(keyGen);
 
-        log.finest(() -> String.format("request executing: %s", Arrays.stream(keyGenCashed.get()).collect(Collectors.joining(","))));
+        log.finest(() -> String.format("request executing: %s", String.join(",", keyGenCashed.get())));
 
         if (isNew()) {
             init();
@@ -458,15 +434,19 @@ public class Base {
         }
 
         // keep values
-        Document retrievedDocument = new Document(keyGenCashed.get());
+        Document retrievedDocument ;//= new Document(keyGenCashed.get());
 
         Iterable<String> responseData;
         if (res == null) {
             responseData = null;
-            retrievedDocument.setNull();
+            retrievedDocument = new Document(keyGenCashed.get(), new String[]{null});
         } else {
             responseData = encoder.encode(res);
-            retrievedDocument.setValues(responseData);
+            ArrayList<String> values = new ArrayList<>();
+            for (String responseDatum : responseData) {
+                values.add(responseDatum);
+            }
+            retrievedDocument = new Document(keyGenCashed.get(), values.toArray(new String[0]));
         }
         put(retrievedDocument);
         requestHistory.add(retrievedDocument);
@@ -718,18 +698,11 @@ public class Base {
         return requestMode == rmTrack && documentListTrackIterator != null;
     }
 
-    public Stream<Document> getProperty(String... keys) {
-        return properties
-                .stream()
-                .filter(x -> x.match_to(keys));
-
+    public Stream<Document> getProperties(String... keys) {
+        return propertyContainer.getProperty(keys);
     }
 
-    /**
-     * adds property as a document,
-     * @param property
-     */
     public void addProperty(String... property) {
-        this.properties.add(documentFromArray(property));
+        propertyContainer.addProperty(property);
     }
 }
