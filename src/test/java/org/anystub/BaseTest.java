@@ -23,6 +23,7 @@ import static org.anystub.Document.ars;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -371,6 +372,14 @@ public class BaseTest {
         assertNull(emptyResult);
 
         assertNull(base.request("nullKey"));
+
+        String[] singleItemArray = base.requestArray(() -> new String[]{null},
+                "nullArray");
+
+        assertNotNull(singleItemArray);
+        assertEquals(1, singleItemArray.length);
+        assertNull(singleItemArray[0]);
+
     }
 
     @Test

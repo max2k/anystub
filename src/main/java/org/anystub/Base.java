@@ -439,7 +439,7 @@ public class Base {
         Iterable<String> responseData;
         if (res == null) {
             responseData = null;
-            retrievedDocument = new Document(keyGenCashed.get(), new String[]{null});
+            retrievedDocument = new Document(keyGenCashed.get());
         } else {
             responseData = encoder.encode(res);
             ArrayList<String> values = new ArrayList<>();
@@ -541,7 +541,7 @@ public class Base {
 
     /**
      * clears buffer, set isNew to true
-     * doesn't touch appropriate file (a note: just remove a file you need to remove manually)
+     * doesn't touch appropriate file (a note: just remove a file manually if you do not need the data anymore)
      * doesn't clean properties
      */
     public void clear() {
