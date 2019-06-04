@@ -24,22 +24,19 @@ public class BaseManagerFactoryTest {
     @AnyStubId
     public void customBaseManager() {
 
-        BaseManagerFactory.setDefaultStubInitializer(base -> StubHttpClient.addHeadersRule(base, "http"));
-
-
         ResponseEntity<String> forEntity;
 
         forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api/random", String.class);
         assertEquals(200, forEntity.getStatusCodeValue());
         assertEquals(1, getStub().times());
-        assertTrue(getStub().match().findFirst().get().getKey(2).startsWith("Accept:"));
+        assertEquals(1, getStub().timesEx(null, null, "https.*"));
 
-        BaseManagerFactory.setDefaultStubInitializer(null);
+        BaseManagerFactory.setDefaultStubInitializer(base -> StubHttpClient.addHeadersRule(base, "http"));
 
         forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api/random", String.class);
         assertEquals(200, forEntity.getStatusCodeValue());
         assertEquals(1, getStub().times());
-        assertEquals(1, getStub().timesEx(null, null, "https.*"));
+        assertTrue(getStub().match().findFirst().get().getKey(2).startsWith("Accept:"));
 
         BaseManagerFactory.setDefaultStubInitializer(base -> {});
 
@@ -47,6 +44,13 @@ public class BaseManagerFactoryTest {
         assertEquals(200, forEntity.getStatusCodeValue());
         assertEquals(1, getStub().times());
         assertEquals(1, getStub().timesEx(null, null, "https.*"));
+
+        BaseManagerFactory.setDefaultStubInitializer(null);
+
+        forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api/random", String.class);
+        assertEquals(200, forEntity.getStatusCodeValue());
+        assertEquals(2, getStub().times());
+        assertEquals(2, getStub().timesEx(null, null, "https.*"));
 
     }
 }
