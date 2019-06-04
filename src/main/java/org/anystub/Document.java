@@ -22,12 +22,15 @@ public class Document {
     private final List<String> keys = new ArrayList<>();
     private final List<String> exception = new ArrayList<>();
     private final List<String> values = new ArrayList<>();
-//    private boolean nullValue = false;
 
     public Document() {
-        // just an explicit declaration. to be consistent
+        // an explicit declaration. to be consistent
     }
 
+    /**
+     * creates a Document with nullValue
+     * @param keys
+     */
     public Document(String... keys) {
         this.keys.addAll(asList(keys));
 
@@ -45,6 +48,11 @@ public class Document {
         this.assign(document);
     }
 
+    /**
+     *
+     * @param keys
+     * @param values if values == null the Document
+     */
     public Document(String[] keys, String[] values) {
         this.keys.addAll(asList(keys));
         this.values.addAll(asList(values));
