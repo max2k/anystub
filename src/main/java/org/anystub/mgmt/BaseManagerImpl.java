@@ -13,8 +13,8 @@ import java.util.function.Supplier;
 public class BaseManagerImpl implements BaseManager {
     private static BaseManagerImpl baseManager = new BaseManagerImpl();
     private List<Base> list = new ArrayList<>();
-    public static final String defaultStubPath = new File("src/test/resources/anystub/stub.yml").getPath();
-    public static final String defaultPath = new File("src/test/resources/anystub").getPath();
+    public static final String DEFAULT_STUB_PATH = new File("src/test/resources/anystub/stub.yml").getPath();
+    public static final String DEFAULT_PATH = new File("src/test/resources/anystub").getPath();
 
     public static BaseManagerImpl instance() {
         return baseManager;
@@ -30,7 +30,7 @@ public class BaseManagerImpl implements BaseManager {
      * @return
      */
     public Base getBase() {
-        return getBase(defaultStubPath);
+        return getBase(DEFAULT_STUB_PATH);
     }
 
     /**
@@ -42,7 +42,7 @@ public class BaseManagerImpl implements BaseManager {
     public Base getBase(String filename) {
 
         String fullPath = filename == null || filename.isEmpty() ?
-                defaultStubPath :
+                DEFAULT_STUB_PATH :
                 getFilePath(filename);
 
         return get(fullPath).orElseGet(new Supplier<Base>() {
@@ -71,7 +71,7 @@ public class BaseManagerImpl implements BaseManager {
     public static String getFilePath(String filename) {
         File file = new File(filename);
         if (file.getParentFile() == null || file.getParent().isEmpty()) {
-            return defaultPath + File.separator + file.getPath();
+            return DEFAULT_PATH + File.separator + file.getPath();
         }
         return file.getPath();
     }
@@ -93,7 +93,7 @@ public class BaseManagerImpl implements BaseManager {
     }
 
     protected void stubInitialization(Base newStub) {
-
+        // default initializator does nothing
     }
 
 }

@@ -4,8 +4,11 @@ import org.anystub.Base;
 
 import java.util.function.Consumer;
 
-final public class BaseManagerFactory {
+public final class BaseManagerFactory {
     private static BaseManager baseManager = null;
+
+    private BaseManagerFactory() {
+    }
 
     public static BaseManager getBaseManager() {
         if (baseManager == null) {
@@ -19,8 +22,10 @@ final public class BaseManagerFactory {
     }
 
     /**
-     * sets default stub initializer
-     * you can use it to define default properties for all stubs
+     * sets default stub initializer.
+     * You can use it to define default properties for all stubs.
+     * When you define new initializer new BaseManager is created. hence all stubs switch to new state (with no history).
+     * To recover default initializer pass null. It will recover all stubs with their statuses and call history
      *
      * @param initializer
      */

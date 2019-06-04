@@ -168,7 +168,7 @@ public class HttpUtil {
         strings.add(httpRequest.getRequestLine().getProtocolVersion().toString());
 
         String fullUrl =
-                ((Function<String, String>) o -> {
+                ((Function<String, String>) (String o) -> {
                     if (httpHost != null && !o.contains(httpHost.toString())) {
                         return httpHost.toString() + o;
                     }

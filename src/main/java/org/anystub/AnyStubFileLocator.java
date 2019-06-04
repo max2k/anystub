@@ -22,13 +22,7 @@ public class AnyStubFileLocator {
             try {
                 Class<?> aClass = Class.forName(s.getClassName());
 
-                try {
-                    Method method;
-                    method = aClass.getMethod(s.getMethodName());
-                    id = method.getAnnotation(AnyStubId.class);
-                } catch (NoSuchMethodException ignored) {
-                    id = null;
-                }
+                id = methodInfo(s, aClass);
 
                 if (id != null) {
                     filename = id.filename().isEmpty() ?
@@ -58,6 +52,18 @@ public class AnyStubFileLocator {
 
         return new AnyStubIdData(filename,
                 id.requestMode());
+    }
+
+    private static AnyStubId methodInfo(StackTraceElement s, Class<?> aClass) {
+        AnyStubId id;
+        try {
+            Method method;
+            method = aClass.getMethod(s.getMethodName());
+            id = method.getAnnotation(AnyStubId.class);
+        } catch (NoSuchMethodException ignored) {
+            id = null;
+        }
+        return id;
     }
 
     /**

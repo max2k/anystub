@@ -59,7 +59,7 @@ public class Base {
      * Note: Consider using  instead
      *
      * @param path the path to stub file if filename holds only filename (without path) then creates file in src/test/resources/anystub/
-     * examples: new Base("./stub.yml") uses/creates file in current/work dir, new Base("stub.yml") uses/creates src/test/resources/anystub/stub.yml;
+     *             examples: new Base("./stub.yml") uses/creates file in current/work dir, new Base("stub.yml") uses/creates src/test/resources/anystub/stub.yml;
      */
     public Base(String path) {
         this.filePath = path;
@@ -432,8 +432,8 @@ public class Base {
             throw ex;
         }
 
-        // keep values
-        Document retrievedDocument ;//= new Document(keyGenCashed.get());
+        // store values
+        Document retrievedDocument;
 
         Iterable<String> responseData;
         if (res == null) {
