@@ -2,6 +2,6 @@ request0:
   exception: []
   keys: [POST, HTTP/1.1, 'https://gturnquist-quoters.cfapps.io:443/api/randomX', '{"a":1}']
   values: [HTTP/1.1, '405', Method Not Allowed, 'Allow: GET', 'Content-Type: application/json;charset=UTF-8',
-    'Date: Tue, 14 May 2019 22:09:49 GMT', 'X-Vcap-Request-Id: 5e4f3254-45e2-40a3-684b-05aece2123fa',
-    'Content-Length: 156', 'Connection: keep-alive', '{"timestamp":"2019-05-14T22:09:49.602+0000","status":405,"error":"Method
+    'Date: Thu, 28 Nov 2019 23:44:41 GMT', 'X-Vcap-Request-Id: cc39fe72-ce8a-4015-44ee-b1f68105ee9b',
+    'Content-Length: 156', 'Connection: keep-alive', '{"timestamp":"2019-11-28T23:44:41.958+0000","status":405,"error":"Method
       Not Allowed","message":"Request method ''POST'' not supported","path":"/api/randomX"}']
