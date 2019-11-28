@@ -8,10 +8,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 
@@ -82,6 +85,28 @@ public class StubHttpClientTest {
         assertEquals(405, response);
         assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times());
         assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times(null, null, null, "{\"a\":1}"));
+
+    }
+
+    @Test
+    @AnyStubId
+    public void executePostTextTest() throws IOException {
+        StubHttpClient.addBodyRule("randomX");
+
+        HttpClient real = HttpClients.createDefault();
+        StubHttpClient result = new StubHttpClient(real);
+
+        HttpPost httpUriRequest = new HttpPost("https://gturnquist-quoters.cfapps.io:443/api/randomX-text");
+        httpUriRequest.setHeader("Content-Type", "application/json; charset=UTF-8");
+        StringEntity stringEntity = new StringEntity("some text", StandardCharsets.UTF_8);
+        httpUriRequest.setEntity(stringEntity);
+        int response = result.execute(httpUriRequest,
+                httpResponse -> httpResponse.getStatusLine().getStatusCode());
+
+
+        assertEquals(405, response);
+        assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times());
+        assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times(null, null, null, "some text"));
 
     }
 
