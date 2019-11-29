@@ -11,8 +11,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.HttpEntityWrapper;
+import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.message.BasicHttpResponse;
 
 import java.io.ByteArrayInputStream;
@@ -93,8 +92,16 @@ public class HttpUtil {
             strings.add(headerToString(h));
         }
 
-        extractEntity(httpResponse.getEntity())
-                .ifPresent(strings::add);
+        if(httpResponse.getEntity() != null) {
+            try {
+                BufferedHttpEntity bufferedHttpEntity = new BufferedHttpEntity(httpResponse.getEntity());
+                httpResponse.setEntity(bufferedHttpEntity);
+                extractEntity(bufferedHttpEntity)
+                        .ifPresent(strings::add);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "buffering the entity failed", e);
+            }
+        }
 
         return strings;
     }
@@ -104,7 +111,13 @@ public class HttpUtil {
 
         if (httpRequest instanceof HttpEntityEnclosingRequest) {
             HttpEntityEnclosingRequest request = (HttpEntityEnclosingRequest) httpRequest;
-            return extractEntityData(request.getEntity());
+            try {
+                BufferedHttpEntity bufferedHttpEntity = new BufferedHttpEntity(request.getEntity());
+                request.setEntity(bufferedHttpEntity);
+                return extractEntityData(bufferedHttpEntity);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "buffering the entity failed", e);
+            }
         }
         return null;
     }
@@ -136,18 +149,15 @@ public class HttpUtil {
 
                 basicHttpEntity.setContent(inputStream);
 
-
-            } else if (entity instanceof ByteArrayEntity) {
+            } else if (!entity.isStreaming()){
+                // put to cover:1. entity instanceof StringEntity
+                // comes from https://github.com/OpenFeign/feign
+                // when Content-Type: application/json; charset=UTF-8
+                // 2. entity instanceof ByteArrayEntity
                 // comes from org.springframework.web.client.RestTemplate
-                ByteArrayEntity byteArrayEntity = (ByteArrayEntity) entity;
+                // 3. HttpEntityWrapper
                 try (ByteArrayOutputStream byteArray = new ByteArrayOutputStream()) {
-                    byteArrayEntity.writeTo(byteArray);
-                    bytes = byteArray.toByteArray();
-                }
-            } else if (entity instanceof HttpEntityWrapper) {
-                HttpEntityWrapper entityWrapper = (HttpEntityWrapper) entity;
-                try (ByteArrayOutputStream byteArray = new ByteArrayOutputStream()) {
-                    entityWrapper.writeTo(byteArray);
+                    entity.writeTo(byteArray);
                     bytes = byteArray.toByteArray();
                 }
             } else {
