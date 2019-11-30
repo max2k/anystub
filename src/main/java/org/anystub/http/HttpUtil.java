@@ -31,15 +31,26 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
+import static java.util.Arrays.stream;
 import static org.anystub.Util.escapeCharacterString;
 
 public class HttpUtil {
 
     private static final Logger LOGGER = Logger.getLogger(HttpUtil.class.getName());
+
+    /**
+     * to set properties for http tabs
+     * will work if AnySettingsHttp didn't set
+     */
+    @Deprecated
     public static final String HTTP_PROPERTY = "http";
+    @Deprecated
     public static final String HTTP_PROPERTY_ALL_HEADERS = "allHeaders";
+    @Deprecated
     public static final String HTTP_PROPERTY_HEADER = "header";
+    @Deprecated
     public static final String HTTP_PROPERTY_BODY = "body";
+    @Deprecated
     public static final String HTTP_PROPERTY_MASK_BODY = "maskBody";
 
     private HttpUtil() {
@@ -92,7 +103,7 @@ public class HttpUtil {
             strings.add(headerToString(h));
         }
 
-        if(httpResponse.getEntity() != null) {
+        if (httpResponse.getEntity() != null) {
             try {
                 BufferedHttpEntity bufferedHttpEntity = new BufferedHttpEntity(httpResponse.getEntity());
                 httpResponse.setEntity(bufferedHttpEntity);
@@ -149,7 +160,7 @@ public class HttpUtil {
 
                 basicHttpEntity.setContent(inputStream);
 
-            } else if (!entity.isStreaming()){
+            } else if (!entity.isStreaming()) {
                 // put to cover:1. entity instanceof StringEntity
                 // comes from https://github.com/OpenFeign/feign
                 // when Content-Type: application/json; charset=UTF-8
@@ -210,12 +221,39 @@ public class HttpUtil {
     }
 
     public static List<String> encodeHeaders(HttpRequest httpRequest, String fullUrl) {
-        ArrayList<String> strings = new ArrayList<>();
+        AnySettingsHttp settings = AnySettingsHttpExtractor.discoverSettings();
+
+        if (settings == null) {
+            return encodeHeadersByProps(httpRequest, fullUrl);
+        }
 
         Header[] allHeaders = httpRequest.getAllHeaders();
         Arrays.sort(allHeaders, Comparator.comparing(NameValuePair::getName));
 
-        boolean matchAllHeaders = BaseManagerFactory.getBaseManager().getStub()
+
+        if (settings.allHeaders()) {
+            return stream(allHeaders)
+                    .map(HttpUtil::headerToString)
+                    .collect(Collectors.toList());
+        }
+
+        Set<String> headersToAdd = stream(settings.headers())
+                .collect(Collectors.toSet());
+
+        return stream(allHeaders)
+                .filter(header -> headersToAdd.contains(header.getName()))
+                .map(HttpUtil::headerToString)
+                .collect(Collectors.toList());
+
+    }
+
+    @Deprecated
+    private static List<String> encodeHeadersByProps(HttpRequest httpRequest, String fullUrl) {
+        ArrayList<String> strings = new ArrayList<>();
+
+        Header[] allHeaders = httpRequest.getAllHeaders();
+        Arrays.sort(allHeaders, Comparator.comparing(NameValuePair::getName));
+        boolean matchAllHeaders = matchAllHeaders = BaseManagerFactory.getBaseManager().getStub()
                 .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_ALL_HEADERS)
                 .anyMatch(d -> fullUrl.contains(d.get()));
 
@@ -244,11 +282,25 @@ public class HttpUtil {
     }
 
     private static boolean matchBodyRule(String url) {
+        AnySettingsHttp settings = AnySettingsHttpExtractor.discoverSettings();
+
+        if (settings == null) {
+            return matchBodyRuleByProps(url);
+        }
+
+        return stream(settings.bodyTrigger())
+                .anyMatch(url::contains);
+    }
+
+    @Deprecated
+    private static boolean matchBodyRuleByProps(String url) {
         return BaseManagerFactory.getBaseManager().getStub()
                 .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_BODY)
                 .anyMatch(d -> url.contains(d.get()));
     }
 
+
+    @Deprecated
     private static String maskBody(String url, String s) {
         return BaseManagerFactory.getBaseManager().getStub()
                 .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_MASK_BODY)

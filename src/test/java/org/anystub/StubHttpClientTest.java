@@ -1,5 +1,6 @@
 package org.anystub;
 
+import org.anystub.http.AnySettingsHttp;
 import org.anystub.http.StubHttpClient;
 import org.anystub.mgmt.BaseManagerFactory;
 import org.apache.http.HttpHost;
@@ -132,6 +133,64 @@ public class StubHttpClientTest {
         assertEquals(405, response);
         assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times());
         assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times(null, null, null, "very-string"));
+
+    }
+
+
+    @Test
+    @AnyStubId
+    @AnySettingsHttp(headers = {"HEADER", "HEADER3"})
+    public void executePostHttpSettingsTest() throws IOException {
+
+        HttpClient real = HttpClients.createDefault();
+        StubHttpClient result = new StubHttpClient(real);
+
+        HttpPost httpUriRequest = new HttpPost("https://gturnquist-quoters.cfapps.io:443/api/randomX-stream");
+        httpUriRequest.setHeader("Content-Type", "plain/text; charset=UTF-8");
+        httpUriRequest.setHeader("HEADER", "1");
+        httpUriRequest.setHeader("HEADER2", "2");
+        httpUriRequest.setHeader("HEADER3", "3");
+        BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
+        ByteArrayInputStream inputStream = new ByteArrayInputStream("very-string".getBytes(StandardCharsets.UTF_8));
+        basicHttpEntity.setContent(inputStream);
+        httpUriRequest.setEntity(basicHttpEntity);
+        int response = result.execute(httpUriRequest,
+                httpResponse -> httpResponse.getStatusLine().getStatusCode());
+
+
+        assertEquals(405, response);
+        assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times());
+        assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times(null, null, "HEADER: 1", "HEADER3: 3"));
+
+    }
+
+    @Test
+    @AnyStubId
+    @AnySettingsHttp(allHeaders = true, bodyTrigger = "randomX-stream")
+    public void executePostHttpSettingsBodyTest() throws IOException {
+
+        HttpClient real = HttpClients.createDefault();
+        StubHttpClient result = new StubHttpClient(real);
+
+        HttpPost httpUriRequest = new HttpPost("https://gturnquist-quoters.cfapps.io:443/api/randomX-stream");
+        httpUriRequest.setHeader("Content-Type", "plain/text; charset=UTF-8");
+        httpUriRequest.setHeader("HEADER", "1");
+        httpUriRequest.setHeader("HEADER2", "2");
+        httpUriRequest.setHeader("HEADER3", "3");
+        BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
+        ByteArrayInputStream inputStream = new ByteArrayInputStream("very-string".getBytes(StandardCharsets.UTF_8));
+        basicHttpEntity.setContent(inputStream);
+        httpUriRequest.setEntity(basicHttpEntity);
+        int response = result.execute(httpUriRequest,
+                httpResponse -> httpResponse.getStatusLine().getStatusCode());
+
+
+        assertEquals(405, response);
+        assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times());
+        assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times("POST", "HTTP/1.1",
+                "Content-Type: plain/text; charset=UTF-8", "HEADER: 1", "HEADER2: 2",
+                "HEADER3: 3", "https://gturnquist-quoters.cfapps.io:443/api/randomX-stream",
+                "very-string"));
 
     }
 

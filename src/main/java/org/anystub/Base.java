@@ -697,10 +697,23 @@ public class Base {
         return requestMode == rmTrack && documentListTrackIterator != null;
     }
 
+    /**
+     *
+     * @param keys
+     * @return
+     */
+    @Deprecated
     public Stream<Document> getProperties(String... keys) {
         return propertyContainer.getProperty(keys);
     }
 
+    /**
+     * set properties to manage key extraction from packages, see org.anystub.http.HttpUtil for details
+     * Deprecated. use @AnySettings* instead
+     *
+     * @param property
+     */
+    @Deprecated
     public void addProperty(String... property) {
         propertyContainer.addProperty(property);
     }

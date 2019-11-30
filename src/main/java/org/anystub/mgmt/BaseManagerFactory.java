@@ -29,6 +29,7 @@ public final class BaseManagerFactory {
      *
      * @param initializer
      */
+    @Deprecated
     public static void setDefaultStubInitializer(Consumer<Base> initializer) {
         if (initializer == null) {
             BaseManagerFactory.baseManager = null;
