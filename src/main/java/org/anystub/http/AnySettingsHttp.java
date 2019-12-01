@@ -10,27 +10,40 @@ import java.lang.annotation.Target;
 public @interface AnySettingsHttp {
 
     /**
+     * override global settings for headers, bodyTrigger, bodyMask
+     * ex. global settings define headers: "Context-Type" which requires to include it in every request
+     *   in local test you can suppress adding it into stub
+     * allHeaders - always overrides global, if not defined in class/method level then it is false
+     * if true - overrider global settings
+     * if false - enrich global settings
+     * @return
+     */
+    boolean overrideGlobal() default false;
+
+    /**
      * includes all headers in key
      * @return
      */
     boolean allHeaders() default false;
 
     /**
-     * includes selected headers in a key,
+     * to define headers which will be included in a request key,
      * if not empty then allHeaders ignored
      * @return
      */
     String[] headers() default {};
 
     /**
-     * defines strings which trigger inclusions request body in a key if the string is a part of url
+     * to define URLs which trigger inclusions request body in a key
      * @return
      */
     String[] bodyTrigger() default {};
 
     /**
-     * convertion for key, ex. to remove time
+     * to define regex expressions which will be replaced by elapses "..." in request body
      * @return
      */
-//    Function<String, String> keyProcessor() default null;
+    String[] bodyMask() default {};
+
+
 }

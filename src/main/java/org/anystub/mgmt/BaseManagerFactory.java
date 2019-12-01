@@ -24,13 +24,13 @@ public final class BaseManagerFactory {
     /**
      * sets default stub initializer.
      * You can use it to define default properties for all stubs.
+     *
      * When you define new initializer new BaseManager is created. hence all stubs switch to new state (with no history).
      * To recover default initializer pass null. It will recover all stubs with their statuses and call history
      *
      * @param initializer
      */
-    @Deprecated
-    public static void setDefaultStubInitializer(Consumer<Base> initializer) {
+    synchronized public static void setDefaultStubInitializer(Consumer<Base> initializer) {
         if (initializer == null) {
             BaseManagerFactory.baseManager = null;
             return;

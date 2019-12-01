@@ -71,8 +71,8 @@ public class StubHttpClientTest {
 
     @Test
     @AnyStubId
+    @AnySettingsHttp(bodyTrigger = "randomX")
     public void executePostTest() throws IOException {
-        StubHttpClient.addBodyRule("randomX");
 
         HttpClient real = HttpClients.createDefault();
         StubHttpClient result = new StubHttpClient(real);
@@ -92,8 +92,8 @@ public class StubHttpClientTest {
 
     @Test
     @AnyStubId
+    @AnySettingsHttp(bodyTrigger = "randomX")
     public void executePostTextTest() throws IOException {
-        StubHttpClient.addBodyRule("randomX");
 
         HttpClient real = HttpClients.createDefault();
         StubHttpClient result = new StubHttpClient(real);
@@ -114,8 +114,8 @@ public class StubHttpClientTest {
 
     @Test
     @AnyStubId
+    @AnySettingsHttp(bodyTrigger = "443")
     public void executePostStreamingTest() throws IOException {
-        StubHttpClient.addBodyRule("443");
 
         HttpClient real = HttpClients.createDefault();
         StubHttpClient result = new StubHttpClient(real);
@@ -191,6 +191,31 @@ public class StubHttpClientTest {
                 "Content-Type: plain/text; charset=UTF-8", "HEADER: 1", "HEADER2: 2",
                 "HEADER3: 3", "https://gturnquist-quoters.cfapps.io:443/api/randomX-stream",
                 "very-string"));
+
+    }
+
+    @Test
+    @AnyStubId
+    @AnySettingsHttp(bodyTrigger = "ran928374", bodyMask = {"111", "222", "\\d\\d-\\d\\d-\\d\\d", "\\d\\d:\\d\\d"})
+    public void executePostHttpSettingsBodyMaskTest() throws IOException {
+
+        HttpClient real = HttpClients.createDefault();
+        StubHttpClient result = new StubHttpClient(real);
+
+        HttpPost httpUriRequest = new HttpPost("https://gturnquist-quoters.cfapps.io:443/api/ran928374-long-url");
+        BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
+        ByteArrayInputStream inputStream = new ByteArrayInputStream("test 222 test 111 01-12-19 12:15 eom".getBytes(StandardCharsets.UTF_8));
+        basicHttpEntity.setContent(inputStream);
+        httpUriRequest.setEntity(basicHttpEntity);
+        int response = result.execute(httpUriRequest,
+                httpResponse -> httpResponse.getStatusLine().getStatusCode());
+
+
+        assertEquals(405, response);
+        assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times());
+        assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times("POST", "HTTP/1.1",
+                "https://gturnquist-quoters.cfapps.io:443/api/ran928374-long-url",
+                "test ... test ... ... ... eom"));
 
     }
 

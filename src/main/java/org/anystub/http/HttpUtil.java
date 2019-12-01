@@ -17,10 +17,13 @@ import org.apache.http.message.BasicHttpResponse;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +34,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
+import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static org.anystub.Util.escapeCharacterString;
 
@@ -38,20 +42,10 @@ public class HttpUtil {
 
     private static final Logger LOGGER = Logger.getLogger(HttpUtil.class.getName());
 
-    /**
-     * to set properties for http tabs
-     * will work if AnySettingsHttp didn't set
-     */
-    @Deprecated
-    public static final String HTTP_PROPERTY = "http";
-    @Deprecated
-    public static final String HTTP_PROPERTY_ALL_HEADERS = "allHeaders";
-    @Deprecated
-    public static final String HTTP_PROPERTY_HEADER = "header";
-    @Deprecated
-    public static final String HTTP_PROPERTY_BODY = "body";
-    @Deprecated
-    public static final String HTTP_PROPERTY_MASK_BODY = "maskBody";
+    public static boolean globalAllHeaders = false;
+    public static String[] globalHeaders = {};
+    public static String[] globalBodyTrigger = {};
+    public static String[] globalBodyMask = {};
 
     private HttpUtil() {
     }
@@ -196,14 +190,14 @@ public class HttpUtil {
                     return o;
                 }).apply(httpRequest.getRequestLine().getUri());
 
-        strings.addAll(encodeHeaders(httpRequest, fullUrl));
+        strings.addAll(encodeHeaders(httpRequest));
         strings.add(fullUrl);
 
         if (matchBodyRule(fullUrl)) {
             byte[] bytes = extractEntity(httpRequest);
             if (bytes != null) {
                 if (Util.isText(bytes)) {
-                    String bodyText = maskBody(fullUrl, new String(bytes, StandardCharsets.UTF_8));
+                    String bodyText = maskBody(new String(bytes, StandardCharsets.UTF_8));
                     strings.add(escapeCharacterString(bodyText));
                 } else {
                     // omit changes fot binary data
@@ -220,94 +214,76 @@ public class HttpUtil {
         return encode(httpRequest, null);
     }
 
-    public static List<String> encodeHeaders(HttpRequest httpRequest, String fullUrl) {
+    public static List<String> encodeHeaders(HttpRequest httpRequest) {
+
+        boolean currentAllHeaders = HttpUtil.globalAllHeaders;
+
         AnySettingsHttp settings = AnySettingsHttpExtractor.discoverSettings();
 
-        if (settings == null) {
-            return encodeHeadersByProps(httpRequest, fullUrl);
+        if (settings != null) {
+            currentAllHeaders = settings.allHeaders();
         }
 
-        Header[] allHeaders = httpRequest.getAllHeaders();
-        Arrays.sort(allHeaders, Comparator.comparing(NameValuePair::getName));
+        Header[] currentHeaders = httpRequest.getAllHeaders();
+        Arrays.sort(currentHeaders, Comparator.comparing(NameValuePair::getName));
 
 
-        if (settings.allHeaders()) {
-            return stream(allHeaders)
+        if (currentAllHeaders) {
+            return stream(currentHeaders)
                     .map(HttpUtil::headerToString)
                     .collect(Collectors.toList());
         }
 
-        Set<String> headersToAdd = stream(settings.headers())
-                .collect(Collectors.toSet());
 
-        return stream(allHeaders)
+        Set<String> headersToAdd = new HashSet<>();
+        if (settings != null) {
+            headersToAdd.addAll(asList(settings.headers()));
+        }
+        if ((settings == null || !settings.overrideGlobal()) && globalHeaders != null) {
+            headersToAdd.addAll(asList(globalHeaders));
+        }
+
+        return stream(currentHeaders)
                 .filter(header -> headersToAdd.contains(header.getName()))
                 .map(HttpUtil::headerToString)
                 .collect(Collectors.toList());
 
     }
 
-    @Deprecated
-    private static List<String> encodeHeadersByProps(HttpRequest httpRequest, String fullUrl) {
-        ArrayList<String> strings = new ArrayList<>();
-
-        Header[] allHeaders = httpRequest.getAllHeaders();
-        Arrays.sort(allHeaders, Comparator.comparing(NameValuePair::getName));
-        boolean matchAllHeaders = matchAllHeaders = BaseManagerFactory.getBaseManager().getStub()
-                .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_ALL_HEADERS)
-                .anyMatch(d -> fullUrl.contains(d.get()));
-
-        if (matchAllHeaders) {
-            for (Header h : allHeaders) {
-                strings.add(headerToString(h));
-            }
-            return strings;
-        }
-
-        Set<String> headersToAdd = BaseManagerFactory.getBaseManager().getStub()
-                .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_HEADER)
-                .filter(d -> fullUrl.contains(d.get()))
-                .map(d -> d.getKey(2))
-                .collect(Collectors.toSet());
-
-        if (!headersToAdd.isEmpty()) {
-            for (Header h : allHeaders) {
-                if (headersToAdd.contains(h.getName())) {
-                    strings.add(headerToString(h));
-                }
-            }
-        }
-
-        return strings;
-    }
 
     private static boolean matchBodyRule(String url) {
+        Set<String> currentBodyTriggers = new HashSet<>();
+
         AnySettingsHttp settings = AnySettingsHttpExtractor.discoverSettings();
 
-        if (settings == null) {
-            return matchBodyRuleByProps(url);
+        if (settings != null) {
+            currentBodyTriggers.addAll(asList(settings.bodyTrigger()));
         }
 
-        return stream(settings.bodyTrigger())
+        if ((settings == null || !settings.overrideGlobal()) && globalBodyTrigger != null) {
+            currentBodyTriggers.addAll(asList(globalBodyTrigger));
+        }
+
+
+        return currentBodyTriggers.stream()
                 .anyMatch(url::contains);
     }
 
-    @Deprecated
-    private static boolean matchBodyRuleByProps(String url) {
-        return BaseManagerFactory.getBaseManager().getStub()
-                .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_BODY)
-                .anyMatch(d -> url.contains(d.get()));
-    }
 
+    private static String maskBody(String s) {
+        Set<String> currentBodyMask = new HashSet<>();
 
-    @Deprecated
-    private static String maskBody(String url, String s) {
-        return BaseManagerFactory.getBaseManager().getStub()
-                .getProperties(HTTP_PROPERTY, HTTP_PROPERTY_MASK_BODY)
-                .filter(d -> url.contains(d.getKey(2)))
-                .map(d -> s.replaceAll(d.get(), "..."))
-                .findFirst()
-                .orElse(s);
+        AnySettingsHttp settings = AnySettingsHttpExtractor.discoverSettings();
+        if (settings != null) {
+            currentBodyMask.addAll(asList(settings.bodyMask()));
+        }
+
+        if ((settings != null || !settings.overrideGlobal()) && globalBodyMask != null) {
+            currentBodyMask.addAll(asList(globalBodyMask));
+        }
+
+        return currentBodyMask.stream()
+                .reduce(s, (r, m) -> r.replaceAll(m, "..."));
     }
 
     public static String headerToString(Header h) {

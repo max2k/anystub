@@ -2,6 +2,7 @@ package org.anystub.it_http;
 
 import org.anystub.AnyStubId;
 import org.anystub.Base;
+import org.anystub.http.AnySettingsHttp;
 import org.apache.http.client.HttpClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,10 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import static org.anystub.http.StubHttpClient.addBodyMaskRule;
-import static org.anystub.http.StubHttpClient.addBodyRule;
-import static org.anystub.http.StubHttpClient.addHeaderRule;
-import static org.anystub.http.StubHttpClient.addHeadersRule;
+
 import static org.anystub.mgmt.BaseManagerFactory.getStub;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -48,36 +46,28 @@ public class HttpSourceSystemTest {
 
     @Test
     @AnyStubId
+    @AnySettingsHttp(allHeaders = true)
     public void getWithHeaders() {
 
-        addHeadersRule("random");
         ResponseEntity<String> forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api/random", String.class);
         assertEquals(200, forEntity.getStatusCodeValue());
 
         assertEquals(1, getStub().times());
         assertTrue(getStub().match().findFirst().get().getKey(2).startsWith("Accept:"));
 
-
-        forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api", String.class);
-        assertEquals(200, forEntity.getStatusCodeValue());
-        assertEquals(1, getStub().timesEx(null, null, "https.*"));
     }
 
     @Test
     @AnyStubId
+    @AnySettingsHttp(headers = "Accept")
     public void getWithHeader() {
 
-        addHeaderRule("Accept", "random");
         ResponseEntity<String> forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api/random", String.class);
         assertEquals(200, forEntity.getStatusCodeValue());
 
         assertEquals(1, getStub().times());
         assertTrue(getStub().match().findFirst().get().getKey(2).startsWith("Accept:"));
 
-
-        forEntity = restTemplate.getForEntity("https://gturnquist-quoters.cfapps.io/api", String.class);
-        assertEquals(200, forEntity.getStatusCodeValue());
-        assertEquals(1, getStub().timesEx(null, null, "https.*"));
     }
 
     @Test(expected = HttpClientErrorException.class)
@@ -86,15 +76,15 @@ public class HttpSourceSystemTest {
     }
 
     @Test(expected = HttpClientErrorException.class)
+    @AnySettingsHttp(bodyTrigger = "random/xxx")
     public void postBodyTest() {
-        addBodyRule("random/xxx");
         restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random/xxx", "{test}", String.class);
     }
 
     @Test
     @AnyStubId
+    @AnySettingsHttp(bodyTrigger = "random/xxx")
     public void postMultiLineBodyTest() {
-        addBodyRule("random/xxx");
         try {
             restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random/xxx", "{test:1,\ntest2:3}", String.class);
         } catch (HttpClientErrorException ex) {
@@ -112,8 +102,8 @@ public class HttpSourceSystemTest {
 
     @Test
     @AnyStubId
+    @AnySettingsHttp(bodyTrigger = "random/xxx")
     public void postBinaryBodyTest() {
-        addBodyRule("random/xxx");
         try {
             restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random/xxx", new String(new byte[]{1, 2, 3, 4}), String.class);
         } catch (HttpClientErrorException ex) {
@@ -125,10 +115,9 @@ public class HttpSourceSystemTest {
 
     @Test
     @AnyStubId
+    @AnySettingsHttp(bodyTrigger = "random/xxx", bodyMask = "\\{.+\\}")
     public void postMaskedBodyTest() {
         int exceptionsNumber = 0;
-        addBodyRule("random/xxx");
-        addBodyMaskRule("random/xxx", "\\{.+\\}");
 
 
         for (int i = 0; i < 2; i++) {
