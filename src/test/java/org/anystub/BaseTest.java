@@ -449,29 +449,4 @@ public class BaseTest {
     }
 
 
-    @Test
-    @AnyStubId
-    public void propertyTest() {
-        Base stub = BaseManagerFactory.getBaseManager().getStub();
-
-        stub.addProperty("test", "1", "a");
-        stub.addProperty("test", "1", "b");
-        stub.addProperty("xxx", "2");
-
-
-        Document xxx;
-        List<Document> test;
-        xxx = stub.getProperties("xxx").findFirst().get();
-        assertEquals("2", xxx.getVals().iterator().next());
-        test = stub.getProperties("test", "1").collect(Collectors.toList());
-        assertEquals(2, test.size());
-        assertEquals("a", test.get(0).getVals().iterator().next());
-        assertEquals("b", test.get(1).getVals().iterator().next());
-
-        test = stub.getProperties("test", "1", "X").collect(Collectors.toList());
-        assertTrue(test.isEmpty());
-
-    }
-
-
 }
