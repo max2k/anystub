@@ -15,10 +15,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class StubHttpClientTest {
 
@@ -216,6 +219,32 @@ public class StubHttpClientTest {
         assertEquals(1, BaseManagerFactory.getBaseManager().getStub().times("POST", "HTTP/1.1",
                 "https://gturnquist-quoters.cfapps.io:443/api/ran928374-long-url",
                 "test ... test ... ... ... eom"));
+
+    }
+
+    @Test
+    @AnyStubId
+    public void executePostMissingBodyTest() throws IOException {
+
+        StubHttpClient result = new StubHttpClient(null);
+
+        HttpPost httpUriRequest = new HttpPost("https://gturnquist-quoters.cfapps.io:443/api/ran928374-long-url");
+        BasicHttpEntity basicHttpEntity = new BasicHttpEntity();
+        httpUriRequest.setEntity(basicHttpEntity);
+        HttpResponse response = result.execute(httpUriRequest,
+                httpResponse -> httpResponse);
+
+
+        assertEquals(200, response.getStatusLine().getStatusCode());
+
+        try (ByteArrayOutputStream byteArray = new ByteArrayOutputStream()) {
+
+            assertNotNull(response.getEntity());
+            response.getEntity().writeTo(byteArray);
+            String s = new String(byteArray.toByteArray(), StandardCharsets.UTF_8);
+            assertTrue(s.startsWith("{\"locale\":\"en-US\","));
+            assertTrue(s.endsWith(",\"code\":\"AOGL976\"}"));
+        }
 
     }
 

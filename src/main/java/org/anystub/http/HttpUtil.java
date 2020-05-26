@@ -46,6 +46,7 @@ public class HttpUtil {
     public static String[] globalHeaders = {};
     public static String[] globalBodyTrigger = {};
     public static String[] globalBodyMask = {};
+    private static final String HEADER_MASK = "^[A-Za-z0-9\\-]+: .+";
 
     private HttpUtil() {
     }
@@ -66,7 +67,7 @@ public class HttpUtil {
         while (iterator.hasNext()) {
             String header;
             header = iterator.next();
-            if (!header.matches(".+: .+")) {
+            if (!header.matches(HEADER_MASK)) {
                 postHeader = header;
                 break;
             }
@@ -129,9 +130,15 @@ public class HttpUtil {
 
     public static Optional<String> extractEntity(HttpEntity entity) {
         byte[] bytes = extractEntityData(entity);
-        return bytes != null ?
-                Optional.of(Util.toCharacterString(bytes)) :
-                Optional.empty();
+        if (bytes == null) {
+            return Optional.empty();
+        }
+        String entityText = Util.toCharacterString(bytes);
+        if (entityText.matches(HEADER_MASK)) {
+            entityText = Util.addTextPrefix(entityText);
+        }
+
+        return Optional.of(entityText);
     }
 
     public static byte[] extractEntityData(HttpEntity entity) {
