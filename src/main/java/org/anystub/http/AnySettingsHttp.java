@@ -34,13 +34,13 @@ public @interface AnySettingsHttp {
     String[] headers() default {};
 
     /**
-     * to define URLs which trigger inclusions request body in a key
+     * to define URLs which trigger inclusion a request body in a key
      * @return
      */
     String[] bodyTrigger() default {};
 
     /**
-     * to define regex expressions which will be replaced by elapses "..." in request body
+     * to define regex expressions which will be replaced by elapses "..." in a request body
      * @return
      */
     String[] bodyMask() default {};
