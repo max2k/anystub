@@ -1,6 +1,7 @@
 package org.anystub;
 
 import org.anystub.mgmt.BaseManagerFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +16,7 @@ public class BaseMockTest {
     }
 
     @Test
-//    @Ignore("mock is not working with java 11")
+    @Ignore("mock is not working with java 11")
     public void passThroughTest() throws Exception {
         MockSupplier upstream = mock(MockSupplier.class);
 
