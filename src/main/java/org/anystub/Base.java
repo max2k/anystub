@@ -48,7 +48,6 @@ public class Base {
     private final String filePath;
     private boolean isNew = true;
     private RequestMode requestMode = rmNew;
-    private final PropertyContainer propertyContainer = new PropertyContainer();
 
     /**
      * creates stub by specific path.
