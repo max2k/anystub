@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 public class StubStatementTest {
 
     @Test
-    @Ignore("mokito failed on java 11")
     public void executeQueryTest() throws SQLException {
         StubConnection connection = mock(StubConnection.class);
         StubDataSource dataSource = mock(StubDataSource.class);
