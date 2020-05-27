@@ -59,6 +59,10 @@ public class Util {
         return bodyText;
     }
 
+    public static String addTextPrefix(String bodyText) {
+        return TEXT_PREFIX + bodyText;
+    }
+
     /**
      * recover binary data from string from stub file
      *
