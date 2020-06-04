@@ -24,7 +24,7 @@ import static java.util.Arrays.stream;
 public class StubStatement implements Statement {
     protected StubConnection stubConnection;
     private Statement realStatement = null;
-    private List<String> batch = new LinkedList<>();
+    private final List<String> batch = new LinkedList<>();
     private String executedCommand = null;
 
 

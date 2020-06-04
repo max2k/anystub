@@ -5,7 +5,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.RequestMode;
+import org.anystub.jdbc.StubConnection;
 import org.anystub.jdbc.StubDataSource;
+import org.anystub.jdbc.StubStatement;
 import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +19,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -94,6 +100,33 @@ public class HikariJdbcSourceSystemTest {
                 .getBase("testCaseNameTest-hikariTest.yml").times());
         assertTrue("no exceptions expected", true);
     }
+
+    @Test
+    @AnyStubId(requestMode = RequestMode.rmAll)
+    public void callAStatement() throws SQLException {
+        Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from dual");
+
+        assertEquals(false, resultSet.next());
+
+
+    }
+
+    @Test
+    @AnyStubId(requestMode = RequestMode.rmNew)
+    public void callAStatementFromStub() throws SQLException {
+        Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from dual");
+
+        assertEquals(true, resultSet.next());
+
+
+    }
+
+    @Autowired
+    DataSource dataSource;
 
     @TestConfiguration
     static class Conf {
