@@ -20,7 +20,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,7 +30,6 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.spy;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
@@ -103,13 +104,29 @@ public class HikariJdbcSourceSystemTest {
     @Test
     @AnyStubId(requestMode = RequestMode.rmAll)
     public void callAStatement() throws SQLException {
-//        https://www.programcreek.com/java-api-examples/?api=com.zaxxer.hikari.HikariDataSource
-        StubDataSource stubDataSource = new StubDataSource(jdbcTemplate.getDataSource());
-        StubConnection stubConnection = new StubConnection(stubDataSource);
-        StubStatement stubStatement = new StubStatement(stubConnection);
-        stubStatement.executeQuery("select * from dual");
+        Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from dual");
+
+        assertEquals(false, resultSet.next());
+
 
     }
+
+    @Test
+    @AnyStubId(requestMode = RequestMode.rmNew)
+    public void callAStatementFromStub() throws SQLException {
+        Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from dual");
+
+        assertEquals(true, resultSet.next());
+
+
+    }
+
+    @Autowired
+    DataSource dataSource;
 
     @TestConfiguration
     static class Conf {
