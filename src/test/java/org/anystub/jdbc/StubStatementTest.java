@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 public class StubStatementTest {
 
     @Test
+    @Ignore("not implemented test")
     public void executeQueryTest() throws SQLException {
         StubConnection connection = mock(StubConnection.class);
         StubDataSource dataSource = mock(StubDataSource.class);

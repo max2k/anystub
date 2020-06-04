@@ -5,7 +5,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.RequestMode;
+import org.anystub.jdbc.StubConnection;
 import org.anystub.jdbc.StubDataSource;
+import org.anystub.jdbc.StubStatement;
 import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +19,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.spy;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest()
@@ -93,6 +98,17 @@ public class HikariJdbcSourceSystemTest {
                 .getBaseManager()
                 .getBase("testCaseNameTest-hikariTest.yml").times());
         assertTrue("no exceptions expected", true);
+    }
+
+    @Test
+    @AnyStubId(requestMode = RequestMode.rmAll)
+    public void callAStatement() throws SQLException {
+//        https://www.programcreek.com/java-api-examples/?api=com.zaxxer.hikari.HikariDataSource
+        StubDataSource stubDataSource = new StubDataSource(jdbcTemplate.getDataSource());
+        StubConnection stubConnection = new StubConnection(stubDataSource);
+        StubStatement stubStatement = new StubStatement(stubConnection);
+        stubStatement.executeQuery("select * from dual");
+
     }
 
     @TestConfiguration
