@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @SpringBootTest
+
 public class JdbcStubRSTest {
 
     private Logger log = Logger.getLogger("test");
@@ -34,8 +35,8 @@ public class JdbcStubRSTest {
 
 
     @RepeatedTest(2)
-    @AnyStubId(requestMode = RequestMode.rmAll)
-    public void selectwithaliasTest() {
+    @AnyStubId(requestMode = RequestMode.rmAll, filename = "selectwithaliasTest")
+    public void testSelectwithalias() {
 
             log.info("Creating tables");
 

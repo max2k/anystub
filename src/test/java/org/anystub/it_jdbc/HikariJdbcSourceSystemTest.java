@@ -1,20 +1,13 @@
 package org.anystub.it_jdbc;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import org.anystub.AnyStubId;
-import org.anystub.Base;
 import org.anystub.RequestMode;
-import org.anystub.jdbc.StubDataSource;
 import org.anystub.mgmt.BaseManagerFactory;
 import org.anystub.src.Customer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -36,12 +29,18 @@ public class HikariJdbcSourceSystemTest {
     private final static Logger log = Logger.getLogger("test");
     
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    JdbcTemplate jdbcTemplate;
 
-    @Test
-    public void someTest() {
+
+    @Autowired
+    DataSource dataSource;
+
+    @Test()
+    public void testSome() {
 
         log.info("Creating tables");
+        log.info(String.format("ds is null: %b", dataSource==null));
+        log.info(String.format("jdbcT is null: %b", jdbcTemplate==null));
 
         jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
         jdbcTemplate.execute("CREATE TABLE customers(" +
@@ -80,14 +79,14 @@ public class HikariJdbcSourceSystemTest {
 
     @Test
     @AnyStubId(requestMode = RequestMode.rmPassThrough)
-    public void passThroughTest() {
+    public void testPassThrough() {
         jdbcTemplate.execute("DROP TABLE testcasefileX IF EXISTS");
         assertTrue("no exceptions expected", true);
     }
 
     @Test
-    @AnyStubId(requestMode = RequestMode.rmTrack)
-    public void testCaseNameTest() {
+    @AnyStubId(requestMode = RequestMode.rmTrack, filename = "testCaseNameTest")
+    public void testCaseName() {
 
         jdbcTemplate.execute("DROP TABLE testcasename IF EXISTS");
         jdbcTemplate.execute("DROP TABLE testcasename IF EXISTS");
@@ -101,7 +100,7 @@ public class HikariJdbcSourceSystemTest {
 
     @Test
     @AnyStubId(requestMode = RequestMode.rmAll)
-    public void callAStatement() throws SQLException {
+    public void testCallAStatement() throws SQLException {
         Connection connection = dataSource.getConnection();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from dual");
@@ -112,8 +111,8 @@ public class HikariJdbcSourceSystemTest {
     }
 
     @Test
-    @AnyStubId(requestMode = RequestMode.rmNew)
-    public void callAStatementFromStub() throws SQLException {
+    @AnyStubId(requestMode = RequestMode.rmNew, filename = "callAStatementFromStub")
+    public void testCallAStatementFromStub() throws SQLException {
         Connection connection = dataSource.getConnection();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from dual");
@@ -122,8 +121,5 @@ public class HikariJdbcSourceSystemTest {
 
 
     }
-
-    @Autowired
-    DataSource dataSource;
 
 }

@@ -19,7 +19,7 @@ public class BaseManagerFactoryTest {
 
     @Test
     @AnyStubId(filename = "customBaseManager")
-    public void customGlobalHttpSettings() {
+    public void testCustomGlobalHttpSettings() {
 
         ResponseEntity<String> forEntity;
 

@@ -3,13 +3,13 @@ request0:
   keys: [GET, HTTP/1.1, 'https://gturnquist-quoters.cfapps.io/api/random']
   values: [HTTP/1.1, '200', OK, 'Content-Type: application/json;charset=UTF-8', 'Date:
       Sun, 21 Apr 2019 21:33:00 GMT', 'X-Vcap-Request-Id: c7208981-ad8d-4dcd-6d00-2f2e4bb1ba53',
-    'Content-Length: 197', 'Connection: keep-alive', '{"type":"success","value":{"id":2,"quote":"With Boot you deploy everywhere you can find a JVM basically."}}']
+    'Content-Length: 197', 'Connection: keep-alive', '{"type":"success","value":{"id":2,"quote":"With
+      Boot you deploy everywhere you can find a JVM basically."}}']
 request1:
   exception: []
   keys: [GET, HTTP/1.1, 'https://test']
-  values: [HTTP/1.1, '200', OK, 'Content-Type: plain/text;charset=UTF-8', 'Date:
-                 Sun, 21 Apr 2019 21:33:00 GMT',
-           'Content-Length: 4', 'Connection: keep-alive', 'test']
+  values: [HTTP/1.1, '200', OK, 'Content-Type: plain/text;charset=UTF-8', 'Date: Sun,
+      21 Apr 2019 21:33:00 GMT', 'Content-Length: 4', 'Connection: keep-alive', test]
 request2:
   exception: []
   keys: [POST, HTTP/1.1, 'https://gturnquist-quoters.cfapps.io/api/random']
