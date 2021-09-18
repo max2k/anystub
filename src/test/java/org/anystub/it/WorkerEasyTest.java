@@ -1,14 +1,16 @@
 package org.anystub.it;
 
 import org.anystub.Base;
+import org.anystub.src.SourceSystem;
 import org.anystub.mgmt.BaseManagerFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  *
@@ -17,7 +19,7 @@ public class WorkerEasyTest {
 
     SourceSystem sourceSystem;
 
-    @Before
+    @BeforeEach
     public void createStub() {
         Base base = BaseManagerFactory.getBaseManager().getBase("WorkerEasyTest.yml");
         sourceSystem = new SourceSystem("http://localhost:8080") {

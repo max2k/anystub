@@ -1,17 +1,18 @@
-package org.anystub.it_jdbc;
+package org.anystub.it_hikari;
 
 import org.anystub.AnyStubId;
+import org.anystub.Base;
 import org.anystub.RequestMode;
 import org.anystub.jdbc.StubDataSource;
+import org.anystub.mgmt.BaseManagerFactory;
+import org.anystub.src.Customer;
 import org.h2.jdbcx.JdbcDataSource;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
@@ -19,10 +20,11 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest()
+
+@SpringBootTest
 public class JdbcStubRSTest {
 
     private Logger log = Logger.getLogger("test");
@@ -31,11 +33,9 @@ public class JdbcStubRSTest {
     private JdbcTemplate jdbcTemplate;
 
 
-    @Test
+    @RepeatedTest(2)
     @AnyStubId(requestMode = RequestMode.rmAll)
     public void selectwithaliasTest() {
-
-        for (int i=0; i<2; i++) {
 
             log.info("Creating tables");
 
@@ -55,9 +55,9 @@ public class JdbcStubRSTest {
             jdbcTemplate.batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)", splitUpNames);
 
             log.info("Querying for customer records where first_name = 'Josh':");
-            List<JdbcSourceSystemTest.Customer> query = jdbcTemplate.query(
+            List<Customer> query = jdbcTemplate.query(
                     "SELECT id idx, first_name first_nameX, last_name last_nameX FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                    (rs, rowNum) -> new JdbcSourceSystemTest.Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
+                    (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
             );
 
             assertEquals(2, query.size());
@@ -67,7 +67,7 @@ public class JdbcStubRSTest {
 
             query = jdbcTemplate.query(
                     "SELECT id idx, first_name first_nameX, last_name last_nameX FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                    (rs, rowNum) -> new JdbcSourceSystemTest.Customer(rs.getLong("idx"), rs.getString("first_nameX"), rs.getString("last_nameX"))
+                    (rs, rowNum) -> new Customer(rs.getLong("idx"), rs.getString("first_nameX"), rs.getString("last_nameX"))
             );
 
             assertEquals(2, query.size());
@@ -75,21 +75,10 @@ public class JdbcStubRSTest {
             assertEquals("Bloch", query.get(0).last_name);
             assertEquals("Long", query.get(1).last_name);
             assertEquals(4L, query.get(1).id);
-        }
-    }
-    @TestConfiguration
-    static class Conf {
 
-        @Bean
-        DataSource dataSource() {
-
-            JdbcDataSource ds = new JdbcDataSource();
-            ds.setURL("jdbc:h2:./test5;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
-
-            return new StubDataSource(ds)
-                    .setStubSuffix("stub-rs")
-                    .setStubResultSetMode(true);
-        }
+        Base base = BaseManagerFactory.getStub("stub-rs");
+        assertTrue(base.times() > 1);
 
     }
+
 }

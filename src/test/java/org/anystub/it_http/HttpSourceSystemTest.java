@@ -4,8 +4,8 @@ import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.http.AnySettingsHttp;
 import org.apache.http.client.HttpClient;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
@@ -13,27 +13,22 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-
 import static org.anystub.mgmt.BaseManagerFactory.getStub;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest()
+@SpringBootTest
 @AnyStubId(filename = "httpStub.yml")
 public class HttpSourceSystemTest {
 
     @Autowired
     private HttpSourceSystem httpSourceSystem;
 
-    @Autowired
-    private Base httpBase;
+//    @Autowired
+//    private Base httpBase;
 
     @Autowired(required = false)
     private RestTemplate restTemplate;
-
-    @Autowired
-    HttpClient httpClient;
 
     @Test
     public void getStringsTest() {
@@ -70,15 +65,19 @@ public class HttpSourceSystemTest {
 
     }
 
-    @Test(expected = HttpClientErrorException.class)
+    @Test
     public void postTest() {
-        restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random", null, String.class);
+        Assertions.assertThrows(HttpClientErrorException.class, () -> {
+            restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random", null, String.class);
+        });
     }
 
-    @Test(expected = HttpClientErrorException.class)
+    @Test
     @AnySettingsHttp(bodyTrigger = "random/xxx")
     public void postBodyTest() {
-        restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random/xxx", "{test}", String.class);
+        Assertions.assertThrows(HttpClientErrorException.class, () -> {
+            restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random/xxx", "{test}", String.class);
+        });
     }
 
     @Test

@@ -5,12 +5,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.anystub.AnyStubId;
 import org.anystub.Base;
 import org.anystub.RequestMode;
-import org.anystub.jdbc.StubConnection;
 import org.anystub.jdbc.StubDataSource;
-import org.anystub.jdbc.StubStatement;
 import org.anystub.mgmt.BaseManagerFactory;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.anystub.src.Customer;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -28,11 +26,11 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest()
+
+@SpringBootTest
 @AnyStubId
 public class HikariJdbcSourceSystemTest {
     private final static Logger log = Logger.getLogger("test");
@@ -61,9 +59,9 @@ public class HikariJdbcSourceSystemTest {
         jdbcTemplate.batchUpdate("INSERT INTO customers(first_name, last_name) VALUES (?,?)", splitUpNames);
 
         log.info("Querying for customer records where first_name = 'Josh':");
-        List<JdbcSourceSystemTest.Customer> query = jdbcTemplate.query(
+        List<Customer> query = jdbcTemplate.query(
                 "SELECT id, first_name, last_name FROM customers WHERE first_name = ?", new Object[]{"Josh"},
-                (rs, rowNum) -> new JdbcSourceSystemTest.Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
+                (rs, rowNum) -> new Customer(rs.getLong("id"), rs.getString("first_name"), rs.getString("last_name"))
         );
 
         query.forEach(customer -> log.info(customer.toString()));
@@ -128,25 +126,4 @@ public class HikariJdbcSourceSystemTest {
     @Autowired
     DataSource dataSource;
 
-    @TestConfiguration
-    static class Conf {
-
-        @Bean
-        DataSource dataSource() {
-
-            Base base = BaseManagerFactory
-                    .getBaseManager()
-                    .getBase("jdbcStub-hk.yml");
-
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl("jdbc:h2:./test4;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
-            HikariDataSource ds = new HikariDataSource(config);
-
-            DataSource stubDataSource = new StubDataSource(ds)
-                    .setFallbackBase(base)
-                    .setStubSuffix("hikariTest");
-            return stubDataSource;
-        }
-
-    }
 }

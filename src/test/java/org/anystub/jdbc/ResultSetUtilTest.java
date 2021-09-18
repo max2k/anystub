@@ -1,13 +1,16 @@
 package org.anystub.jdbc;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ResultSetUtilTest {
 
@@ -22,6 +25,7 @@ public class ResultSetUtilTest {
 
         assertEquals("HELLO: XX", decode.getString("PUBLIC.SP_HELLO('XX')"));
     }
+
     @Test
     public void decodeAliasMultiline() throws SQLException {
 

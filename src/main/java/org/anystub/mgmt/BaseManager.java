@@ -25,4 +25,5 @@ public interface BaseManager {
      * @return
      */
     Base getStub();
+    Base getStub(String suffix);
 }

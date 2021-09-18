@@ -1,10 +1,9 @@
 package org.anystub;
 
 import org.anystub.mgmt.BaseManagerFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @AnyStubId(filename = "AnyStubFileLocatorTest3-x")
 public class AnyStubFileLocatorTest3 {

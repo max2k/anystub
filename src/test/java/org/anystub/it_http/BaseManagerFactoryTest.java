@@ -1,23 +1,20 @@
-package org.anystub.mgmt;
+package org.anystub.it_http;
 
 import org.anystub.AnyStubId;
 import org.anystub.http.HttpUtil;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
 import static org.anystub.mgmt.BaseManagerFactory.getStub;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public class BaseManagerFactoryTest {
 
-    @Autowired(required = false)
+    @Autowired
     private RestTemplate restTemplate;
 
     @Test

@@ -1,21 +1,22 @@
 package org.anystub.it_jdbc;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.anystub.AnyStubId;
+import org.anystub.Base;
 import org.anystub.RequestMode;
-import org.anystub.mgmt.BaseManagerImpl;
+import org.anystub.jdbc.StubDataSource;
+import org.anystub.mgmt.BaseManagerFactory;
+import org.anystub.src.Customer;
 import org.h2.tools.SimpleResultSet;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.CallableStatementCallback;
-import org.springframework.jdbc.core.CallableStatementCreator;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -26,33 +27,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.sql.Blob;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.sql.*;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.sql.Types.VARCHAR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest()
+@SpringBootTest
 @AnyStubId(filename = "jdbcStub.yml")
 public class JdbcSourceSystemTest {
 
@@ -429,26 +413,7 @@ public class JdbcSourceSystemTest {
     }
 
 
-    public static class Customer {
-        final long id;
-        final String first_name;
-        final String last_name;
 
-        Customer(long id, String first_name, String last_name) {
-            this.id = id;
-            this.first_name = first_name;
-            this.last_name = last_name;
-        }
-
-        @Override
-        public String toString() {
-            return "Customer{" +
-                    "id=" + id +
-                    ", first_name='" + first_name + '\'' +
-                    ", last_name='" + last_name + '\'' +
-                    '}';
-        }
-    }
 
 
     @Test

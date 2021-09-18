@@ -1,7 +1,8 @@
 package org.anystub;
 
 import org.anystub.mgmt.BaseManagerFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,14 +21,11 @@ import java.util.stream.IntStream;
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
 import static org.anystub.Document.ars;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
+ *
  */
 public class BaseTest {
 
@@ -102,14 +100,16 @@ public class BaseTest {
         assertEquals(-1594594225, val);
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test()
     public void requestException() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase();
         base.clear();
         assertTrue(base.isNew());
 
-        base.request("rand", "1002", "notakey");
+        Assertions.assertThrows(NoSuchElementException.class, () -> {
+            base.request("rand", "1002", "notakey");
+        });
     }
 
     @Test
@@ -155,14 +155,15 @@ public class BaseTest {
 
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void restrictionTest() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("restrictionTest.yml");
         base.clear();
         base.constrain(RequestMode.rmNone);
-
-        base.request("restrictionTest");
+        Assertions.assertThrows(NoSuchElementException.class, () -> {
+            base.request("restrictionTest");
+        });
     }
 
 
@@ -213,7 +214,7 @@ public class BaseTest {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./complexObject.yml");
         base.clear();
-        
+
         Human human = base.request2(() -> h,
                 values -> {
                     Iterator<String> v = values.iterator();
@@ -323,12 +324,12 @@ public class BaseTest {
 
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
+    @Test
     public void exceptionTest() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./exceptionStub.yml");
         base.clear();
-        
+
         boolean exceptionCaught = false;
         try {
             base.request(() -> {
@@ -341,17 +342,15 @@ public class BaseTest {
         assertTrue(exceptionCaught);
 
         base.clear();
-        exceptionCaught = false;
-        try {
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
             base.request(() -> {
                 throw new IndexOutOfBoundsException("for test");
             }, "key");
-        } catch (IndexOutOfBoundsException ex) {
-            exceptionCaught = true;
-        }
+        });
 
-        assertTrue(exceptionCaught);
-        base.request(() -> "okok", "key");
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
+            base.request(() -> "okok", "key");
+        });
     }
 
     @Test

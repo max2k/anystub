@@ -92,6 +92,18 @@ public class BaseManagerImpl implements BaseManager {
         return getBase();
     }
 
+    @Override
+    public Base getStub(String suffix) {
+        AnyStubId s = AnyStubFileLocator.discoverFile(suffix);
+        if (s != null) {
+            return getBase(s.filename())
+                    .constrain(s.requestMode());
+        }
+
+        return getBase();
+    }
+
+
     protected void stubInitialization(Base newStub) {
         // default initializator does nothing
     }
