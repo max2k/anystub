@@ -1,10 +1,12 @@
 package org.anystub.it;
 
 import org.anystub.Base;
-import org.anystub.src.SourceSystem;
 import org.anystub.mgmt.BaseManagerFactory;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.io.IOException;
 
@@ -25,9 +27,8 @@ public class DefaultConfiguration {
     }
 
     @Bean
-    public SourceSystem sourceSystem(Base base) {
-
-
+    @Primary
+    public SourceSystem sourceSystemTest(Base base) {
         return new SourceSystem("http://localhost:8080") {
             @Override
             public String get() throws IOException {

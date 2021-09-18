@@ -1,7 +1,6 @@
 package org.anystub.it;
 
 import org.anystub.Base;
-import org.anystub.src.SourceSystem;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

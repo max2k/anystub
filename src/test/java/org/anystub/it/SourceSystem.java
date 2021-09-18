@@ -1,4 +1,4 @@
-package org.anystub.src;
+package org.anystub.it;
 
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,6 @@
 package org.anystub.it;
 
 import org.anystub.Base;
-import org.anystub.src.SourceSystem;
 import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

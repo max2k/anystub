@@ -1,6 +1,5 @@
 package org.anystub.it;
 
-import org.anystub.src.SourceSystem;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
