@@ -20,6 +20,9 @@ public class AnyStubFileLocator {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (StackTraceElement s : stackTrace) {
             try {
+                if (s.getMethodName().startsWith("lambda$")) {
+                    continue;
+                }
                 Class<?> aClass = Class.forName(s.getClassName());
 
                 id = methodInfo(s, aClass);

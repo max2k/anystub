@@ -2,23 +2,16 @@ package org.anystub.it_jdbc;
 
 import org.anystub.AnyStubId;
 import org.anystub.RequestMode;
-import org.anystub.mgmt.BaseManagerImpl;
+import org.anystub.src.Customer;
 import org.h2.tools.SimpleResultSet;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.CallableStatementCallback;
-import org.springframework.jdbc.core.CallableStatementCreator;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
@@ -26,33 +19,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.sql.Blob;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.sql.*;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.sql.Types.VARCHAR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest()
+@SpringBootTest
 @AnyStubId(filename = "jdbcStub.yml")
 public class JdbcSourceSystemTest {
 
@@ -65,14 +41,14 @@ public class JdbcSourceSystemTest {
     private DataSource dataSource;
 
     @Test
-    public void injectedDSTest() {
+    public void testInjectedDS() {
 
         assertEquals(dataSource, jdbcTemplate.getDataSource());
     }
 
     @Test
-    @AnyStubId(filename = "jdbcStub", requestMode = RequestMode.rmNone)
-    public void someTest() {
+    @AnyStubId(filename = "jdbcStub4testSome", requestMode = RequestMode.rmNone)
+    public void testSome() {
 
 
         log.info("Creating tables");
@@ -107,8 +83,8 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
-    @AnyStubId
-    public void selectwithaliasTest() {
+    @AnyStubId(filename = "selectwithaliasTest")
+    public void testSelectwithalias() {
 
         for (int i=0; i<2; i++) {
 
@@ -155,7 +131,7 @@ public class JdbcSourceSystemTest {
 
 
     @Test
-    public void storeProcedureTest() {
+    public void testStoreProcedure() {
         jdbcTemplate.execute("DROP ALIAS SP_HELLO if Exists");
         jdbcTemplate.execute("CREATE ALIAS SP_HELLO AS $$\n" +
                 "String spHello(String value) {\n" +
@@ -176,8 +152,8 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
-    @AnyStubId
-    public void blobTest() {
+    @AnyStubId(filename = "blobTest")
+    public void testBlob() {
         for (int ii=0; ii<2; ii++) {
             jdbcTemplate.execute("DROP TABLE BLOBREPORT IF EXISTS");
 
@@ -229,8 +205,8 @@ public class JdbcSourceSystemTest {
 
 
     @Test
-    @AnyStubId(requestMode = RequestMode.rmAll)
-    public void integerLongTest() {
+    @AnyStubId(filename = "integerLongTest", requestMode = RequestMode.rmAll)
+    public void testIntegerLongTest() {
         jdbcTemplate.execute("DROP TABLE SOMETYPES IF EXISTS");
 
         String sql = "CREATE TABLE SOMETYPES(\n" +
@@ -313,8 +289,8 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
-    @AnyStubId
-    public void integerLongTest1() throws SQLException {
+    @AnyStubId(filename = "integerLongTest1")
+    public void testIntegerLong1() throws SQLException {
         for (int i=0; i<2; i++) {
             jdbcTemplate.execute("DROP ALIAS SP_HELLO2 if Exists");
             jdbcTemplate.execute("CREATE ALIAS SP_HELLO2 AS $$\n" +
@@ -429,30 +405,11 @@ public class JdbcSourceSystemTest {
     }
 
 
-    public static class Customer {
-        final long id;
-        final String first_name;
-        final String last_name;
 
-        Customer(long id, String first_name, String last_name) {
-            this.id = id;
-            this.first_name = first_name;
-            this.last_name = last_name;
-        }
-
-        @Override
-        public String toString() {
-            return "Customer{" +
-                    "id=" + id +
-                    ", first_name='" + first_name + '\'' +
-                    ", last_name='" + last_name + '\'' +
-                    '}';
-        }
-    }
 
 
     @Test
-    public void sirs() throws SQLException {
+    public void testSirs() throws SQLException {
         SimpleResultSet rs = new SimpleResultSet();
         rs.addColumn("ID", Types.INTEGER, 10, 0);
         rs.addColumn("NAME", Types.VARCHAR, 255, 0);

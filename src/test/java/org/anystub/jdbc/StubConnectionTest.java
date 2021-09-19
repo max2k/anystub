@@ -1,15 +1,17 @@
 package org.anystub.jdbc;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
 
 public class StubConnectionTest {
 
     @Test
-    public void callKey() throws SQLException {
+    public void testCallKey() throws SQLException {
         StubConnection instance = new StubConnection(null);
 
         String[] strings;

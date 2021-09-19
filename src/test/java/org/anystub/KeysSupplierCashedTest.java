@@ -1,15 +1,15 @@
 package org.anystub;
 
-import org.junit.Test;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class KeysSupplierCashedTest {
 
 
     @Test
-    public void get() {
+    public void testSet() {
 
         int[] i = new int[]{0};
 

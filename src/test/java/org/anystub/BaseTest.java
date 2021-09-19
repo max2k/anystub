@@ -1,7 +1,8 @@
 package org.anystub;
 
 import org.anystub.mgmt.BaseManagerFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,19 +21,16 @@ import java.util.stream.IntStream;
 import static java.lang.Integer.parseInt;
 import static java.util.Collections.emptyList;
 import static org.anystub.Document.ars;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
+ *
  */
 public class BaseTest {
 
     @Test
-    public void save() throws IOException {
+    public void testSave() throws IOException {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./stubSaveTest.yml");
 
@@ -58,7 +56,7 @@ public class BaseTest {
 
 
     @Test
-    public void stringRequest() {
+    public void testStringRequest() {
         Base base = BaseManagerFactory.getBaseManager().getBase();
         String request = base.request(() -> "xxx", "qwe", "stringkey");
 
@@ -66,7 +64,7 @@ public class BaseTest {
     }
 
     @Test
-    public void request() {
+    public void testRequest() {
         Base base = BaseManagerFactory.getBaseManager().getBase("request.yml");
         base.clear();
         assertTrue(base.isNew());
@@ -102,18 +100,20 @@ public class BaseTest {
         assertEquals(-1594594225, val);
     }
 
-    @Test(expected = NoSuchElementException.class)
-    public void requestException() {
+    @Test()
+    public void testRequestException() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase();
         base.clear();
         assertTrue(base.isNew());
 
-        base.request("rand", "1002", "notakey");
+        Assertions.assertThrows(NoSuchElementException.class, () -> {
+            base.request("rand", "1002", "notakey");
+        });
     }
 
     @Test
-    public void binaryDataTest() {
+    public void testBinaryDataTest() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./stubBin.yml");
         base.clear();
@@ -155,14 +155,15 @@ public class BaseTest {
 
     }
 
-    @Test(expected = NoSuchElementException.class)
-    public void restrictionTest() {
+    @Test
+    public void testRestrictionTest() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("restrictionTest.yml");
         base.clear();
         base.constrain(RequestMode.rmNone);
-
-        base.request("restrictionTest");
+        Assertions.assertThrows(NoSuchElementException.class, () -> {
+            base.request("restrictionTest");
+        });
     }
 
 
@@ -194,7 +195,7 @@ public class BaseTest {
 
 
     @Test
-    public void requestNull() {
+    public void testRequestNull() {
 
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./NullObj.yml");
@@ -207,13 +208,13 @@ public class BaseTest {
     }
 
     @Test
-    public void requestComplexObject() {
+    public void testRequestComplexObject() {
         Human h = new Human(13, 180, 30, 60, "i'm");
 
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./complexObject.yml");
         base.clear();
-        
+
         Human human = base.request2(() -> h,
                 values -> {
                     Iterator<String> v = values.iterator();
@@ -259,7 +260,7 @@ public class BaseTest {
     }
 
     @Test
-    public void historyCheck() {
+    public void testHistoryCheck() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./historyCheck.yml");
         base.clear();
@@ -284,7 +285,7 @@ public class BaseTest {
     }
 
     @Test
-    public void nullMatching() {
+    public void testNullMatching() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./historyCheck.yml");
         base.clear();
@@ -301,7 +302,7 @@ public class BaseTest {
     }
 
     @Test
-    public void regexpMatching() {
+    public void testRegexpMatching() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./historyCheck.yml");
         base.clear();
@@ -323,12 +324,12 @@ public class BaseTest {
 
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void exceptionTest() {
+    @Test
+    public void testExceptionTest() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./exceptionStub.yml");
         base.clear();
-        
+
         boolean exceptionCaught = false;
         try {
             base.request(() -> {
@@ -341,21 +342,19 @@ public class BaseTest {
         assertTrue(exceptionCaught);
 
         base.clear();
-        exceptionCaught = false;
-        try {
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
             base.request(() -> {
                 throw new IndexOutOfBoundsException("for test");
             }, "key");
-        } catch (IndexOutOfBoundsException ex) {
-            exceptionCaught = true;
-        }
+        });
 
-        assertTrue(exceptionCaught);
-        base.request(() -> "okok", "key");
+        Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
+            base.request(() -> "okok", "key");
+        });
     }
 
     @Test
-    public void nullReturning() {
+    public void testNullReturning() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./nullReturning.yml");
         base.clear();
@@ -383,7 +382,7 @@ public class BaseTest {
     }
 
     @Test
-    public void request_oneway_object() throws IOException {
+    public void testRequest_oneway_object() throws IOException {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./streams.yml")
                 .constrain(RequestMode.rmAll);
@@ -413,7 +412,7 @@ public class BaseTest {
     }
 
     @Test
-    public void requestSerializableTest() {
+    public void testRequestSerializableTest() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./serialize.yml");
         base.clear();
@@ -427,7 +426,7 @@ public class BaseTest {
     }
 
     @Test
-    public void fileInResourcesTest() {
+    public void testFileInResourcesTest() {
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("in-res.yml");
         base.clear();
@@ -437,7 +436,7 @@ public class BaseTest {
     }
 
     @Test
-    public void punctuationInStub() {
+    public void testPunctuationInStub() {
 
         Base base = BaseManagerFactory.getBaseManager()
                 .getBase("./punctuation.yml");

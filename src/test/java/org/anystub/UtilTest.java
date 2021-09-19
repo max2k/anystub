@@ -1,15 +1,16 @@
 package org.anystub;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import static org.anystub.Util.escapeCharacterString;
 import static org.anystub.Util.isText;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UtilTest {
 
     @Test
-    public void isTextTest() {
+    public void testIsTextTest() {
         assertTrue(isText("thisistextline"));
         assertTrue(isText("{\"this is\": \'text' }; line"));
         assertFalse(isText("thisistextline" + (char) 0x03));
@@ -23,7 +24,7 @@ public class UtilTest {
 
 
     @Test
-    public void isText1() {
+    public void testIsText1() {
 
         assertTrue(isText("thisistextline".getBytes()));
         assertTrue(isText("{\"this is\": \'text' }; line".getBytes()));
@@ -35,7 +36,7 @@ public class UtilTest {
     }
 
     @Test
-    public void toCharacterStringTest() {
+    public void testToCharacterStringTest() {
         String s;
         s = Util.toCharacterString("thisistextline".getBytes());
         assertEquals("thisistextline", s);
@@ -46,7 +47,7 @@ public class UtilTest {
     }
 
     @Test
-    public void escapeTest() {
+    public void testEscapeTest() {
         assertEquals("", escapeCharacterString(""));
         assertEquals("TEXT TEXT", escapeCharacterString("TEXT"));
         assertEquals("TEXT BASE", escapeCharacterString("BASE"));

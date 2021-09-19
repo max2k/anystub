@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class HttpSourceSystem {
 
-    @Autowired(required = false)
+    @Autowired
     private RestTemplate restTemplate;
 
     public String getStrings() {

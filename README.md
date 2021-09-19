@@ -15,7 +15,7 @@ Install from Maven Central
     <dependency>
       <groupId>org.anystub</groupId>
       <artifactId>anystub</artifactId>
-      <version>0.5.1</version>
+      <version>0.6.0</version>
       <scope>test</scope>
     </dependency>
 ```
@@ -87,7 +87,7 @@ public class WorkerEasyTest {
     }
 
     @Test
-    public void easyTest() throws IOException {
+    public void testEasy() throws IOException {
 
         Worker worker = new Worker(sourceSystem);
         assertEquals("fixed", worker.get());

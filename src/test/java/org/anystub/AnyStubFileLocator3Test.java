@@ -1,13 +1,12 @@
 package org.anystub;
 
 import org.anystub.mgmt.BaseManagerFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @AnyStubId(filename = "AnyStubFileLocatorTest3-x")
-public class AnyStubFileLocatorTest3 {
+public class AnyStubFileLocator3Test {
 
     {
         Base stub = BaseManagerFactory.getBaseManager().getStub();
@@ -20,7 +19,7 @@ public class AnyStubFileLocatorTest3 {
     }
 
     @Test
-    public void discoverFile() {
+    public void testDiscoverFile() {
         String aaa = BaseManagerFactory.getBaseManager().getBase("AnyStubFileLocatorTest3-x.yml").get("aaa");
         assertEquals("bbb", aaa);
 
