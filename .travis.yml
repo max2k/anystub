@@ -1,9 +1,9 @@
 language: java
 jdk:
-  - oraclejdk8
+  - openjdk11
 sudo: false
 install: false
-dist: trusty
+dist: bionic
 addons:
   sonarqube:
     organization: "anystub1"
