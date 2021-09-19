@@ -174,13 +174,14 @@
                         </goals>
                     </execution>
                 </executions>
-<!--                <configuration>-->
-<!--                    <excludes>-->
-<!--                        <exclude>**/StubDatabaseMetaData.java</exclude>-->
-<!--                        <exclude>**/StubResultSet.java</exclude>-->
-<!--                        <exclude>**/StubCallableStatement.java</exclude>-->
-<!--                    </excludes>-->
-<!--                </configuration>-->
+                <configuration>
+                    <excludes>
+                        <exclude>**/StubDatabaseMetaData.java</exclude>
+                        <exclude>**/StubResultSet.java</exclude>
+                        <exclude>**/StubCallableStatement.java</exclude>
+                        <exclude>**/test/java/**/*.java</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
         </plugins>
