@@ -1,4 +1,4 @@
-package org.anystub.it_jdbc;
+package org.anystub.it_hikari;
 
 import org.anystub.AnyStubId;
 import org.anystub.RequestMode;
@@ -105,9 +105,19 @@ public class HikariJdbcSourceSystemTest {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from dual");
 
+        assertEquals(true, resultSet.next());
         assertEquals(false, resultSet.next());
+    }
 
+    @Test
+    @AnyStubId(requestMode = RequestMode.rmNone)
+    public void testCallAStatementNone() throws SQLException {
+        Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from dual");
 
+        assertEquals(true, resultSet.next());
+        assertEquals(false, resultSet.next());
     }
 
     @Test

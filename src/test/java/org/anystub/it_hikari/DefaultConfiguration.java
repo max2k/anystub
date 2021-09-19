@@ -1,5 +1,7 @@
 package org.anystub.it_hikari;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.anystub.Base;
 import org.anystub.http.StubHttpClient;
 import org.anystub.jdbc.StubDataSource;
@@ -21,20 +23,22 @@ import javax.sql.DataSource;
 @Configuration
 public class DefaultConfiguration {
 
-
-
     @Bean
     DataSource dataSource() {
 
-        JdbcDataSource ds = new JdbcDataSource();
-        ds.setURL("jdbc:h2:./test5;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
+        Base base = BaseManagerFactory
+                .getBaseManager()
+                .getBase("jdbcStub-hk.yml");
 
-        return new StubDataSource(ds)
-                .setStubSuffix("stub-rs")
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:h2:./test4;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
+        HikariDataSource ds = new HikariDataSource(config);
+
+        DataSource stubDataSource = new StubDataSource(ds)
+                .setFallbackBase(base)
+                .setStubSuffix("hikariTest")
                 .setStubResultSetMode(true);
+        return stubDataSource;
     }
-
-
-
-
 }
+

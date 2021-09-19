@@ -77,7 +77,7 @@ public class JdbcStubRSTest {
             assertEquals("Long", query.get(1).last_name);
             assertEquals(4L, query.get(1).id);
 
-        Base base = BaseManagerFactory.getStub("stub-rs");
+        Base base = BaseManagerFactory.getStub("hikariTest");
         assertTrue(base.times() > 1);
 
     }

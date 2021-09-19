@@ -47,7 +47,7 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
-    @AnyStubId(filename = "jdbcStub", requestMode = RequestMode.rmNone)
+    @AnyStubId(filename = "jdbcStub4testSome", requestMode = RequestMode.rmNone)
     public void testSome() {
 
 
