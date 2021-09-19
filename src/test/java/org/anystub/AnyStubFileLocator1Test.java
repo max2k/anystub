@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class AnyStubFileLocatorTest1 {
+public class AnyStubFileLocator1Test {
     @Test
     public void testname() {
         assertNull(AnyStubFileLocator.discoverFile());

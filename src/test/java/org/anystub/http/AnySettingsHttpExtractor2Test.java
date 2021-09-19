@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class AnySettingsHttpExtractorTest2 {
+public class AnySettingsHttpExtractor2Test {
 
     @Test
     public void testDiscoverSettings() {

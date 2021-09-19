@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @AnyStubId(filename = "AnyStubFileLocatorTest3-x")
-public class AnyStubFileLocatorTest3 {
+public class AnyStubFileLocator3Test {
 
     {
         Base stub = BaseManagerFactory.getBaseManager().getStub();
