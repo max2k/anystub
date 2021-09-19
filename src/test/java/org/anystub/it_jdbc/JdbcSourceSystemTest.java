@@ -41,14 +41,14 @@ public class JdbcSourceSystemTest {
     private DataSource dataSource;
 
     @Test
-    public void injectedDSTest() {
+    public void testInjectedDS() {
 
         assertEquals(dataSource, jdbcTemplate.getDataSource());
     }
 
     @Test
     @AnyStubId(filename = "jdbcStub", requestMode = RequestMode.rmNone)
-    public void testSsome() {
+    public void testSome() {
 
 
         log.info("Creating tables");

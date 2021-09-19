@@ -54,9 +54,9 @@ public class StubHttpClientTest {
     }
 
     @Test
-    public void testexecuteResponseHandlerTest() throws IOException {
+    public void testExecuteResponseHandlerTest() throws IOException {
 
-        Base base = BaseManagerFactory.getBaseManager().getBase("httpStub-static.yml")
+        Base base = BaseManagerFactory.getBaseManager().getBase("testExecuteResponseHandlerTest.yml")
                 .constrain(RequestMode.rmNone);
         base.clear();
 
