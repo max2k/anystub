@@ -19,7 +19,7 @@ public class AnyStubFileLocatorTest3 {
     }
 
     @Test
-    public void discoverFile() {
+    public void testDiscoverFile() {
         String aaa = BaseManagerFactory.getBaseManager().getBase("AnyStubFileLocatorTest3-x.yml").get("aaa");
         assertEquals("bbb", aaa);
 

@@ -13,7 +13,7 @@ public class BaseMockTest {
     }
 
     @Test
-    public void passThroughTest() throws Exception {
+    public void testPassThroughTest() throws Exception {
         MockSupplier upstream = mock(MockSupplier.class);
 
 

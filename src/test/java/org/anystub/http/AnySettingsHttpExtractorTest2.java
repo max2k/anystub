@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class AnySettingsHttpExtractorTest2 {
 
     @Test
-    public void discoverSettings() {
+    public void testDiscoverSettings() {
         assertNull(AnySettingsHttpExtractor.discoverSettings());
     }
 

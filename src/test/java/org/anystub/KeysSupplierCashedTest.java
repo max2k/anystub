@@ -9,7 +9,7 @@ public class KeysSupplierCashedTest {
 
 
     @Test
-    public void get() {
+    public void testSet() {
 
         int[] i = new int[]{0};
 

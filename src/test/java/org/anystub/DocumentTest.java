@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DocumentTest {
 
     @Test
-    public void equalTest() {
+    public void testtestEqualTest() {
         assertEquals(new Document("qwe", "ewwq", "123"), new Document("qwe", "ewwq", "123"));
         assertEquals(new Document(), new Document());
         assertNotEquals(new Document("qwe", "ewwq", "1234"), new Document("qwe", "ewwq", "123"));
@@ -30,14 +30,14 @@ public class DocumentTest {
     }
 
     @Test
-    public void equalToTest() {
+    public void testequalToTest() {
         assertTrue(new Document("123", "321").keyEqual_to("123", "321"));
         assertTrue(new Document("123", "321", "asd").keyEqual_to("123", "321", "asd"));
         assertFalse(new Document("123", "321").keyEqual_to("123"));
     }
 
     @Test
-    public void match_toTest() {
+    public void testmatch_toTest() {
         assertTrue(new Document(ars("qwe"), ars("321")).match_to());
         assertTrue(new Document(ars("qwe"), ars("321")).match_to("qwe"));
         assertFalse(new Document(ars("qwe"), ars("321")).match_to("q"));
@@ -45,7 +45,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void matchEx_toTest() {
+    public void testmatchEx_toTest() {
         assertTrue(new Document(ars("qwe"), ars("321")).matchEx_to(ars()));
         assertTrue(new Document(ars("qwe"), ars("321")).matchEx_to());
         assertTrue(new Document(ars("qwe"), ars("321")).matchEx_to("qwe"));
@@ -63,7 +63,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void assert_toTest() {
+    public void testassert_toTest() {
         // expected two values in key. first one is equal to "qwe", second one is any value
 
         Assertions.assertThrows(AssertionError.class, () -> {
@@ -73,7 +73,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void assert_to2Test() {
+    public void testassert_to2Test() {
         // expected two values in key are equal to two tested values
         Assertions.assertThrows(AssertionError.class, () -> {
             new Document(ars("qwe", "asd", "123"), ars("321")).assert_to("qwe", "dsa");
@@ -81,7 +81,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void assertEx_toTest() {
+    public void testassertEx_toTest() {
         // expected two values in key are matched to two tested values
         Assertions.assertThrows(AssertionError.class, () -> {
 
@@ -90,7 +90,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void assertEx_to2Test() {
+    public void testassertEx_to2Test() {
         // expected value contains two values "qwe" and any other. actually it has only one value "321"
         Assertions.assertThrows(AssertionError.class, () -> {
 
@@ -99,7 +99,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void exceptionTest() {
+    public void testexceptionTest() {
         Document doc = new Document(new NoSuchElementException("aaaa"), "123");
         Iterator<String> exception = doc.getException().iterator();
         assertTrue(exception.next().contains("NoSuchElementException"));
@@ -112,7 +112,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void exceptionWMessageTest() {
+    public void testexceptionWMessageTest() {
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
 
             new Document(new IndexOutOfBoundsException("aaaa"), "123").getVals();
@@ -120,14 +120,14 @@ public class DocumentTest {
     }
 
     @Test
-    public void exceptionWoMessageTest() {
+    public void testexceptionWoMessageTest() {
         Assertions.assertThrows(IndexOutOfBoundsException.class, () -> {
             new Document(new IndexOutOfBoundsException(), "123").getVals();
         });
     }
 
     @Test
-    public void exceptionNotFountTest() {
+    public void testexceptionNotFountTest() {
 
         TreeMap<String, Object> res = new TreeMap<>();
         res.put("keys", "123");
@@ -139,7 +139,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void aroTest() {
+    public void testaroTest() {
         String[] aro = Document.aro("sdf", 2, "ssdf");
         assertArrayEquals(ars("sdf", null, null, "ssdf"), aro);
         aro = Document.aro("sdf", 0, "ssdf");
@@ -147,7 +147,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void nullHolder() {
+    public void testnullHolder() {
         Map<String, Object> map = new Document(ars("12")).toMap();
 
         Document document = new Document(map);
@@ -155,7 +155,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void emptyHolder() {
+    public void testemptyHolder() {
         Map<String, Object> map = new Document(ars("12"), arsNull()).toMap();
 
         Document document = new Document(map);
@@ -166,7 +166,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void fromArrayTest() {
+    public void testfromArrayTest() {
         Document document = Document.fromArray("11", "22", "333");
 
         assertEquals("333", document.get());
@@ -175,7 +175,7 @@ public class DocumentTest {
     }
 
     @Test
-    public void isNullValueTest() {
+    public void testisNullValueTest() {
         assertTrue(new Document("1", "2").isNullValue());
     }
 }

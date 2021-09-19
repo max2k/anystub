@@ -80,7 +80,7 @@ public class HttpSourceSystemTest {
     }
 
     @Test
-    public void TestPost() {
+    public void testPost() {
         Assertions.assertThrows(HttpClientErrorException.class, () -> {
             restTemplate.postForEntity("https://gturnquist-quoters.cfapps.io/api/random", null, String.class);
         });

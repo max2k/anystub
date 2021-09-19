@@ -1,6 +1,8 @@
 package org.anystub.http;
 
 
+import org.anystub.AnyStubFileLocator;
+import org.anystub.AnyStubId;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,7 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AnySettingsHttpExtractorTest {
 
     @Test
-    public void discoverSettingsClass() {
+    public void testdiscoverSettingsClass() {
+        AnyStubId s = AnyStubFileLocator.discoverFile();
         AnySettingsHttp anySettingsHttp = AnySettingsHttpExtractor.discoverSettings();
         assertNotNull(anySettingsHttp);
         assertFalse(anySettingsHttp.allHeaders());
@@ -17,7 +20,7 @@ public class AnySettingsHttpExtractorTest {
     }
     @Test
     @AnySettingsHttp(headers = {"test1", "test2"}, allHeaders = false, bodyTrigger = {"http://", "234"})
-    public void discoverSettings1() {
+    public void testdiscoverSettings1() {
         AnySettingsHttp anySettingsHttp = AnySettingsHttpExtractor.discoverSettings();
         assertNotNull(anySettingsHttp);
         Object headers = new String[]{"test1", "test2"};
@@ -28,7 +31,7 @@ public class AnySettingsHttpExtractorTest {
 
     @Test
     @AnySettingsHttp(headers = {})
-    public void discoverSettings2() {
+    public void testdiscoverSettings2() {
         AnySettingsHttp anySettingsHttp = AnySettingsHttpExtractor.discoverSettings();
         assertNotNull(anySettingsHttp);
         Object headers = new String[]{"test1", "test2"};

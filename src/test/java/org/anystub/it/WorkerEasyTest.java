@@ -40,7 +40,7 @@ public class WorkerEasyTest {
     }
 
     @Test
-    public void xTest() throws IOException {
+    public void testX() throws IOException {
 
         Worker worker = new Worker(sourceSystem);
         assertEquals("fixed", worker.get());

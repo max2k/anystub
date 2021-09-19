@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class HttpUtilTest {
     
     @Test
-    public void encodeBodyLikeHttpHeader() {
+    public void testEncodeBodyLikeHttpHeader() {
 
         List<String> strings = asList("HTTP/1.1", "200", "OK", "Content-Type: application/text;charset=UTF-8",
                 "Date: Tue, 04 Jun 2019 19:35:46 GMT", "X-Vcap-Request-Id: d42ad690-5e17-4321-7fd4-e3e5d65156e9",

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EncoderSavepointTest {
     @Test
-    public void encodeTest() {
+    public void testEncodeTest() {
         StubSavepoint stubSavepoint = new StubSavepoint(1, "2");
         Iterator<String> encode = new EncoderSavepoint().encode(stubSavepoint).iterator();
         assertEquals("Savepoint",encode.next());
