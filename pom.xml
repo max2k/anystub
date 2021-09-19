@@ -40,6 +40,8 @@
         <gpg.skip>true</gpg.skip>
         <sonar.organization>anystub1</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.sources>src/main/java</sonar.sources>
+        <sonar.tests>src/test/java</sonar.tests>
     </properties>
 
     <dependencies>
@@ -179,7 +181,7 @@
                         <exclude>**/StubDatabaseMetaData.java</exclude>
                         <exclude>**/StubResultSet.java</exclude>
                         <exclude>**/StubCallableStatement.java</exclude>
-                        <exclude>**/test/java/**/*.java</exclude>
+                        <exclude>test/java/**/*.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
