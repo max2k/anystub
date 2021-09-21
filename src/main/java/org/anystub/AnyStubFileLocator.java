@@ -61,7 +61,7 @@ public class AnyStubFileLocator {
         AnyStubId id;
         try {
             Method method;
-            method = aClass.getMethod(s.getMethodName());
+            method = aClass.getDeclaredMethod(s.getMethodName());
             id = method.getAnnotation(AnyStubId.class);
         } catch (NoSuchMethodException ignored) {
             id = null;
