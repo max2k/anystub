@@ -22,7 +22,7 @@ public class AnySettingsHttpExtractor {
             }
             try {
                 Method method;
-                method = aClass.getMethod(s.getMethodName());
+                method = aClass.getDeclaredMethod(s.getMethodName());
                 id = method.getAnnotation(AnySettingsHttp.class);
             } catch (NoSuchMethodException ignored) {
             }
