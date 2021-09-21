@@ -3,6 +3,7 @@ package org.anystub.http;
 
 import org.anystub.AnyStubFileLocator;
 import org.anystub.AnyStubId;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,6 +38,22 @@ public class AnySettingsHttpExtractorTest {
         Object headers = new String[]{"test1", "test2"};
         assertFalse(anySettingsHttp.allHeaders());
         assertArrayEquals(new String[]{}, anySettingsHttp.headers());
+    }
+
+    @Test
+    @AnySettingsHttp(allHeaders = true)
+    public void testSettingsInTestLambda() {
+        AnySettingsHttp anySettingsHttp = AnySettingsHttpExtractor.discoverSettings();
+        assertNotNull(anySettingsHttp);
+        assertTrue(anySettingsHttp.allHeaders());
+
+        Runnable r = () -> {
+            AnySettingsHttp anySettingsHttp1 = AnySettingsHttpExtractor.discoverSettings();
+            assertNotNull(anySettingsHttp1);
+            assertTrue(anySettingsHttp1.allHeaders());
+        };
+
+        r.run();
     }
 
 }

@@ -8,6 +8,9 @@ public class AnySettingsHttpExtractor {
         AnySettingsHttp id = null;
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (StackTraceElement s : stackTrace) {
+            if (s.getMethodName().startsWith("lambda$")) {
+                continue;
+            }
             Class<?> aClass = null;
             try {
                 aClass = Class.forName(s.getClassName());
