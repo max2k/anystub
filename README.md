@@ -1,9 +1,6 @@
-*MOVED TO [https://github.com/anystub/anystub](https://github.com/anystub/anystub)*
-
 # anystub   
 
-[![Build Status](https://travis-ci.org/anystub/anystub.svg?branch=master)](https://travis-ci.org/anystub/anystub) [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=org.anystub:anystub&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.anystub:anystub) [![gitter.im/anystub-java](https://badges.gitter.im/anystub-java.svg)](https://gitter.im/anystub-java)
-
+[![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=org.anystub:anystub&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.anystub:anystub) 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.anystub/anystub/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.anystub/anystub)
 
 record input/output for tests in java. inspired by vcr for rails
@@ -105,15 +102,13 @@ Stub-files allow you to define the behaviour you need manually. The files are ym
 
 Base has methods match*() and times*() to analyze data-flow in your tests.
 
-**Recap**
-
-your workflow scenario:
-- create Base object - to set up your stub-file.
-- extend your 'sourceSystem' to trace all calls for the important methods.
-
-look at [wiki|https://github.com/anystub/anystub/wiki/anystub-and-SpringBoot] to see how it works with spring-boot
+Above we created a wrapper for the method `String get()` which has no parameters and returns String. Anystub provides a convenient way to wrap methods which operate trivial or Serializable types. When methods have parameters of non-trivial types you still need to provide serializers.
 
 
-Above we created a stub for the method `String get()` which has no parameters and returns String. When methods have parameters of non-trivial types you need to extract key-data from parameters as String and write convertors to transform the result value to strings and recover it from strings.
+**Further reading**
 
-There is support for Serializable types for return values. The support could be added quite easy to any data class.
+Look at [wiki|https://github.com/anystub/anystub/wiki/anystub-and-SpringBoot] to see how it works with spring-boot.
+
+
+You can [record and play](https://anystub-guides.github.io/) calls which go through RestTemplate/ApacheClient or JdbcTemplate/DataSource. 
+
