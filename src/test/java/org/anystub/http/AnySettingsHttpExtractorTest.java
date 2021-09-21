@@ -42,7 +42,7 @@ public class AnySettingsHttpExtractorTest {
 
     @Test
     @AnySettingsHttp(allHeaders = true)
-    public void testSettingsInTestLambda() {
+    void testSettingsInTestLambda() {
         AnySettingsHttp anySettingsHttp = AnySettingsHttpExtractor.discoverSettings();
         assertNotNull(anySettingsHttp);
         assertTrue(anySettingsHttp.allHeaders());
