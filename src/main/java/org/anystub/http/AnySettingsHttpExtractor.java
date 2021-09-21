@@ -8,6 +8,9 @@ public class AnySettingsHttpExtractor {
         AnySettingsHttp id = null;
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (StackTraceElement s : stackTrace) {
+            if (s.getMethodName().startsWith("lambda$")) {
+                continue;
+            }
             Class<?> aClass = null;
             try {
                 aClass = Class.forName(s.getClassName());
@@ -19,7 +22,7 @@ public class AnySettingsHttpExtractor {
             }
             try {
                 Method method;
-                method = aClass.getMethod(s.getMethodName());
+                method = aClass.getDeclaredMethod(s.getMethodName());
                 id = method.getAnnotation(AnySettingsHttp.class);
             } catch (NoSuchMethodException ignored) {
             }
