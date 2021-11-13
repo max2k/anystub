@@ -1,6 +1,7 @@
 request0:
   exception: []
-  keys: [GET, HTTP/1.1, 'Accept: text/plain, */*', 'https://gturnquist-quoters.cfapps.io/api/random']
+  keys: [GET, HTTP/1.1, 'Accept: text/plain, application/json, application/*+json,
+      */*', 'https://gturnquist-quoters.cfapps.io/api/random']
   values: [HTTP/1.1, '200', OK, 'Content-Type: application/json;charset=UTF-8', 'Date:
       Tue, 04 Jun 2019 19:35:46 GMT', 'X-Vcap-Request-Id: 021c7d49-b2ae-4abc-432f-b6a45d439e28',
     'Content-Length: 177', 'Connection: keep-alive', '{"type":"success","value":{"id":3,"quote":"Spring

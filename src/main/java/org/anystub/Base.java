@@ -1,5 +1,7 @@
 package org.anystub;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -208,6 +210,54 @@ public class Base {
                 values -> values,
                 s -> s,
                 keys);
+    }
+
+    /**
+     * Requests an object. It looks for a document in a stub file
+     * If it is not found then requests the value from the supplier.
+     * Keys and response saves as json-strings
+     * @param supplier method which is able to return an actual response
+     * @param responseClass type of the response
+     * @param keys all arguments of requested function
+     * @param <R>
+     * @param <E>
+     * @return
+     * @throws E
+     */
+    public <R extends Object, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+
+        String[] kk = new String[keys.length];
+
+        for (int i = 0; i < keys.length; i++) {
+            try {
+                kk[i] = objectMapper.writeValueAsString(keys[i]);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return request(supplier,
+                values -> {
+                    R r = null;
+                    try {
+                        r = objectMapper.readValue(values, responseClass);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    return r;
+                },
+                r -> {
+                    String s;
+                    try {
+                        s = objectMapper.writeValueAsString(r);
+                    } catch (JsonProcessingException e) {
+                        s = "failed encoder";
+                    }
+                    return s;
+                },
+                kk);
     }
 
     /**
