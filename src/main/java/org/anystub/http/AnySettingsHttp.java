@@ -37,11 +37,11 @@ public @interface AnySettingsHttp {
      * to define URLs which trigger inclusion a request body in a key.
      * request body includes in a key if any of these strings is a substring of URL
      * example:
-     *  @AnySettingsHttp(bodyTrigger = "random")
+     *  '@AnySettingsHttp(bodyTrigger = "random")'
      *  the request to https://gturnquist-quoters.cfapps.io:443/api/randomX will be recorded with request body
      *  the request to https://gturnquist-quoters.cfapps.io:443/api/any will be recorded without request body
      *
-     * @return
+     * @return strings which trigger including request body into index
      */
     String[] bodyTrigger() default {};
 
