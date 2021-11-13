@@ -231,11 +231,7 @@ public class Base {
         String[] kk = new String[keys.length];
 
         for (int i = 0; i < keys.length; i++) {
-            try {
-                kk[i] = objectMapper.writeValueAsString(keys[i]);
-            } catch (JsonProcessingException e) {
-                throw new TypeNotPresentException(keys[i].getClass().getName(), e);
-            }
+            kk[i] = new EncoderJson<Object>().encode(keys[i]);
         }
 
         return request(supplier,

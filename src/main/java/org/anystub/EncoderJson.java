@@ -9,7 +9,7 @@ public class EncoderJson<R extends Object>  implements EncoderSimple<R>{
         try {
             s = ObjectMapperFactory.get().writeValueAsString(r);
         } catch (JsonProcessingException e) {
-            s = "failed encoder";
+            s = "**encoding failed**";
         }
         return s;
     }
