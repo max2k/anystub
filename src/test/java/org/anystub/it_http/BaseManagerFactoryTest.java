@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.util.function.Consumer;
 
 import static org.anystub.mgmt.BaseManagerFactory.getStub;
 import static org.junit.jupiter.api.Assertions.*;
