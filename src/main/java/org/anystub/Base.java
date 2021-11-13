@@ -1,36 +1,18 @@
 package org.anystub;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Collections.singletonList;
-import static org.anystub.RequestMode.rmAll;
-import static org.anystub.RequestMode.rmNew;
-import static org.anystub.RequestMode.rmNone;
-import static org.anystub.RequestMode.rmPassThrough;
-import static org.anystub.RequestMode.rmTrack;
+import static org.anystub.RequestMode.*;
 
 /**
  * provides basic access to stub-file

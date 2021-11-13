@@ -35,9 +35,9 @@ public final class BaseManagerFactory {
 
      * @deprecated since 0.6.2, use HttpUtil::global* properties instead
      *
-     * @param initializer
+     * @param initializer setter props for stubs
      */
-    @Deprecated
+    @Deprecated(since = "0.6.2")
     synchronized public static void setDefaultStubInitializer(Consumer<Base> initializer) {
         if (initializer == null) {
             BaseManagerFactory.baseManager = null;
