@@ -1,5 +1,7 @@
 package org.anystub.mgmt;
 
+import org.anystub.AnyStubFileLocator;
+import org.anystub.AnyStubId;
 import org.anystub.Base;
 
 import java.util.function.Consumer;
@@ -44,5 +46,23 @@ public final class BaseManagerFactory {
                 initializer.accept(newStub);
             }
         };
+    }
+
+    public static Base locate() {
+        return BaseManagerFactory.locate(null);
+    }
+
+    public static Base locate(String fallback) {
+        AnyStubId s = AnyStubFileLocator.discoverFile();
+        if (s != null) {
+            return BaseManagerFactory
+                    .getBaseManager()
+                    .getBase(s.filename())
+                    .constrain(s.requestMode());
+        }
+
+        return BaseManagerFactory
+                .getBaseManager()
+                .getBase(fallback);
     }
 }

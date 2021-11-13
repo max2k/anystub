@@ -17,8 +17,6 @@ public class DefaultConfiguration {
         ds.setURL("jdbc:h2:./test5;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE");
 
         return new StubDataSource(ds);
-//                .setStubSuffix("stub-rs")
-//                ;
     }
 
 }
