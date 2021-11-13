@@ -234,7 +234,7 @@ public class Base {
             try {
                 kk[i] = objectMapper.writeValueAsString(keys[i]);
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
 
@@ -244,7 +244,7 @@ public class Base {
                     try {
                         r = objectMapper.readValue(values, responseClass);
                     } catch (JsonProcessingException e) {
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
                     return r;
                 },
