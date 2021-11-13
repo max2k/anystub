@@ -239,24 +239,8 @@ public class Base {
         }
 
         return request(supplier,
-                values -> {
-                    R r = null;
-                    try {
-                        r = objectMapper.readValue(values, responseClass);
-                    } catch (JsonProcessingException e) {
-                        throw new TypeNotPresentException(keys[i].getClass().getName(), e);
-                    }
-                    return r;
-                },
-                r -> {
-                    String s;
-                    try {
-                        s = objectMapper.writeValueAsString(r);
-                    } catch (JsonProcessingException e) {
-                        s = "failed encoder";
-                    }
-                    return s;
-                },
+                new DecoderJson<R>(responseClass),
+                new EncoderJson<>(),
                 kk);
     }
 
