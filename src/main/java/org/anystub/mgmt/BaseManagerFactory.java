@@ -32,9 +32,12 @@ public final class BaseManagerFactory {
      *
      * When you define new initializer new BaseManager is created. hence all stubs switch to new state (with no history).
      * To recover default initializer pass null. It will recover all stubs with their statuses and call history
+
+     * @deprecated since 0.6.2, use HttpUtil::global* properties instead
      *
-     * @param initializer
+     * @param initializer setter props for stubs
      */
+    @Deprecated(since = "0.6.2")
     synchronized public static void setDefaultStubInitializer(Consumer<Base> initializer) {
         if (initializer == null) {
             BaseManagerFactory.baseManager = null;
