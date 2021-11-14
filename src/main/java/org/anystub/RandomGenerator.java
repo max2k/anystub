@@ -155,10 +155,8 @@ public class RandomGenerator {
     public static <R> void populate(R a) {
         Class<?> aClass = a.getClass();
         for (Method m : aClass.getMethods()) {
-            if (!m.getName().startsWith("set")) {
-                continue;
-            }
-            if (m.getParameterTypes().length != 1) {
+            if (!m.getName().startsWith("set") ||
+                    m.getParameterTypes().length != 1) {
                 continue;
             }
             Object g = g(m.getParameterTypes()[0]);
@@ -168,10 +166,6 @@ public class RandomGenerator {
                 log.finest(() -> String.format("cannot set generated value with %s", m.getName()));
             }
         }
-    }
-
-    public static void s() {
-        RandomGenerator.g(Integer.class);
     }
 
     public static String gString() {
