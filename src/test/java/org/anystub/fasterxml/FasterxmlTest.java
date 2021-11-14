@@ -22,7 +22,7 @@ public class FasterxmlTest {
 
     @Test
     void remoteCall() {
-        String res = systemr.get("wieurowiuesflksdl ", LocalDate.now().minusDays(123));
+        String res = systemr.get("wieurowiuesflksdl ", LocalDate.of(2021,7,13));
 
         Assertions.assertEquals("iuesflksdl 2021-07-13", res);
     }
@@ -31,7 +31,7 @@ public class FasterxmlTest {
     @Test
     void remoteCallCar() {
         RandomSystem.Car c = new RandomSystem.Car();
-        c.setProd(LocalDate.now());
+        c.setProd(LocalDate.of(2021,11,13));
         c.setWeight(303);
         c.setCapacity(5);
         RandomSystem.Car cc = systemr.get(c);

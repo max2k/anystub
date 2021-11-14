@@ -206,20 +206,29 @@ public class Base {
      * @return
      * @throws E
      */
-    public <R extends Object, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
+    public <R, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
 
-        String[] kk = new String[keys.length];
+
+        if (keys.length == 1) {
+            String key;
+            key = new EncoderJson<Object>().encode(keys[0]);
+            return request(supplier,
+                    new DecoderJson<R>(responseClass),
+                    new EncoderJson<>(),
+                    key);
+        }
+        String[] sKeys = new String[keys.length];
 
         for (int i = 0; i < keys.length; i++) {
-            kk[i] = new EncoderJson<Object>().encode(keys[i]);
+            sKeys[i] = new EncoderJson<>().encode(keys[i]);
         }
 
         return request(supplier,
                 new DecoderJson<R>(responseClass),
                 new EncoderJson<>(),
-                kk);
+                sKeys);
     }
 
     /**
@@ -232,9 +241,8 @@ public class Base {
      * @throws E
      */
     public <E extends Exception> Boolean requestB(Supplier<Boolean, E> supplier, String... keys) throws E {
-        return request(supplier,
-                Boolean::parseBoolean,
-                String::valueOf,
+        return requestO(supplier,
+            Boolean.class,
                 keys);
     }
 
@@ -248,9 +256,8 @@ public class Base {
      * @throws E
      */
     public <E extends Exception> Integer requestI(Supplier<Integer, E> supplier, String... keys) throws E {
-        return request(supplier,
-                Integer::parseInt,
-                String::valueOf,
+        return requestO(supplier,
+                Integer.class,
                 keys);
     }
 
@@ -264,6 +271,7 @@ public class Base {
      * @return recovered object
      * @throws E expected exception
      */
+    @Deprecated(since = "0.7.0")
     public <T extends Serializable, E extends Exception> T requestSerializable(Supplier<T, E> supplier, String... keys) throws E {
         return request(supplier,
                 Util::decode,
@@ -280,6 +288,7 @@ public class Base {
      * @return requested response
      * @throws E if document if not found in cache
      */
+    @Deprecated(since = "0.7.0")
     public <E extends Exception> String[] requestArray(String... keys) throws E {
         return request2(Base::throwNSE,
                 values -> values == null ? null : StreamSupport.stream(values.spliterator(), false).collect(Collectors.toList()).toArray(new String[0]),
@@ -352,7 +361,7 @@ public class Base {
 
     /**
      * Looks for an Object in stub-file or gets it from the supplier. Uses encoder and decoder to convert the request
-     * and results in the stub-file. Uses keys to match the request in the stub-files
+     * and results in the stub-file. It uses keys to match the request in the stub-files.
      *
      * @param supplier provide real answer
      * @param decoder  create object from values

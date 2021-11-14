@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,6 +30,9 @@ class RandomGeneratorTest {
         En en;
         LocalDate localDate;
         LocalDateTime localDateTime;
+        OffsetTime offsetTime;
+        OffsetDateTime offsetDateTime;
+        ZonedDateTime zonedDateTime;
 
         public int getI() {
             return i;
@@ -119,6 +121,30 @@ class RandomGeneratorTest {
         public void setLocalDateTime(LocalDateTime localDateTime) {
             this.localDateTime = localDateTime;
         }
+
+        public OffsetTime getOffsetTime() {
+            return offsetTime;
+        }
+
+        public void setOffsetTime(OffsetTime offsetTime) {
+            this.offsetTime = offsetTime;
+        }
+
+        public OffsetDateTime getOffsetDateTime() {
+            return offsetDateTime;
+        }
+
+        public void setOffsetDateTime(OffsetDateTime offsetDateTime) {
+            this.offsetDateTime = offsetDateTime;
+        }
+
+        public ZonedDateTime getZonedDateTime() {
+            return zonedDateTime;
+        }
+
+        public void setZonedDateTime(ZonedDateTime zonedDateTime) {
+            this.zonedDateTime = zonedDateTime;
+        }
     }
 
     static public class B {
@@ -134,54 +160,20 @@ class RandomGeneratorTest {
     }
 
     @Test
-    void t1() throws JsonProcessingException, InvocationTargetException, IllegalAccessException {
-        String s;
-        s = ObjectMapperFactory.get().writeValueAsString(123);
+    void t1() throws JsonProcessingException {
 
-        ObjectMapperFactory.get().readValue(s, Integer.class);
-
-        String[] sa = new String[]{"123", "543"};
-        s = ObjectMapperFactory.get().writeValueAsString(sa);
-        A a = ObjectMapperFactory.get().readValue("{}", A.class);
-
-        Class<? extends A> aClass = a.getClass();
-        for (Method m : aClass.getMethods()) {
-            if (!m.getName().startsWith("set")) {
-                continue;
-            }
-//            System.out.println(m.getName());
-            System.out.println(m.getParameterTypes()[0]);
-            Class<?> parameterType = m.getParameterTypes()[0];
-            if (parameterType.isArray()) {
-                Object o = ObjectMapperFactory.get().readValue("[]", parameterType);
-                m.invoke(a, o);
-                continue;
-            }
-
-            if (parameterType.getName() == "int") {
-                Integer v = 1;
-                m.invoke(a, v);
-                continue;
-            }
-//            System.out.println(m.getReturnType().getName());
-        }
-
-        System.out.println(ObjectMapperFactory.get().writeValueAsString(a));
+        List list = ObjectMapperFactory.get().readValue("[]", List.class);
+        System.out.println(list);
 
     }
 
     @Test
     void t2() throws JsonProcessingException {
-        Integer g = RandomGenerator.g(int.class);
-        System.out.println(g);
-        Double gd = RandomGenerator.g(double.class);
-        System.out.println(gd);
-        String g1 = RandomGenerator.g(String.class);
-        System.out.println(g1);
 
         A a = RandomGenerator.g(A.class);
-        System.out.println(ObjectMapperFactory.get().writeValueAsString(a));
+        String s = ObjectMapperFactory.get().writeValueAsString(a);
 
+        System.out.println(s);
     }
 
     @Test

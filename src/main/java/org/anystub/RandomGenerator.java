@@ -79,6 +79,14 @@ public class RandomGenerator {
             log.finest(() -> String.format("cannot build empty object for %s", genClass.getName()));
         }
 
+        try {
+            R r = ObjectMapperFactory.get().readValue("[]", genClass);
+            populate(r);
+            return r;
+        } catch (JacksonException ex) {
+            log.finest(() -> String.format("cannot build empty object for %s", genClass.getName()));
+        }
+
         return null;
     }
 

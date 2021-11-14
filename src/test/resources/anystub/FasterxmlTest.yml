@@ -1,7 +1,7 @@
 request0:
   exception: []
-  keys: ['"wieurowiuesflksdl "', '[2021,7,13]']
-  values: '"iuesflksdl 2021-07-13"'
+  keys: ['wieurowiuesflksdl ', '[2021,7,13]']
+  values: 'iuesflksdl 2021-07-13'
 request1:
   exception: []
   keys: '{"weight":303,"capacity":5,"prod":[2021,11,13]}'

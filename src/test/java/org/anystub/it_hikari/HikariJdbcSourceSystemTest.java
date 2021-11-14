@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 
@@ -39,8 +40,8 @@ public class HikariJdbcSourceSystemTest {
     public void testSome() {
 
         log.info("Creating tables");
-        log.info(String.format("ds is null: %b", dataSource==null));
-        log.info(String.format("jdbcT is null: %b", jdbcTemplate==null));
+        assertNotNull(dataSource);
+        assertNotNull(jdbcTemplate);
 
         jdbcTemplate.execute("DROP TABLE customers IF EXISTS");
         jdbcTemplate.execute("CREATE TABLE customers(" +
