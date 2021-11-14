@@ -165,7 +165,7 @@ class RandomGeneratorTest {
         A a = RandomGenerator.g(A.class);
         String s = ObjectMapperFactory.get().writeValueAsString(a);
 
-        assertFalse(s.contains("null"));
+        assertFalse(s.contains("null"), s);
     }
 
     @Test

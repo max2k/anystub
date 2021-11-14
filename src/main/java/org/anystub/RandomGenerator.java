@@ -17,6 +17,53 @@ public class RandomGenerator {
     private static final String[] javaTypes = {"int", "double"};
 
     public static <R> R g(Class<R> genClass) {
+
+
+        if (genClass.isPrimitive()) {
+            return gPrimitive(genClass);
+        }
+
+        R r;
+        r = gBasic(genClass);
+        if (r != null) {
+            return r;
+        }
+
+        r = gTime(genClass);
+        if (r!=null) {
+            return r;
+        }
+
+        if (genClass.isArray()) {
+            try {
+                r = ObjectMapperFactory.get().readValue("[]", genClass);
+            } catch (JsonProcessingException e) {
+                log.finest(() -> String.format("cannot build empty array for %s", genClass.getName()));
+            }
+            return r;
+        }
+
+
+        try {
+            r = ObjectMapperFactory.get().readValue("{}", genClass);
+            populate(r);
+            return r;
+        } catch (JacksonException ex) {
+            log.finest(() -> String.format("cannot build empty object for %s", genClass.getName()));
+        }
+
+        try {
+            // attempt to create an empty list
+            r = ObjectMapperFactory.get().readValue("[]", genClass);
+            return r;
+        } catch (JacksonException ex) {
+            log.finest(() -> String.format("cannot build an empty list for %s", genClass.getName()));
+        }
+
+        return null;
+    }
+
+    public static <R> R gPrimitive(Class<R> genClass) {
         if (genClass.equals(int.class)) {
             Object o = gInt();
             return (R) o;
@@ -25,10 +72,35 @@ public class RandomGenerator {
             Object o = (byte) gInt();
             return (R) o;
         }
+        if (genClass.equals(char.class)) {
+            Object o = (char) gInt();
+            return (R) o;
+        }
+        if (genClass.equals(boolean.class)) {
+            Object o = random.nextBoolean();
+            return (R) o;
+        }
         if (genClass.equals(double.class)) {
             Object o = gDouble();
             return (R) o;
         }
+        if (genClass.equals(short.class)) {
+            Object o = (short) gInt();
+            return (R) o;
+        }
+        if (genClass.equals(long.class)) {
+            Object o = (long) gInt();
+            return (R) o;
+        }
+        if (genClass.equals(float.class)) {
+            Object o = (float) gDouble();
+            return (R) o;
+        }
+
+        return null;
+    }
+
+    public static <R> R gBasic(Class<R> genClass) {
         if (genClass.equals(String.class)) {
             return (R) gString();
         }
@@ -38,24 +110,18 @@ public class RandomGenerator {
         if (genClass.equals(Double.class)) {
             return (R) (Double) gDouble();
         }
-
-        if(genClass.isPrimitive()) {
-            return null;
+        if (genClass.equals(byte[].class)) {
+            byte[] n = new byte[random.nextInt() + 10];
+            random.nextBytes(n);
+            return (R) n;
         }
-
         if (genClass.isEnum()) {
-           return gEnum(genClass);
+            return gEnum(genClass);
         }
+        return null;
+    }
 
-        if (genClass.isArray()) {
-            R r;
-            try {
-                r = ObjectMapperFactory.get().readValue("[]", genClass);
-            } catch (JsonProcessingException e) {
-                r = null;
-            }
-            return r;
-        }
+    public static <R> R gTime(Class<R> genClass) {
         if (genClass.equals(LocalDateTime.class)) {
             return (R) gDateTime();
         }
@@ -67,29 +133,12 @@ public class RandomGenerator {
             return (R) gOffsetDateTime();
         }
 
-        if(genClass.equals(OffsetTime.class)) {
+        if (genClass.equals(OffsetTime.class)) {
             return (R) gOffsetTime();
         }
-        if(genClass.equals(ZonedDateTime.class)) {
+        if (genClass.equals(ZonedDateTime.class)) {
             return (R) gZonedDateTime();
         }
-
-        try {
-            R r = ObjectMapperFactory.get().readValue("{}", genClass);
-            populate(r);
-            return r;
-        } catch (JacksonException ex) {
-            log.finest(() -> String.format("cannot build empty object for %s", genClass.getName()));
-        }
-
-        try {
-            R r = ObjectMapperFactory.get().readValue("[]", genClass);
-            populate(r);
-            return r;
-        } catch (JacksonException ex) {
-            log.finest(() -> String.format("cannot build empty object for %s", genClass.getName()));
-        }
-
         return null;
     }
 
@@ -170,7 +219,7 @@ public class RandomGenerator {
             Object[] instances = (Object[]) invoke;
             return (R) instances[random.nextInt(instances.length)];
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            log.finest(()->String.format("cannot get instance of enum %s", genClass.getName()));
+            log.finest(() -> String.format("cannot get instance of enum %s", genClass.getName()));
         }
         return null;
     }
