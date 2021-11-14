@@ -20,9 +20,22 @@ class RandomGeneratorTest {
 
     static public class A {
         int i;
+        byte bb;
+        char cc;
+        boolean bbb;
+        double ddd;
+        short aShort;
+        long aLong;
+        float aFloat;
+        byte [] bytes;
+
         Integer II;
         Double d;
         String s;
+        Long aLong1;
+        Float aFloat1;
+        Byte aByte1;
+
         String[] sa;
         List<String> ls;
         B b;
@@ -33,6 +46,8 @@ class RandomGeneratorTest {
         OffsetTime offsetTime;
         OffsetDateTime offsetDateTime;
         ZonedDateTime zonedDateTime;
+
+
 
         public int getI() {
             return i;
@@ -144,6 +159,94 @@ class RandomGeneratorTest {
 
         public void setZonedDateTime(ZonedDateTime zonedDateTime) {
             this.zonedDateTime = zonedDateTime;
+        }
+
+        public byte getBb() {
+            return bb;
+        }
+
+        public void setBb(byte bb) {
+            this.bb = bb;
+        }
+
+        public char getCc() {
+            return cc;
+        }
+
+        public void setCc(char cc) {
+            this.cc = cc;
+        }
+
+        public boolean isBbb() {
+            return bbb;
+        }
+
+        public void setBbb(boolean bbb) {
+            this.bbb = bbb;
+        }
+
+        public double getDdd() {
+            return ddd;
+        }
+
+        public void setDdd(double ddd) {
+            this.ddd = ddd;
+        }
+
+        public short getaShort() {
+            return aShort;
+        }
+
+        public void setaShort(short aShort) {
+            this.aShort = aShort;
+        }
+
+        public long getaLong() {
+            return aLong;
+        }
+
+        public void setaLong(long aLong) {
+            this.aLong = aLong;
+        }
+
+        public float getaFloat() {
+            return aFloat;
+        }
+
+        public void setaFloat(float aFloat) {
+            this.aFloat = aFloat;
+        }
+
+        public byte[] getBytes() {
+            return bytes;
+        }
+
+        public void setBytes(byte[] bytes) {
+            this.bytes = bytes;
+        }
+
+        public Long getaLong1() {
+            return aLong1;
+        }
+
+        public void setaLong1(Long aLong1) {
+            this.aLong1 = aLong1;
+        }
+
+        public Float getaFloat1() {
+            return aFloat1;
+        }
+
+        public void setaFloat1(Float aFloat1) {
+            this.aFloat1 = aFloat1;
+        }
+
+        public Byte getaByte1() {
+            return aByte1;
+        }
+
+        public void setaByte1(Byte aByte1) {
+            this.aByte1 = aByte1;
         }
     }
 

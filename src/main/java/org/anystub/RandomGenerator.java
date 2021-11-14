@@ -11,10 +11,11 @@ import java.util.logging.Logger;
 
 public class RandomGenerator {
 
-    private static final Logger log = Logger.getLogger(Base.class.getName());
+    private static final Logger log = Logger.getLogger(RandomGenerator.class.getName());
     private static final Random random = new Random();
 
-    private static final String[] javaTypes = {"int", "double"};
+    private RandomGenerator() {
+    }
 
     public static <R> R g(Class<R> genClass) {
 
@@ -110,8 +111,17 @@ public class RandomGenerator {
         if (genClass.equals(Double.class)) {
             return (R) (Double) gDouble();
         }
+        if (genClass.equals(Long.class)) {
+            return (R) (Long) (long) gInt();
+        }
+        if (genClass.equals(Float.class)) {
+            return (R) (Float)(float) gDouble();
+        }
+        if (genClass.equals(Byte.class)) {
+            return (R) (Byte)(byte) gInt();
+        }
         if (genClass.equals(byte[].class)) {
-            byte[] n = new byte[random.nextInt() + 10];
+            byte[] n = new byte[random.nextInt(10) + 10];
             random.nextBytes(n);
             return (R) n;
         }
