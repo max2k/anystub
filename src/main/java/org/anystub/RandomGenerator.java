@@ -29,13 +29,13 @@ public class RandomGenerator {
             Object o = gDouble();
             return (R) o;
         }
-        if (genClass.getName().equals(String.class.getName())) {
+        if (genClass.equals(String.class)) {
             return (R) gString();
         }
-        if (genClass.getName().equals(Integer.class.getName())) {
+        if (genClass.equals(Integer.class)) {
             return (R) (Object) gInt();
         }
-        if (genClass.getName().equals(Double.class.getName())) {
+        if (genClass.equals(Double.class)) {
             return (R) (Double) gDouble();
         }
 
@@ -69,6 +69,9 @@ public class RandomGenerator {
 
         if(genClass.equals(OffsetTime.class)) {
             return (R) gOffsetTime();
+        }
+        if(genClass.equals(ZonedDateTime.class)) {
+            return (R) gZonedDateTime();
         }
 
         try {

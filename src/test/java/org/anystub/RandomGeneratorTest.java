@@ -160,20 +160,12 @@ class RandomGeneratorTest {
     }
 
     @Test
-    void t1() throws JsonProcessingException {
-
-        List list = ObjectMapperFactory.get().readValue("[]", List.class);
-        System.out.println(list);
-
-    }
-
-    @Test
     void t2() throws JsonProcessingException {
 
         A a = RandomGenerator.g(A.class);
         String s = ObjectMapperFactory.get().writeValueAsString(a);
 
-        System.out.println(s);
+        assertFalse(s.contains("null"));
     }
 
     @Test
