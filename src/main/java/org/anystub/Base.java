@@ -270,6 +270,8 @@ public class Base {
      * @param <E>      expected exception
      * @return recovered object
      * @throws E expected exception
+     *
+     * @deprecated use requestO instead
      */
     @Deprecated(since = "0.7.0")
     public <T extends Serializable, E extends Exception> T requestSerializable(Supplier<T, E> supplier, String... keys) throws E {
@@ -287,6 +289,8 @@ public class Base {
      * @param <E>  type of allowed Exception
      * @return requested response
      * @throws E if document if not found in cache
+     *
+     * @deprecated use requestO instead
      */
     @Deprecated(since = "0.7.0")
     public <E extends Exception> String[] requestArray(String... keys) throws E {
@@ -305,7 +309,10 @@ public class Base {
      * @param <E>      expected exception
      * @return string array. it could be null;
      * @throws E expected exception
+     *
+     * @deprecated use requestO instead
      */
+    @Deprecated(since = "0.7.0")
     public <E extends Exception> String[] requestArray(Supplier<String[], E> supplier, String... keys) throws E {
         return request2(supplier,
                 values -> values == null ? null : StreamSupport.stream(values.spliterator(), false).collect(Collectors.toList()).toArray(new String[0]),

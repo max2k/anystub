@@ -276,4 +276,16 @@ class RandomGeneratorTest {
         En en = RandomGenerator.gEnum(En.class);
         System.out.println(en);
     }
+
+    @Test
+    void arrayLoopTest() throws JsonProcessingException {
+        String[] t =new String[]{"abc", "xyz"};
+
+        String s = ObjectMapperFactory.get().writeValueAsString(t);
+        String[] recoveredT = ObjectMapperFactory.get().readValue(s, String[].class);
+
+        assertArrayEquals(t, recoveredT);
+
+
+    }
 }
