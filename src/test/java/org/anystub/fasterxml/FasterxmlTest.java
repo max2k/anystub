@@ -14,7 +14,7 @@ import java.time.LocalDate;
 
 @SpringBootTest
 @AnyStubId
-public class FasterxmlTest {
+class FasterxmlTest {
 
     @Autowired
     RandomSystem systemr;
@@ -46,7 +46,7 @@ public class FasterxmlTest {
         @Bean
         @Primary
         public RandomSystem systemrTest(@Qualifier("randomSystem") RandomSystem v) {
-            return new RandomSystemTest(v);
+            return new RandomSystemT(v);
         }
     }
 

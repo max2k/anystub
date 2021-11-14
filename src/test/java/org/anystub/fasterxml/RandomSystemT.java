@@ -4,9 +4,9 @@ import org.anystub.mgmt.BaseManagerFactory;
 
 import java.time.LocalDate;
 
-public class RandomSystemTest extends RandomSystem {
+public class RandomSystemT extends RandomSystem {
     private final RandomSystem v;
-    public RandomSystemTest(RandomSystem v) {
+    public RandomSystemT(RandomSystem v) {
         super();
         this.v = v;
     }
