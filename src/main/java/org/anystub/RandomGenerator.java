@@ -145,7 +145,7 @@ public class RandomGenerator {
 
     public static OffsetDateTime gOffsetDateTime() {
         return OffsetDateTime.now()
-                .plusDays(random.nextInt(100) - 200)
+                .plusDays(random.nextInt(100) - 200L)
                 .plusHours(random.nextInt(3))
                 .plusMinutes(random.nextInt(10))
                 .plusSeconds(random.nextInt(60));
