@@ -56,11 +56,4 @@ public class BaseManagerFactoryTest {
         assertEquals("stub.yml", new File(locate.getFilePath()).getName());
     }
 
-    @Test
-    void initTest() {
-        Base test1 = BaseManagerFactory.getBaseManager().getBase("test1");
-        assertTrue(test1.isNew());
-        test1.put("key1", "val");
-        BaseManagerFactory.setDefaultStubInitializer(null);
-    }
 }

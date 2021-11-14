@@ -25,10 +25,10 @@ import static org.anystub.RequestMode.*;
  */
 public class Base {
 
-    private static Logger log = Logger.getLogger(Base.class.getName());
-    private List<Document> documentList = new ArrayList<>();
+    private static final Logger log = Logger.getLogger(Base.class.getName());
+    private final List<Document> documentList = new ArrayList<>();
     private Iterator<Document> documentListTrackIterator;
-    private List<Document> requestHistory = new ArrayList<>();
+    private final List<Document> requestHistory = new ArrayList<>();
     private final String filePath;
     private boolean isNew = true;
     private RequestMode requestMode = rmNew;
