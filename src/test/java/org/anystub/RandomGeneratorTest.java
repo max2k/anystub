@@ -300,5 +300,42 @@ class RandomGeneratorTest {
         assertArrayEquals(t, recoveredT);
 
 
+
+    }
+
+    enum AZ {
+        aa,bb
+    }
+
+    @Test
+    void TypeNameGen() {
+        RandomGenerator.g(new TypeReference<Integer>() {
+        });
+        RandomGenerator.g(new TypeReference<String>() {
+        });
+        RandomGenerator.g(new TypeReference<Double>() {
+        });
+        RandomGenerator.g(new TypeReference<Long>() {
+        });
+        RandomGenerator.g(new TypeReference<Float>() {
+        });
+        RandomGenerator.g(new TypeReference<Byte>() {
+        });
+        byte[] g = RandomGenerator.g(new TypeReference<byte[]>() {
+        });
+        assertTrue(g.length >= 10);
+        RandomGenerator.g(new TypeReference<AZ>() {
+        });
+
+        RandomGenerator.g(new TypeReference<LocalDateTime>() {
+        });
+        RandomGenerator.g(new TypeReference<LocalDate>() {
+        });
+        RandomGenerator.g(new TypeReference<OffsetDateTime>() {
+        });
+        RandomGenerator.g(new TypeReference<OffsetTime>() {
+        });
+        RandomGenerator.g(new TypeReference<ZonedDateTime>() {
+        });
     }
 }

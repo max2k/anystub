@@ -231,12 +231,7 @@ public class RandomGenerator {
 
     public static <R> R g(TypeReference<R> returnType) {
         String typeName = returnType.getType().getTypeName();
-        R r = null;
-        r = gPrimitive(typeName);
-        if (r != null) {
-            return r;
-        }
-        r = gBasic(typeName);
+        R r = gBasic(typeName);
         if (r != null) {
             return r;
         }
@@ -262,42 +257,7 @@ public class RandomGenerator {
 
     }
 
-    public static <R> R gPrimitive(String genClass) {
-        if (genClass.equals("int")) {
-            Object o = gInt();
-            return (R) o;
-        }
-        if (genClass.equals("byte")) {
-            Object o = (byte) gInt();
-            return (R) o;
-        }
-        if (genClass.equals("char")) {
-            Object o = (char) gInt();
-            return (R) o;
-        }
-        if (genClass.equals("boolean")) {
-            Object o = random.nextBoolean();
-            return (R) o;
-        }
-        if (genClass.equals("double")) {
-            Object o = gDouble();
-            return (R) o;
-        }
-        if (genClass.equals("short")) {
-            Object o = (short) gInt();
-            return (R) o;
-        }
-        if (genClass.equals("long")) {
-            Object o = (long) gInt();
-            return (R) o;
-        }
-        if (genClass.equals("float")) {
-            Object o = (float) gDouble();
-            return (R) o;
-        }
 
-        return null;
-    }
 
     public static <R> R gBasic(String genClass) {
         if (genClass.equals(String.class.getName())) {
@@ -318,14 +278,11 @@ public class RandomGenerator {
         if (genClass.equals(Byte.class.getName())) {
             return (R) (Byte) (byte) gInt();
         }
-        if (genClass.equals(byte[].class.getName())) {
+        if (genClass.equals("byte[]")) {
             byte[] n = new byte[random.nextInt(10) + 10];
             random.nextBytes(n);
             return (R) n;
         }
-//        if (genClass.isEnum()) {
-//            return gEnum(genClass);
-//        }
         return null;
     }
 
