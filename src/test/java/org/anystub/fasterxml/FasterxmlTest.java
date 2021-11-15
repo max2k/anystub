@@ -1,7 +1,7 @@
 package org.anystub.fasterxml;
 
 import org.anystub.AnyStubId;
-import org.junit.jupiter.api.Assertions;
+import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,6 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @AnyStubId
@@ -24,7 +28,7 @@ class FasterxmlTest {
     void remoteCall() {
         String res = systemr.get("wieurowiuesflksdl ", LocalDate.of(2021,7,13));
 
-        Assertions.assertEquals("iuesflksdl 2021-07-13", res);
+        assertEquals("iuesflksdl 2021-07-13", res);
     }
 
 
@@ -36,7 +40,26 @@ class FasterxmlTest {
         c.setCapacity(5);
         RandomSystem.Car cc = systemr.get(c);
 
-        Assertions.assertEquals(359, cc.getWeight());
+        assertEquals(359, cc.getWeight());
+    }
+
+    @Test
+    void getList() {
+        List<String> l = systemr.getL("unique-param");
+
+        assertEquals(asList("111", "222"), l);
+    }
+
+
+    @Test
+    void postCallTest() {
+        RandomSystem.Car c = new RandomSystem.Car();
+        c.setProd(LocalDate.of(2021,01,12));
+        c.setWeight(100);
+        c.setCapacity(50);
+        systemr.post(c);
+
+        assertEquals(1, BaseManagerFactory.locate().times("post"));
     }
 
 

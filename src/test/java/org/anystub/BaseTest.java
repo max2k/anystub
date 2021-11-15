@@ -447,5 +447,13 @@ public class BaseTest {
         assertEquals("[][!\"#$%&'()*+,./:;<=>?@\\^_`{|}~-]", request);
     }
 
+    void testNoResponseRequest() {
+        Base base = BaseManagerFactory.getBaseManager()
+                .getBase("noResponse.yml");
+
+//        base.request2()
+
+    }
+
 
 }

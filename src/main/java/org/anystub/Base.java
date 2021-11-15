@@ -487,6 +487,12 @@ public class Base {
         return decoder.decode(responseData);
     }
 
+    public <E extends Exception> void post(Consumer<E> consumer, Object... keys) throws E{
+        requestO(()->{
+            consumer.run();
+            return null;
+        }, Void.class, keys);
+    }
 
     /**
      * reloads stub-file - IOException exceptions are suppressed

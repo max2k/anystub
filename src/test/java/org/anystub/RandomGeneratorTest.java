@@ -279,6 +279,8 @@ class RandomGeneratorTest {
 
     @Test
     void arrayLoopTest() throws JsonProcessingException {
+
+
         String[] t =new String[]{"abc", "xyz"};
 
         String s = ObjectMapperFactory.get().writeValueAsString(t);
