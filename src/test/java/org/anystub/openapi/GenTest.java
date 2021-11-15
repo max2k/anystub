@@ -3,6 +3,7 @@ package org.anystub.openapi;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.anystub.AnyStubId;
 import org.anystub.RequestMode;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openapitools.client.ApiException;
 import org.openapitools.client.api.PetApi;
@@ -25,11 +26,11 @@ public class GenTest {
 
 
         assertEquals(-592218937L, petById.getId());
-        System.out.println(petById);
     }
 
     @Test
     @AnyStubId(requestMode = RequestMode.rmPassThrough)
+    @Disabled("sometime the API gives correct response")
     void requestException() throws ApiException {
         PetApi petApi = new PetApi();
 
@@ -37,17 +38,12 @@ public class GenTest {
 
 
         assertThrows(Exception.class, () -> {
-            petApiTest.getPetById(123L);
+            Pet petById = petApiTest.getPetById(123L);
+            System.out.println(petById.toString());
         });
 
 
     }
 
-    @Test
-    void typeTest() {
-        TypeReference<String> rt = new TypeReference<>() {
-        };
 
-        assertEquals("", rt.getType().getTypeName());
-    }
 }
