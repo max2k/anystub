@@ -1,6 +1,7 @@
 package org.anystub;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -266,6 +267,16 @@ class RandomGeneratorTest {
     void t2() throws JsonProcessingException {
 
         A a = RandomGenerator.g(A.class);
+        String s = ObjectMapperFactory.get().writeValueAsString(a);
+
+        assertFalse(s.contains("null"), s);
+    }
+
+    @Test
+    void t3() throws JsonProcessingException {
+        TypeReference<A> type = new TypeReference<A>() {
+        };
+        A a = RandomGenerator.g(type);
         String s = ObjectMapperFactory.get().writeValueAsString(a);
 
         assertFalse(s.contains("null"), s);

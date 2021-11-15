@@ -1,6 +1,10 @@
 package org.anystub.fasterxml;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.anystub.AnyStubId;
+import org.anystub.ObjectMapperFactory;
 import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +64,16 @@ class FasterxmlTest {
         systemr.post(c);
 
         assertEquals(1, BaseManagerFactory.locate().times("post"));
+    }
+
+    @Test
+    void recoverWithRefType() throws JsonProcessingException {
+        TypeReference<List<String>> returnType = new TypeReference<>() {};
+        ObjectMapper objectMapper = ObjectMapperFactory.get();
+
+        String in = "[\"111\", \"222\"]";
+        List<String> strings = objectMapper.readValue(in, returnType);
+        assertEquals(asList("111","222"), strings);
     }
 
 

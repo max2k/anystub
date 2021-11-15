@@ -3,7 +3,6 @@ package org.anystub;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.core.ParameterizedTypeReference;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -211,24 +210,25 @@ public class Base {
      * @throws E
      */
     public <R, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
-        if (keys.length == 1) {
-            String key;
-            key = new EncoderJson<Object>().encode(keys[0]);
-            return request(supplier,
-                    new DecoderJson<R>(responseClass),
-                    new EncoderJson<>(),
-                    key);
-        }
+//        if (keys.length == 1) {
+//            String key;
+//            key = new EncoderJson<Object>().encode(keys[0]);
+//            return request(supplier,
+//                    new DecoderJson<R>(responseClass),
+//                    new EncoderJson<>(),
+//                    key);
+//        }
         String[] sKeys = new String[keys.length];
 
         for (int i = 0; i < keys.length; i++) {
             sKeys[i] = new EncoderJson<>().encode(keys[i]);
         }
 
-        return request(supplier,
-                new DecoderJson<R>(responseClass),
-                new EncoderJson<>(),
-                sKeys);
+
+            return request(supplier,
+                    new DecoderJson<R>(responseClass),
+                    new EncoderJson<>(),
+                    sKeys);
     }
 
     public <R, E extends Exception> R requestO(Supplier<R, E> supplier, TypeReference<R> returnType, Object... keys) throws E {
@@ -238,8 +238,8 @@ public class Base {
             @Override
             public R decode(String values) {
                 try {
-                    objectMapper.readValue(values, returnType);
-                } catch (JsonProcessingException e) {
+                    return objectMapper.readValue(values, returnType);
+                } catch (JsonProcessingException | RuntimeException e) {
                     log.finest(() -> String.format("cannot recover object %s from %s", returnType, values));
                 }
                 return null;
@@ -247,24 +247,32 @@ public class Base {
         };
 
 
-        if (keys.length == 1) {
-            String key;
-            key = new EncoderJson<Object>().encode(keys[0]);
-            return request(supplier,
-                    d,
-                    new EncoderJson<>(),
-                    key);
-        }
+//        if (keys.length == 1) {
+//            String key;
+//            key = new EncoderJson<Object>().encode(keys[0]);
+//            return request(supplier,
+//                    d,
+//                    new EncoderJson<>(),
+//                    key);
+//        }
         String[] sKeys = new String[keys.length];
 
         for (int i = 0; i < keys.length; i++) {
             sKeys[i] = new EncoderJson<>().encode(keys[i]);
         }
 
-        return request(supplier,
-                d,
-                new EncoderJson<>(),
-                sKeys);
+        try {
+            return request(supplier,
+                    d,
+                    new EncoderJson<>(),
+                    sKeys);
+        } catch (RuntimeException e) {
+            if (requestMode == rmFake) {
+                R g = (R) RandomGenerator.g(returnType);
+                return g;
+            }
+            throw e;
+        }
     }
 
     /**
