@@ -4,8 +4,6 @@ import org.anystub.AnyStubFileLocator;
 import org.anystub.AnyStubId;
 import org.anystub.Base;
 
-import java.util.function.Consumer;
-
 public final class BaseManagerFactory {
     private static BaseManager baseManager = null;
 
