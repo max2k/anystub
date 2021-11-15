@@ -51,7 +51,7 @@ public class {{classname}}Test extends {{classname}} {
         return BaseManagerFactory.locate()
                         .requestO(()->
                             api.{{operationId}}({{#allParams}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}),
-                            returnType, "{{operationId}}", {{#allParams}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}
+                            returnType, "{{operationId}}" {{#allParams}}, {{paramName}}{{/allParams}}
                         );
 
         {{/returnType}}
@@ -59,7 +59,7 @@ public class {{classname}}Test extends {{classname}} {
              BaseManagerFactory.locate()
                             .post(() ->
                                 api.{{operationId}}({{#allParams}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}),
-                               "{{operationId}}", {{#allParams}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}});
+                               "{{operationId}}" {{#allParams}}, {{paramName}}{{/allParams}});
         {{/returnType}}
 
 
