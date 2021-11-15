@@ -210,25 +210,27 @@ public class Base {
      * @throws E
      */
     public <R, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
-//        if (keys.length == 1) {
-//            String key;
-//            key = new EncoderJson<Object>().encode(keys[0]);
-//            return request(supplier,
-//                    new DecoderJson<R>(responseClass),
-//                    new EncoderJson<>(),
-//                    key);
-//        }
+
         String[] sKeys = new String[keys.length];
 
         for (int i = 0; i < keys.length; i++) {
             sKeys[i] = new EncoderJson<>().encode(keys[i]);
         }
 
-
-            return request(supplier,
-                    new DecoderJson<R>(responseClass),
-                    new EncoderJson<>(),
-                    sKeys);
+        return request(() -> {
+                    try {
+                        return supplier.get();
+                    } catch (Exception e) {
+                        if (requestMode == rmFake) {
+                            return RandomGenerator.g(responseClass);
+                        } else {
+                            throw e;
+                        }
+                    }
+                },
+                new DecoderJson<R>(responseClass),
+                new EncoderJson<>(),
+                sKeys);
     }
 
     public <R, E extends Exception> R requestO(Supplier<R, E> supplier, TypeReference<R> returnType, Object... keys) throws E {
@@ -247,32 +249,27 @@ public class Base {
         };
 
 
-//        if (keys.length == 1) {
-//            String key;
-//            key = new EncoderJson<Object>().encode(keys[0]);
-//            return request(supplier,
-//                    d,
-//                    new EncoderJson<>(),
-//                    key);
-//        }
         String[] sKeys = new String[keys.length];
 
         for (int i = 0; i < keys.length; i++) {
             sKeys[i] = new EncoderJson<>().encode(keys[i]);
         }
 
-        try {
-            return request(supplier,
-                    d,
-                    new EncoderJson<>(),
-                    sKeys);
-        } catch (RuntimeException e) {
-            if (requestMode == rmFake) {
-                R g = (R) RandomGenerator.g(returnType);
-                return g;
-            }
-            throw e;
-        }
+        return request(() -> {
+                    try {
+                        return supplier.get();
+                    } catch (Exception e) {
+                        if (requestMode == rmFake) {
+                            return RandomGenerator.g(returnType);
+                        }
+                        throw e;
+                    }
+                },
+                d,
+                new EncoderJson<>(),
+                sKeys);
+
+
     }
 
     /**
@@ -758,11 +755,14 @@ public class Base {
     }
 
     private boolean seekInCache() {
-        return requestMode == rmNew || requestMode == rmNone;
+        return requestMode == rmNew ||
+                requestMode == rmNone ||
+                requestMode == rmFake;
     }
 
     private boolean writeInCache() {
         return requestMode == rmNew ||
+                requestMode == rmFake ||
                 requestMode == rmAll ||
                 (requestMode == rmTrack && documentListTrackIterator == null);
     }

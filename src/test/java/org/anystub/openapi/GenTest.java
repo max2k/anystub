@@ -9,9 +9,8 @@ import org.openapitools.client.api.PetApi;
 import org.openapitools.client.api.PetApiTest;
 import org.openapitools.client.model.Pet;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class GenTest {
 
@@ -22,10 +21,26 @@ public class GenTest {
 
         PetApiTest petApiTest = new PetApiTest(petApi);
 
-        Pet petById = petApiTest.getPetById(123L);
+        Pet petById = petApiTest.getPetById(1233L);
 
 
-        assertEquals(1L, petById.getId(), );
+        assertEquals(-592218937L, petById.getId());
+        System.out.println(petById);
+    }
+
+    @Test
+    @AnyStubId(requestMode = RequestMode.rmPassThrough)
+    void requestException() throws ApiException {
+        PetApi petApi = new PetApi();
+
+        PetApiTest petApiTest = new PetApiTest(petApi);
+
+
+        assertThrows(Exception.class, () -> {
+            petApiTest.getPetById(123L);
+        });
+
+
     }
 
     @Test
