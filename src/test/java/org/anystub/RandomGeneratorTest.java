@@ -285,7 +285,7 @@ class RandomGeneratorTest {
     @Test
     void enumTest() {
         En en = RandomGenerator.gEnum(En.class);
-        System.out.println(en);
+        assertNotNull(en);
     }
 
     @Test
