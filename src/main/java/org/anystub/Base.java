@@ -1,6 +1,9 @@
 package org.anystub;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.ParameterizedTypeReference;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -198,19 +201,16 @@ public class Base {
      * Requests an object. It looks for a document in a stub file
      * If it is not found then requests the value from the supplier.
      * Keys and response saves as json-strings
-     * @param supplier method which is able to return an actual response
+     *
+     * @param supplier      method which is able to return an actual response
      * @param responseClass type of the response
-     * @param keys all arguments of requested function
+     * @param keys          all arguments of requested function
      * @param <R>
      * @param <E>
      * @return
      * @throws E
      */
     public <R, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
-
-
         if (keys.length == 1) {
             String key;
             key = new EncoderJson<Object>().encode(keys[0]);
@@ -231,6 +231,42 @@ public class Base {
                 sKeys);
     }
 
+    public <R, E extends Exception> R requestO(Supplier<R, E> supplier, TypeReference<R> returnType, Object... keys) throws E {
+        DecoderSimple<R> d = new DecoderSimple<R>() {
+            final ObjectMapper objectMapper = ObjectMapperFactory.get();
+
+            @Override
+            public R decode(String values) {
+                try {
+                    objectMapper.readValue(values, returnType);
+                } catch (JsonProcessingException e) {
+                    log.finest(() -> String.format("cannot recover object %s from %s", returnType, values));
+                }
+                return null;
+            }
+        };
+
+
+        if (keys.length == 1) {
+            String key;
+            key = new EncoderJson<Object>().encode(keys[0]);
+            return request(supplier,
+                    d,
+                    new EncoderJson<>(),
+                    key);
+        }
+        String[] sKeys = new String[keys.length];
+
+        for (int i = 0; i < keys.length; i++) {
+            sKeys[i] = new EncoderJson<>().encode(keys[i]);
+        }
+
+        return request(supplier,
+                d,
+                new EncoderJson<>(),
+                sKeys);
+    }
+
     /**
      * Requests Boolean
      *
@@ -242,7 +278,7 @@ public class Base {
      */
     public <E extends Exception> Boolean requestB(Supplier<Boolean, E> supplier, String... keys) throws E {
         return requestO(supplier,
-            Boolean.class,
+                Boolean.class,
                 keys);
     }
 
@@ -270,7 +306,6 @@ public class Base {
      * @param <E>      expected exception
      * @return recovered object
      * @throws E expected exception
-     *
      * @deprecated use requestO instead
      */
     @Deprecated(since = "0.7.0")
@@ -289,7 +324,6 @@ public class Base {
      * @param <E>  type of allowed Exception
      * @return requested response
      * @throws E if document if not found in cache
-     *
      * @deprecated use requestO instead
      */
     @Deprecated(since = "0.7.0")
@@ -309,7 +343,6 @@ public class Base {
      * @param <E>      expected exception
      * @return string array. it could be null;
      * @throws E expected exception
-     *
      * @deprecated use requestO instead
      */
     @Deprecated(since = "0.7.0")
@@ -487,8 +520,8 @@ public class Base {
         return decoder.decode(responseData);
     }
 
-    public <E extends Exception> void post(Consumer<E> consumer, Object... keys) throws E{
-        requestO(()->{
+    public <E extends Exception> void post(Consumer<E> consumer, Object... keys) throws E {
+        requestO(() -> {
             consumer.run();
             return null;
         }, Void.class, keys);

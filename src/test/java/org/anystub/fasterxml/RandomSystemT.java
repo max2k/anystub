@@ -1,10 +1,9 @@
 package org.anystub.fasterxml;
 
-import org.anystub.Supplier;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.anystub.mgmt.BaseManagerFactory;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class RandomSystemT extends RandomSystem {
@@ -28,9 +27,10 @@ public class RandomSystemT extends RandomSystem {
 
     @Override
     public List<String> getL(String param) {
+        TypeReference<List<String>> returnType = new TypeReference<>() {};
         return BaseManagerFactory.locate()
                 .requestO(()->v.getL(param),
-                        List.class, "getL", param);
+                        returnType, "getL", param);
     }
 
     @Override
