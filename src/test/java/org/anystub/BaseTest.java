@@ -447,11 +447,14 @@ public class BaseTest {
         assertEquals("[][!\"#$%&'()*+,./:;<=>?@\\^_`{|}~-]", request);
     }
 
-    void testNoResponseRequest() {
-        Base base = BaseManagerFactory.getBaseManager()
-                .getBase("noResponse.yml");
 
-//        base.request2()
+    @Test
+    @AnyStubId
+    public void testRequestO(){
+        Base locate = BaseManagerFactory.locate();
+        String s = locate.requestO(() -> "test", String.class, "method", null, "another key");
+        assertEquals("test", s);
+
 
     }
 

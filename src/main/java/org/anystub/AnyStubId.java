@@ -15,7 +15,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface AnyStubId {
     /**
-     * Specifies a file name for current stub
+     * Specifies a file name for current stub.
+     * If not specified - name of testMethod/testClass is used.
      * Automatically adds extension - .yml if missing
      * example:
      *
