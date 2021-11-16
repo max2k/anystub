@@ -19,7 +19,9 @@ public class RandomGenerator {
     }
 
     public static <R> R g(Class<R> genClass) {
-
+        if (genClass == null) {
+            return null;
+        }
 
         if (genClass.isPrimitive()) {
             return gPrimitive(genClass);
@@ -230,6 +232,9 @@ public class RandomGenerator {
     }
 
     public static <R> R g(TypeReference<R> returnType) {
+        if(returnType==null) {
+            return null;
+        }
         String typeName = returnType.getType().getTypeName();
         R r = gBasic(typeName);
         if (r != null) {
