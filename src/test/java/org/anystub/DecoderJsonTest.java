@@ -44,4 +44,12 @@ class DecoderJsonTest {
         });
 
     }
+
+    @Test
+    void decodePrimitives() {
+        assertEquals(1, new DecoderJson<>(int.class).decode("1"));
+        assertEquals(1.123, new DecoderJson<>(double.class).decode("1.123"));
+        assertEquals("1.123", new DecoderJson<>(String.class).decode("1.123"));
+        assertEquals(true, new DecoderJson<>(boolean.class).decode("true"));
+    }
 }

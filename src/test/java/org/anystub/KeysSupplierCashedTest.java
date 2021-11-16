@@ -9,7 +9,7 @@ public class KeysSupplierCashedTest {
 
 
     @Test
-    public void testSet() {
+    void testSet() {
 
         int[] i = new int[]{0};
 
@@ -21,6 +21,31 @@ public class KeysSupplierCashedTest {
 
         assertArrayEquals(new String[]{"1"}, keysSupplier.get());
         assertArrayEquals(new String[]{"1"}, keysSupplier.get());
+
+    }
+
+    @Test
+    @AnyStubId(requestMasks = "test1")
+    void keyMask() {
+        KeysSupplier keysSupplier = new KeysSupplierCashed(() -> {
+
+            return new String[]{"test", "test1", "hello from test1 to test and test3"};
+        });
+
+
+        assertArrayEquals(new String[]{"test", "...", "hello from ... to test and test3"}, keysSupplier.get());
+
+    }
+    @Test
+    @AnyStubId(requestMasks = "t.*s")
+    void keyMaskRegexp() {
+        KeysSupplier keysSupplier = new KeysSupplierCashed(() -> {
+
+            return new String[]{"test", "test1", "hello from test1 to test and test3"};
+        });
+
+
+        assertArrayEquals(new String[]{"...t", "...t1", "hello from ...t3"}, keysSupplier.get());
 
     }
 }

@@ -1,9 +1,13 @@
 package org.anystub.fasterxml;
 
 
+import org.anystub.RandomGenerator;
+import org.anystub.Supplier;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class RandomSystem {
@@ -57,5 +61,15 @@ public class RandomSystem {
         cc.setProd(c.getProd().minusDays(20).minusDays(i));
 
         return cc;
+    }
+    public List<String> getL(String param) {
+        List<String> res = new ArrayList<>();
+        for(int i=0; i<10; i++){
+            res.add(RandomGenerator.gString());
+        }
+        return res;
+    }
+
+    public void post(Car c) {
     }
 }

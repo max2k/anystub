@@ -29,7 +29,7 @@ public class Document {
 
     /**
      * creates a Document with nullValue
-     * @param keys
+     * @param keys list of strings to add to a document as a key
      */
     public Document(String... keys) {
         this.keys.addAll(asList(keys));
@@ -50,8 +50,8 @@ public class Document {
 
     /**
      *
-     * @param keys
-     * @param values if values == null the Document
+     * @param keys list of strings to add to a document as a key
+     * @param values if values == null the Document will include null as a value
      */
     public Document(String[] keys, String[] values) {
         this.keys.addAll(asList(keys));

@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.util.function.Consumer;
 
 import static org.anystub.mgmt.BaseManagerFactory.getStub;
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,11 +56,4 @@ public class BaseManagerFactoryTest {
         assertEquals("stub.yml", new File(locate.getFilePath()).getName());
     }
 
-    @Test
-    void initTest() {
-        Base test1 = BaseManagerFactory.getBaseManager().getBase("test1");
-        assertTrue(test1.isNew());
-        test1.put("key1", "val");
-        BaseManagerFactory.setDefaultStubInitializer(null);
-    }
 }

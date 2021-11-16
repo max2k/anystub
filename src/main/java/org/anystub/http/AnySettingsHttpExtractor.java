@@ -4,6 +4,10 @@ import java.lang.reflect.Method;
 
 public class AnySettingsHttpExtractor {
 
+    private AnySettingsHttpExtractor() {
+
+    }
+
     public static AnySettingsHttp discoverSettings() {
         AnySettingsHttp id = null;
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -11,11 +15,11 @@ public class AnySettingsHttpExtractor {
             if (s.getMethodName().startsWith("lambda$")) {
                 continue;
             }
-            Class<?> aClass = null;
+            Class<?> aClass;
             try {
                 aClass = Class.forName(s.getClassName());
             } catch (ClassNotFoundException ignored) {
-
+                aClass = null;
             }
             if (aClass == null) {
                 continue;

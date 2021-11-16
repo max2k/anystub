@@ -1,5 +1,7 @@
 package org.anystub;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
@@ -21,14 +23,14 @@ import static org.anystub.RequestMode.*;
  * methods request* allow get/keep data in file
  * <p>
  * Check {@link RequestMode} to find options to control get access to external system and store requests strategy
- * <p>
+ *
  */
 public class Base {
 
-    private static Logger log = Logger.getLogger(Base.class.getName());
-    private List<Document> documentList = new ArrayList<>();
+    private static final Logger log = Logger.getLogger(Base.class.getName());
+    private final List<Document> documentList = new ArrayList<>();
     private Iterator<Document> documentListTrackIterator;
-    private List<Document> requestHistory = new ArrayList<>();
+    private final List<Document> requestHistory = new ArrayList<>();
     private final String filePath;
     private boolean isNew = true;
     private RequestMode requestMode = rmNew;
@@ -137,6 +139,13 @@ public class Base {
                 .findFirst();
     }
 
+    /**
+     * returns Finds entity in a stub using the key. returns 1st value string
+     * @param keys keys to find request
+     * @return
+     * @deprecated since = "0.7.0"
+     */
+    @Deprecated(since = "0.7.0")
     public String get(String... keys) {
         return getVals(keys).iterator().next();
     }
@@ -198,28 +207,90 @@ public class Base {
      * Requests an object. It looks for a document in a stub file
      * If it is not found then requests the value from the supplier.
      * Keys and response saves as json-strings
-     * @param supplier method which is able to return an actual response
+     * Supports response generating: look at RequestMode.rmFake
+     *
+     * @param supplier      method which is able to return an actual response
      * @param responseClass type of the response
-     * @param keys all arguments of requested function
-     * @param <R>
-     * @param <E>
-     * @return
-     * @throws E
+     * @param keys          all arguments of requested function
+     * @param <R> return type
+     * @param <E> controlled exception generator could generate
+     * @return returns a response from system or recovered response from a stub
+     * @throws E generates an exception if it comes from supplier or recorded in the stub
      */
-    public <R extends Object, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
+    public <R, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
 
-        String[] kk = new String[keys.length];
+        String[] sKeys = new String[keys.length];
 
         for (int i = 0; i < keys.length; i++) {
-            kk[i] = new EncoderJson<Object>().encode(keys[i]);
+            sKeys[i] = new EncoderJson<>().encode(keys[i]);
         }
 
-        return request(supplier,
+        return request(() -> {
+                    try {
+                        return supplier.get();
+                    } catch (Exception e) {
+                        if (requestMode == rmFake) {
+                            return RandomGenerator.g(responseClass);
+                        } else {
+                            throw e;
+                        }
+                    }
+                },
                 new DecoderJson<R>(responseClass),
                 new EncoderJson<>(),
-                kk);
+                sKeys);
+    }
+    /**
+     * Requests an object. It looks for a document in a stub file
+     * If it is not found then requests the value from the supplier.
+     * Keys and response saves as json-strings.
+     * Supports response generating: look at RequestMode.rmFake
+     *
+     * @param supplier      method which is able to return an actual response
+     * @param returnType    type of the response
+     * @param keys          all arguments of requested function
+     * @param <R> return type
+     * @param <E> controlled exception generator could generate
+     * @return returns a response from system or recovered response from a stub
+     * @throws E generates an exception if it comes from supplier or recorded in the stub
+     */
+    public <R, E extends Exception> R requestO(Supplier<R, E> supplier, TypeReference<R> returnType, Object... keys) throws E {
+        DecoderSimple<R> d = new DecoderSimple<R>() {
+            final ObjectMapper objectMapper = ObjectMapperFactory.get();
+
+            @Override
+            public R decode(String values) {
+                try {
+                    return objectMapper.readValue(values, returnType);
+                } catch (JsonProcessingException | RuntimeException e) {
+                    log.finest(() -> String.format("cannot recover object %s from %s", returnType, values));
+                }
+                return null;
+            }
+        };
+
+
+        String[] sKeys = new String[keys.length];
+
+        for (int i = 0; i < keys.length; i++) {
+            sKeys[i] = new EncoderJson<>().encode(keys[i]);
+        }
+
+        return request(() -> {
+                    try {
+                        return supplier.get();
+                    } catch (Exception e) {
+                        if (requestMode == rmFake) {
+                            return RandomGenerator.g(returnType);
+                        }
+                        throw e;
+                    }
+                },
+                d,
+                new EncoderJson<>(),
+                sKeys);
+
+
     }
 
     /**
@@ -232,9 +303,8 @@ public class Base {
      * @throws E
      */
     public <E extends Exception> Boolean requestB(Supplier<Boolean, E> supplier, String... keys) throws E {
-        return request(supplier,
-                Boolean::parseBoolean,
-                String::valueOf,
+        return requestO(supplier,
+                Boolean.class,
                 keys);
     }
 
@@ -248,9 +318,8 @@ public class Base {
      * @throws E
      */
     public <E extends Exception> Integer requestI(Supplier<Integer, E> supplier, String... keys) throws E {
-        return request(supplier,
-                Integer::parseInt,
-                String::valueOf,
+        return requestO(supplier,
+                Integer.class,
                 keys);
     }
 
@@ -263,7 +332,9 @@ public class Base {
      * @param <E>      expected exception
      * @return recovered object
      * @throws E expected exception
+     * @deprecated use requestO instead
      */
+    @Deprecated(since = "0.7.0")
     public <T extends Serializable, E extends Exception> T requestSerializable(Supplier<T, E> supplier, String... keys) throws E {
         return request(supplier,
                 Util::decode,
@@ -279,7 +350,9 @@ public class Base {
      * @param <E>  type of allowed Exception
      * @return requested response
      * @throws E if document if not found in cache
+     * @deprecated use requestO instead
      */
+    @Deprecated(since = "0.7.0")
     public <E extends Exception> String[] requestArray(String... keys) throws E {
         return request2(Base::throwNSE,
                 values -> values == null ? null : StreamSupport.stream(values.spliterator(), false).collect(Collectors.toList()).toArray(new String[0]),
@@ -296,7 +369,9 @@ public class Base {
      * @param <E>      expected exception
      * @return string array. it could be null;
      * @throws E expected exception
+     * @deprecated use requestO instead
      */
+    @Deprecated(since = "0.7.0")
     public <E extends Exception> String[] requestArray(Supplier<String[], E> supplier, String... keys) throws E {
         return request2(supplier,
                 values -> values == null ? null : StreamSupport.stream(values.spliterator(), false).collect(Collectors.toList()).toArray(new String[0]),
@@ -352,7 +427,7 @@ public class Base {
 
     /**
      * Looks for an Object in stub-file or gets it from the supplier. Uses encoder and decoder to convert the request
-     * and results in the stub-file. Uses keys to match the request in the stub-files
+     * and results in the stub-file. It uses keys to match the request in the stub-files.
      *
      * @param supplier provide real answer
      * @param decoder  create object from values
@@ -471,6 +546,12 @@ public class Base {
         return decoder.decode(responseData);
     }
 
+    public <E extends Exception> void post(Consumer<E> consumer, Object... keys) throws E {
+        requestO(() -> {
+            consumer.run();
+            return null;
+        }, Void.class, keys);
+    }
 
     /**
      * reloads stub-file - IOException exceptions are suppressed
@@ -695,11 +776,14 @@ public class Base {
     }
 
     private boolean seekInCache() {
-        return requestMode == rmNew || requestMode == rmNone;
+        return requestMode == rmNew ||
+                requestMode == rmNone ||
+                requestMode == rmFake;
     }
 
     private boolean writeInCache() {
         return requestMode == rmNew ||
+                requestMode == rmFake ||
                 requestMode == rmAll ||
                 (requestMode == rmTrack && documentListTrackIterator == null);
     }
