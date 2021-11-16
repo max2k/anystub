@@ -23,7 +23,7 @@ import static org.anystub.RequestMode.*;
  * methods request* allow get/keep data in file
  * <p>
  * Check {@link RequestMode} to find options to control get access to external system and store requests strategy
- * <p>
+ *
  */
 public class Base {
 
@@ -139,6 +139,13 @@ public class Base {
                 .findFirst();
     }
 
+    /**
+     * returns Finds entity in a stub using the key. returns 1st value string
+     * @param keys keys to find request
+     * @return
+     * @deprecated since = "0.7.0"
+     */
+    @Deprecated(since = "0.7.0")
     public String get(String... keys) {
         return getVals(keys).iterator().next();
     }
@@ -200,14 +207,15 @@ public class Base {
      * Requests an object. It looks for a document in a stub file
      * If it is not found then requests the value from the supplier.
      * Keys and response saves as json-strings
+     * Supports response generating: look at RequestMode.rmFake
      *
      * @param supplier      method which is able to return an actual response
      * @param responseClass type of the response
      * @param keys          all arguments of requested function
-     * @param <R>
-     * @param <E>
-     * @return
-     * @throws E
+     * @param <R> return type
+     * @param <E> controlled exception generator could generate
+     * @return returns a response from system or recovered response from a stub
+     * @throws E generates an exception if it comes from supplier or recorded in the stub
      */
     public <R, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
 
@@ -232,7 +240,20 @@ public class Base {
                 new EncoderJson<>(),
                 sKeys);
     }
-
+    /**
+     * Requests an object. It looks for a document in a stub file
+     * If it is not found then requests the value from the supplier.
+     * Keys and response saves as json-strings.
+     * Supports response generating: look at RequestMode.rmFake
+     *
+     * @param supplier      method which is able to return an actual response
+     * @param returnType    type of the response
+     * @param keys          all arguments of requested function
+     * @param <R> return type
+     * @param <E> controlled exception generator could generate
+     * @return returns a response from system or recovered response from a stub
+     * @throws E generates an exception if it comes from supplier or recorded in the stub
+     */
     public <R, E extends Exception> R requestO(Supplier<R, E> supplier, TypeReference<R> returnType, Object... keys) throws E {
         DecoderSimple<R> d = new DecoderSimple<R>() {
             final ObjectMapper objectMapper = ObjectMapperFactory.get();

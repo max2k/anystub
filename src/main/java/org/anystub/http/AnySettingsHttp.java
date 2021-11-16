@@ -48,7 +48,9 @@ public @interface AnySettingsHttp {
     /**
      * to define regex expressions which will be replaced by elapses "..." in a request body
      * @return
+     * @deprecated since 0.7.0 use
      */
+    @Deprecated(since = "0.7.0")
     String[] bodyMask() default {};
 
 

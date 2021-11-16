@@ -54,7 +54,8 @@ public class AnyStubFileLocator {
         }
 
         return new AnyStubIdData(filename,
-                id.requestMode());
+                id.requestMode(),
+                id.requestMasks());
     }
 
     private static AnyStubId methodInfo(StackTraceElement s, Class<?> aClass) {
@@ -88,6 +89,6 @@ public class AnyStubFileLocator {
         } else {
             filename = String.format("%s-%s", s, stubSuffix);
         }
-        return new AnyStubIdData(filename, s.requestMode());
+        return new AnyStubIdData(filename, s.requestMode(), s.requestMasks());
     }
 }

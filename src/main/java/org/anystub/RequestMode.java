@@ -1,5 +1,9 @@
 package org.anystub;
 
+/**
+ * Specifies behaviour of a stub
+ */
+
 public enum RequestMode {
     /**
      * Use case: general using of cache.
