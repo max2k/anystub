@@ -1,12 +1,14 @@
 {{>licenseInfo}}
 
 package {{package}};
-// test
+
 import {{invokerPackage}}.ApiException;
+
 {{#imports}}import {{import}};
 {{/imports}}
 import org.anystub.mgmt.BaseManagerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
+
 
 
 {{^fullJavaUtil}}
@@ -22,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 {{/asyncNative}}
 
 /**
- * API tests for {{classname}}
+ * API anystub-test-proxy for {{classname}}
  */
 
 public class {{classname}}Test extends {{classname}} {
@@ -30,6 +32,11 @@ public class {{classname}}Test extends {{classname}} {
 
     public {{classname}}Test({{classname}} api) {
         this.api = api;
+    }
+
+    @Override
+    public ApiClient getApiClient() {
+        return this.api.getApiClient();
     }
 
     {{#operations}}{{#operation}}

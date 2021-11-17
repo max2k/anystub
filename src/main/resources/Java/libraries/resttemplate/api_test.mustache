@@ -1,0 +1,63 @@
+{{>licenseInfo}}
+
+package {{package}};
+
+import {{invokerPackage}}.ApiException;
+
+{{#imports}}import {{import}};
+{{/imports}}
+import org.anystub.mgmt.BaseManagerFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.springframework.web.client.RestClientException;
+
+
+{{^fullJavaUtil}}
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+{{/fullJavaUtil}}
+
+/**
+ * API anystub-test-proxy for {{classname}}
+ */
+public class {{classname}}Test extends {{classname}} {
+    private final {{classname}} api;
+
+    public {{classname}}Test({{classname}} api) {
+        this.api = api;
+    }
+
+
+    @Override
+    public ApiClient getApiClient() {
+        return this.api.getApiClient();
+    }
+
+    {{#operations}}{{#operation}}
+     @Override
+       public {{#returnType}}{{{.}}} {{/returnType}}{{^returnType}}void {{/returnType}}
+       {{operationId}}({{#allParams}}{{{dataType}}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}) throws RestClientException {
+
+
+           {{#returnType}}
+           TypeReference<{{{returnType}}}> returnType = new TypeReference<>() {};
+           return BaseManagerFactory.locate()
+                           .requestO(()->
+                               api.{{operationId}}({{#allParams}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}),
+                               returnType, "{{operationId}}" {{#allParams}}, {{paramName}}{{/allParams}}
+                           );
+
+           {{/returnType}}
+           {{^returnType}}
+                BaseManagerFactory.locate()
+                               .post(() ->
+                                   api.{{operationId}}({{#allParams}} {{paramName}}{{^-last}}, {{/-last}}{{/allParams}}),
+                                  "{{operationId}}" {{#allParams}}, {{paramName}}{{/allParams}});
+           {{/returnType}}
+
+
+
+    }
+    {{/operation}}{{/operations}}
+}

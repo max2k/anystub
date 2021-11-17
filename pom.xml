@@ -123,7 +123,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -196,6 +196,8 @@
                 </configuration>
             </plugin>
 
+
+
         </plugins>
     </build>
 
@@ -210,4 +212,48 @@
         </repository>
     </distributionManagement>
 
+    <profiles>
+        <profile>
+            <id>open-api</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.openapitools</groupId>
+                    <artifactId>openapi-generator</artifactId>
+                    <version>5.3.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.openapitools</groupId>
+                    <artifactId>jackson-databind-nullable</artifactId>
+                    <version>0.2.1</version>
+                </dependency>
+            </dependencies>
+
+<!--            <plugin>-->
+<!--                <groupId>org.openapitools</groupId>-->
+<!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
+<!--                <version>5.3.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <goals>-->
+<!--                            <goal>generate</goal>-->
+
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <inputSpec>${project.basedir}/api.json</inputSpec>-->
+<!--                            <generatorName>java</generatorName>-->
+<!--                            &lt;!&ndash;                            <library>resttemplate</library>&ndash;&gt;-->
+<!--                            <library>native</library>-->
+<!--                            <additionalProperties>restTemplateName=restTemplate</additionalProperties>-->
+<!--                            <templateDirectory>src/main/resources/Java</templateDirectory>-->
+<!--                            <generateApiTests>true</generateApiTests>-->
+<!--                            <generateModelTests>false</generateModelTests>-->
+<!--                            <configOptions>-->
+<!--                                &lt;!&ndash;                                <sourceFolder>src/gen/java/main</sourceFolder>&ndash;&gt;-->
+<!--                            </configOptions>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+        </profile>
+    </profiles>
 </project>
