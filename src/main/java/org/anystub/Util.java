@@ -130,4 +130,12 @@ public class Util {
         }
     }
 
+    public static String[] toArray(Object... keys) {
+        String[] sKeys = new String[keys.length];
+
+        for (int i = 0; i < keys.length; i++) {
+            sKeys[i] = new EncoderJson<>().encode(keys[i]);
+        }
+        return sKeys;
+    }
 }

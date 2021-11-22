@@ -1,0 +1,12 @@
+request0:
+  exception: []
+  keys: [addPetWithHttpInfo, '{"id":null,"category":null,"name":"test","photoUrls":[],"tags":null,"status":null}']
+  values: ['200', '{"Date":["Mon, 22 Nov 2021 12:22:08 GMT"],"Content-Type":["application/json"],"Transfer-Encoding":["chunked"],"Connection":["keep-alive"],"Access-Control-Allow-Origin":["*"],"Access-Control-Allow-Methods":["GET,
+      POST, DELETE, PUT"],"Access-Control-Allow-Headers":["Content-Type, api_key,
+      Authorization"],"Server":["Jetty(9.2.9.v20150224)"]}']
+request1:
+  exception: []
+  keys: [addPet, '{"id":null,"category":null,"name":"test","photoUrls":[],"tags":null,"status":null}']
+  values: ['200', '{"Date":["Mon, 22 Nov 2021 12:22:08 GMT"],"Content-Type":["application/json"],"Transfer-Encoding":["chunked"],"Connection":["keep-alive"],"Access-Control-Allow-Origin":["*"],"Access-Control-Allow-Methods":["GET,
+      POST, DELETE, PUT"],"Access-Control-Allow-Headers":["Content-Type, api_key,
+      Authorization"],"Server":["Jetty(9.2.9.v20150224)"]}']

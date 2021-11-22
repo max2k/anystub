@@ -74,7 +74,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>5.3.12</version>
+            <version>5.3.13</version>
         </dependency>
 
         <dependency>
@@ -196,7 +196,30 @@
                 </configuration>
             </plugin>
 
-
+<!--                <plugin>-->
+<!--                    <groupId>org.openapitools</groupId>-->
+<!--                    <artifactId>openapi-generator-maven-plugin</artifactId>-->
+<!--                    <version>5.3.1-SNAPSHOT</version>-->
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <id>main-files</id>-->
+<!--                            <goals>-->
+<!--                                <goal>generate</goal>-->
+<!--                            </goals>-->
+<!--                            <configuration>-->
+<!--                                <inputSpec>${project.basedir}/api.json</inputSpec>-->
+<!--                                <generatorName>java</generatorName>-->
+<!--                                <library>resttemplate</library>-->
+<!--                                <templateDirectory>${project.basedir}/src/main/resources/Java</templateDirectory>-->
+<!--                                <additionalProperties>restTemplateName=restTemplate</additionalProperties>-->
+<!--                                <generateModelTests>false</generateModelTests>-->
+<!--                                <configOptions>-->
+<!--                                    <dateLibrary>java8</dateLibrary>-->
+<!--                                </configOptions>-->
+<!--                            </configuration>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
+<!--                </plugin>-->
 
         </plugins>
     </build>
@@ -218,42 +241,21 @@
             <dependencies>
                 <dependency>
                     <groupId>org.openapitools</groupId>
-                    <artifactId>openapi-generator</artifactId>
-                    <version>5.3.0</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.openapitools</groupId>
                     <artifactId>jackson-databind-nullable</artifactId>
                     <version>0.2.1</version>
                 </dependency>
+                <dependency>
+                    <groupId>io.swagger</groupId>
+                    <artifactId>swagger-annotations</artifactId>
+                    <version>1.6.3</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
+                    <version>3.0.2</version>
+                </dependency>
             </dependencies>
-
-<!--            <plugin>-->
-<!--                <groupId>org.openapitools</groupId>-->
-<!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
-<!--                <version>5.3.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <inputSpec>${project.basedir}/api.json</inputSpec>-->
-<!--                            <generatorName>java</generatorName>-->
-<!--                            &lt;!&ndash;                            <library>resttemplate</library>&ndash;&gt;-->
-<!--                            <library>native</library>-->
-<!--                            <additionalProperties>restTemplateName=restTemplate</additionalProperties>-->
-<!--                            <templateDirectory>src/main/resources/Java</templateDirectory>-->
-<!--                            <generateApiTests>true</generateApiTests>-->
-<!--                            <generateModelTests>false</generateModelTests>-->
-<!--                            <configOptions>-->
-<!--                                &lt;!&ndash;                                <sourceFolder>src/gen/java/main</sourceFolder>&ndash;&gt;-->
-<!--                            </configOptions>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
         </profile>
     </profiles>
 </project>

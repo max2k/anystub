@@ -219,12 +219,6 @@ public class Base {
      */
     public <R, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
 
-        String[] sKeys = new String[keys.length];
-
-        for (int i = 0; i < keys.length; i++) {
-            sKeys[i] = new EncoderJson<>().encode(keys[i]);
-        }
-
         return request(() -> {
                     try {
                         return supplier.get();
@@ -238,7 +232,7 @@ public class Base {
                 },
                 new DecoderJson<R>(responseClass),
                 new EncoderJson<>(),
-                sKeys);
+                Util.toArray(keys));
     }
     /**
      * Requests an object. It looks for a document in a stub file
@@ -270,12 +264,6 @@ public class Base {
         };
 
 
-        String[] sKeys = new String[keys.length];
-
-        for (int i = 0; i < keys.length; i++) {
-            sKeys[i] = new EncoderJson<>().encode(keys[i]);
-        }
-
         return request(() -> {
                     try {
                         return supplier.get();
@@ -288,7 +276,7 @@ public class Base {
                 },
                 d,
                 new EncoderJson<>(),
-                sKeys);
+                Util.toArray(keys));
 
 
     }
