@@ -44,7 +44,7 @@ class FakeTest {
         @Override
         Pet getPetById(long id) {
             return BaseManagerFactory.locate()
-                    .requestO(() -> petApi.getPetById(id),
+                    .request(() -> petApi.getPetById(id),
                             new TypeReference<Pet>() {
                             },
                             "getPetById", id);
@@ -53,7 +53,7 @@ class FakeTest {
         @Override
         List<Pet> getPets(String name) {
             return BaseManagerFactory.locate()
-                    .requestO(() -> petApi.getPets(name),
+                    .request(() -> petApi.getPets(name),
                             new TypeReference<List<Pet>>() {
                             },
                             "getPetById", name);
@@ -70,7 +70,7 @@ class FakeTest {
         @Override
         Pet getPetById(long id) {
             return BaseManagerFactory.locate()
-                    .requestO(() -> petApi.getPetById(id),
+                    .request(() -> petApi.getPetById(id),
                             Pet.class,
                             "getPetById", id);
         }

@@ -21,7 +21,6 @@ import org.anystub.mgmt.BaseManagerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 
-import java.io.File;
 import java.util.List;
 
 
@@ -66,7 +65,7 @@ List<String> status
          ) throws RestClientException {
 
                 return BaseManagerFactory.locate(fallbackStub)
-                    .requestO(() -> api.findPetsByStatus( status ),
+                    .request(() -> api.findPetsByStatus( status ),
                             new TypeReference<List<Pet>>() {},
                             "findPetsByStatus" , status );
 

@@ -294,7 +294,8 @@ public class BaseTest {
         assertEquals(0L, base.times());
 
         base.request(() -> "okok", "", "3", "3");
-        base.request(() -> "okok", null, "3", "4");
+        String v = null;
+        base.request(() -> "okok", v, "3", "4");
 
         assertEquals(2, base.times());
         assertEquals(1, base.times(""));
@@ -452,7 +453,7 @@ public class BaseTest {
     @AnyStubId
     public void testRequestO(){
         Base locate = BaseManagerFactory.locate();
-        String s = locate.requestO(() -> "test", String.class, "method", null, "another key");
+        String s = locate.request(() -> "test", String.class, "method", null, "another key");
         assertEquals("test", s);
 
 

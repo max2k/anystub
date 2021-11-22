@@ -16,20 +16,20 @@ public class RandomSystemT extends RandomSystem {
     @Override
     public String get(String test, LocalDate d) {
         return BaseManagerFactory.locate()
-                .requestO(() -> v.get(test, d), String.class, test, d);
+                .request(() -> v.get(test, d), String.class, test, d);
     }
 
     @Override
     public Car get(Car c) {
         return BaseManagerFactory.locate()
-                .requestO(() -> v.get(c), Car.class, c);
+                .request(() -> v.get(c), Car.class, c);
     }
 
     @Override
     public List<String> getL(String param) {
         TypeReference<List<String>> returnType = new TypeReference<>() {};
         return BaseManagerFactory.locate()
-                .requestO(()->v.getL(param),
+                .request(()->v.getL(param),
                         returnType, "getL", param);
     }
 
