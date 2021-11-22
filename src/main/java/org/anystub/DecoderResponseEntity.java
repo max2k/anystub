@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.MultiValueMapAdapter;
 
@@ -45,7 +44,7 @@ public class DecoderResponseEntity<T> implements Decoder<ResponseEntity<T>>{
             t = null;
         }
 
-        return new ResponseEntity<T>(t,
+        return new ResponseEntity<>(t,
                 multiValueMap,
                 httpStatus);
     }
