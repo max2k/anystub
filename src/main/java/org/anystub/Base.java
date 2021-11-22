@@ -217,13 +217,7 @@ public class Base {
      * @return returns a response from system or recovered response from a stub
      * @throws E generates an exception if it comes from supplier or recorded in the stub
      */
-    public <R, E extends Exception> R requestO(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
-
-        String[] sKeys = new String[keys.length];
-
-        for (int i = 0; i < keys.length; i++) {
-            sKeys[i] = new EncoderJson<>().encode(keys[i]);
-        }
+    public <R, E extends Exception> R request(Supplier<R, E> supplier, Class<R> responseClass, Object... keys) throws E {
 
         return request(() -> {
                     try {
@@ -238,7 +232,7 @@ public class Base {
                 },
                 new DecoderJson<R>(responseClass),
                 new EncoderJson<>(),
-                sKeys);
+                Util.toArray(keys));
     }
     /**
      * Requests an object. It looks for a document in a stub file
@@ -254,7 +248,7 @@ public class Base {
      * @return returns a response from system or recovered response from a stub
      * @throws E generates an exception if it comes from supplier or recorded in the stub
      */
-    public <R, E extends Exception> R requestO(Supplier<R, E> supplier, TypeReference<R> returnType, Object... keys) throws E {
+    public <R, E extends Exception> R request(Supplier<R, E> supplier, TypeReference<R> returnType, Object... keys) throws E {
         DecoderSimple<R> d = new DecoderSimple<R>() {
             final ObjectMapper objectMapper = ObjectMapperFactory.get();
 
@@ -270,12 +264,6 @@ public class Base {
         };
 
 
-        String[] sKeys = new String[keys.length];
-
-        for (int i = 0; i < keys.length; i++) {
-            sKeys[i] = new EncoderJson<>().encode(keys[i]);
-        }
-
         return request(() -> {
                     try {
                         return supplier.get();
@@ -288,7 +276,7 @@ public class Base {
                 },
                 d,
                 new EncoderJson<>(),
-                sKeys);
+                Util.toArray(keys));
 
 
     }
@@ -303,7 +291,7 @@ public class Base {
      * @throws E
      */
     public <E extends Exception> Boolean requestB(Supplier<Boolean, E> supplier, String... keys) throws E {
-        return requestO(supplier,
+        return request(supplier,
                 Boolean.class,
                 keys);
     }
@@ -318,7 +306,7 @@ public class Base {
      * @throws E
      */
     public <E extends Exception> Integer requestI(Supplier<Integer, E> supplier, String... keys) throws E {
-        return requestO(supplier,
+        return request(supplier,
                 Integer.class,
                 keys);
     }
@@ -332,7 +320,7 @@ public class Base {
      * @param <E>      expected exception
      * @return recovered object
      * @throws E expected exception
-     * @deprecated use requestO instead
+     * @deprecated use request instead
      */
     @Deprecated(since = "0.7.0")
     public <T extends Serializable, E extends Exception> T requestSerializable(Supplier<T, E> supplier, String... keys) throws E {
@@ -350,7 +338,7 @@ public class Base {
      * @param <E>  type of allowed Exception
      * @return requested response
      * @throws E if document if not found in cache
-     * @deprecated use requestO instead
+     * @deprecated use request instead
      */
     @Deprecated(since = "0.7.0")
     public <E extends Exception> String[] requestArray(String... keys) throws E {
@@ -369,7 +357,7 @@ public class Base {
      * @param <E>      expected exception
      * @return string array. it could be null;
      * @throws E expected exception
-     * @deprecated use requestO instead
+     * @deprecated use request instead
      */
     @Deprecated(since = "0.7.0")
     public <E extends Exception> String[] requestArray(Supplier<String[], E> supplier, String... keys) throws E {
@@ -547,7 +535,7 @@ public class Base {
     }
 
     public <E extends Exception> void post(Consumer<E> consumer, Object... keys) throws E {
-        requestO(() -> {
+        request(() -> {
             consumer.run();
             return null;
         }, Void.class, keys);

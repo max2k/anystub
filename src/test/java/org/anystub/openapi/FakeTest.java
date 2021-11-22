@@ -2,16 +2,18 @@ package org.anystub.openapi;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.anystub.AnyStubId;
+import org.anystub.RandomGenerator;
 import org.anystub.RequestMode;
 import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class FakeTest {
 
-    static class Pet {
+    static public class Pet {
         long id;
 
         public long getId() {
@@ -27,6 +29,9 @@ class FakeTest {
         Pet getPetById(long id) {
             throw new RuntimeException("does not work");
         }
+        List<Pet> getPets(String name) {
+            throw new RuntimeException("does not work");
+        }
     }
 
     static class PetApiTest extends PetApi {
@@ -39,10 +44,19 @@ class FakeTest {
         @Override
         Pet getPetById(long id) {
             return BaseManagerFactory.locate()
-                    .requestO(() -> petApi.getPetById(id),
+                    .request(() -> petApi.getPetById(id),
                             new TypeReference<Pet>() {
                             },
                             "getPetById", id);
+        }
+
+        @Override
+        List<Pet> getPets(String name) {
+            return BaseManagerFactory.locate()
+                    .request(() -> petApi.getPets(name),
+                            new TypeReference<List<Pet>>() {
+                            },
+                            "getPetById", name);
         }
     }
 
@@ -56,7 +70,7 @@ class FakeTest {
         @Override
         Pet getPetById(long id) {
             return BaseManagerFactory.locate()
-                    .requestO(() -> petApi.getPetById(id),
+                    .request(() -> petApi.getPetById(id),
                             Pet.class,
                             "getPetById", id);
         }
@@ -64,7 +78,7 @@ class FakeTest {
 
     @Test
     @AnyStubId(requestMode = RequestMode.rmFake)
-    void requestGen() {
+    void testRequestGen() {
 
         PetApi petApi = new PetApi();
 
@@ -73,12 +87,12 @@ class FakeTest {
         Pet petById = petApiTest.getPetById(1233L);
 
 
-        assertEquals(-592218937L, petById.getId());
+        assertEquals(-1178212105L, petById.getId());
     }
 
     @Test
     @AnyStubId(filename = "requestGen", requestMode = RequestMode.rmFake)
-    void requestGen1() {
+    void testRequestGen1() {
 
         PetApi petApi = new PetApi();
 
@@ -92,7 +106,7 @@ class FakeTest {
 
     @Test
     @AnyStubId(requestMode = RequestMode.rmPassThrough)
-    void requestException() {
+    void testRequestException() {
         PetApi petApi = new PetApi();
 
         PetApiTest petApiTest = new PetApiTest(petApi);
@@ -105,4 +119,14 @@ class FakeTest {
 
 
     }
+
+
+    @Test
+    void testPopulate() {
+        Pet pet = new Pet();
+        RandomGenerator.populate(pet);
+
+        assertNotEquals(0, pet.getId());
+    }
+
 }
