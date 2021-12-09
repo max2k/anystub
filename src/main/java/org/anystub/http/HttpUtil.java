@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -228,7 +227,10 @@ public class HttpUtil {
         }
 
         Header[] currentHeaders = httpRequest.getAllHeaders();
-        Arrays.sort(currentHeaders, Comparator.comparing(Header::getName));
+
+        // not comparator in lambda because compiler optimizes to use super class,
+        // the optimization does not work with old apache client
+        Arrays.sort(currentHeaders, HttpUtil::compareHeaders);
 
 
         if (currentAllHeaders) {
@@ -291,6 +293,11 @@ public class HttpUtil {
 
     public static String headerToString(Header h) {
         return String.format("%s: %s", h.getName(), h.getValue());
+    }
+
+
+    private static int compareHeaders(Header h1, Header h2) {
+        return h1.getName().compareTo(h2.getName());
     }
 
 }
