@@ -229,7 +229,7 @@ public class HttpUtil {
         }
 
         Header[] currentHeaders = httpRequest.getAllHeaders();
-        Arrays.sort(currentHeaders, Comparator.comparing(NameValuePair::getName));
+        Arrays.sort(currentHeaders, Comparator.comparing(Header::getName));
 
 
         if (currentAllHeaders) {
