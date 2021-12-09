@@ -1,14 +1,7 @@
 package org.anystub.http;
 
 import org.anystub.Util;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.ProtocolVersion;
+import org.apache.http.*;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.message.BasicHttpResponse;
@@ -17,14 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -229,7 +215,7 @@ public class HttpUtil {
         }
 
         Header[] currentHeaders = httpRequest.getAllHeaders();
-        Arrays.sort(currentHeaders, Comparator.comparing(NameValuePair::getName));
+        Arrays.sort(currentHeaders, Comparator.comparing(Header::getName));
 
 
         if (currentAllHeaders) {
