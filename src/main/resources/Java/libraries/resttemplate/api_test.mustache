@@ -5,7 +5,7 @@ package {{package}};
 {{#imports}}import {{import}};
 {{/imports}}
 
-
+import {{invokerPackage}}.ApiClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -49,6 +49,11 @@ public class {{classname}}Test extends {{classname}} {
     public {{classname}}Test({{classname}} api, String fallbackStub) {
         this.api = api;
         this.fallbackStub = fallbackStub;
+    }
+
+    @Override
+    public ApiClient getApiClient() {
+        return this.api.getApiClient();
     }
 
 
