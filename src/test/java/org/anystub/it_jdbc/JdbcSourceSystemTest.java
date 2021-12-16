@@ -289,6 +289,38 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
+    @AnyStubId(requestMode = RequestMode.rmAll)
+    public void nullColumnValueTest() {
+        jdbcTemplate.execute("DROP TABLE NPETABLE IF EXISTS");
+
+        String sql = "CREATE TABLE NPETABLE(\n" +
+                "ID BIGINT PRIMARY KEY AUTO_INCREMENT,\n" +
+                "C_DATE DATE);";
+        jdbcTemplate.execute(sql);
+
+        String sqlI = "insert into NPETABLE (C_DATE) values (?)";
+        KeyHolder holder = new GeneratedKeyHolder();
+        int affectedRows = jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                PreparedStatement preparedStatement = connection.prepareStatement(sqlI);
+                preparedStatement.setNull(1, Types.DATE);
+                return preparedStatement;
+            }
+        }, holder);
+
+        assertEquals(1, affectedRows);
+
+        List<String> query;
+
+        query = jdbcTemplate.query("select * from NPETABLE where id =?", new Object[]{1},
+                (resultSet, i) -> " " + resultSet.getDate("C_DATE"));
+
+        assertEquals(1, query.size());
+        assertEquals(" null", query.get(0));
+    }
+
+    @Test
     @AnyStubId(filename = "integerLongTest1")
     public void testIntegerLong1() throws SQLException {
         for (int i=0; i<2; i++) {
