@@ -62,7 +62,6 @@ public class JdbcStubRSTest {
             );
 
             assertEquals(2, query.size());
-            assertEquals(3L, query.get(0).id);
             assertEquals("Bloch", query.get(0).last_name);
             assertEquals("Long", query.get(1).last_name);
 
@@ -72,14 +71,11 @@ public class JdbcStubRSTest {
             );
 
             assertEquals(2, query.size());
-            assertEquals(3L, query.get(0).id);
             assertEquals("Bloch", query.get(0).last_name);
             assertEquals("Long", query.get(1).last_name);
-            assertEquals(4L, query.get(1).id);
 
         Base base = BaseManagerFactory.getStub("hikariTest");
-        assertTrue(base.times() > 1);
-
+        assertTrue(base.timesEx("SELECT.*") >= 2);
     }
 
 }
