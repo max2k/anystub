@@ -158,6 +158,9 @@ public class ResultSetUtil {
 
     private static String encodeValue(ResultSet resultSet, int columnType, int column) {
         try {
+            if (resultSet.getObject(column) == null) {
+                return null;
+            }
             switch (columnType) {
 //            case  BIT = -7;
                 case TINYINT:
