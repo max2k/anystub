@@ -167,6 +167,12 @@ public class ResultSetUtil {
             if (resultSet.wasNull()) {
                 return null;
             }
+
+            if (columnType == CHAR ||
+                    columnType == VARCHAR ||
+                    columnType == LONGVARCHAR) {
+                return value.toString();
+            }
             return ObjectMapperFactory.get().writeValueAsString(value);
         } catch (SQLException | JsonProcessingException e) {
             LOGGER.severe(() -> String.format("Failed encode value on %d of type %d", column, columnType));

@@ -318,7 +318,7 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
-    @AnyStubId(filename = "integerLongTest1")
+    @AnyStubId(filename = "integerLongTest1", requestMode = RequestMode.rmAll)
     public void testIntegerLong1() throws SQLException {
         for (int i=0; i<2; i++) {
             jdbcTemplate.execute("DROP ALIAS SP_HELLO2 if Exists");
