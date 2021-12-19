@@ -149,7 +149,7 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
-    @AnyStubId(filename = "blobTest")
+    @AnyStubId(filename = "blobTest", requestMode = RequestMode.rmAll)
     public void testBlob() {
         for (int ii=0; ii<2; ii++) {
             jdbcTemplate.execute("DROP TABLE BLOBREPORT IF EXISTS");
@@ -318,7 +318,7 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
-    @AnyStubId(filename = "integerLongTest1")
+    @AnyStubId(filename = "integerLongTest1", requestMode = RequestMode.rmAll)
     public void testIntegerLong1() throws SQLException {
         for (int i=0; i<2; i++) {
             jdbcTemplate.execute("DROP ALIAS SP_HELLO2 if Exists");
