@@ -560,7 +560,8 @@ public class Base {
      */
     private void load() throws IOException {
         File file = new File(filePath);
-        try (InputStream input = new FileInputStream(file)) {
+        try (InputStream inputStream = new FileInputStream(file);
+             InputStreamReader input = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
             Yaml yaml = new Yaml(new SafeConstructor());
             Object load = yaml.load(input);
 
