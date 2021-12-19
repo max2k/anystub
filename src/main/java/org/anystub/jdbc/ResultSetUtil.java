@@ -1,8 +1,10 @@
 package org.anystub.jdbc;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.anystub.ObjectMapperFactory;
 import org.h2.tools.SimpleResultSet;
 
-import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +12,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -158,74 +163,28 @@ public class ResultSetUtil {
 
     private static String encodeValue(ResultSet resultSet, int columnType, int column) {
         try {
-            if (resultSet.getObject(column) == null) {
+            Object value = resultSet.getObject(column);
+            if (resultSet.wasNull()) {
                 return null;
             }
-            switch (columnType) {
-//            case  BIT = -7;
-                case TINYINT:
-                case SMALLINT:
-                    return String.valueOf(resultSet.getShort(column));
-                case INTEGER:
-                    return String.valueOf(resultSet.getInt(column));
-                case BIGINT:
-                    return resultSet.getBigDecimal(column).toString();
-                case FLOAT:
-                    return String.valueOf(resultSet.getFloat(column));
-                case NUMERIC:
-                case DECIMAL:
-                case REAL:
-                case DOUBLE:
-                    return String.valueOf(resultSet.getDouble(column));
-                case CHAR:
-                case VARCHAR:
-                case LONGVARCHAR:
-                    return resultSet.getString(column);
-                case DATE:
-                    return resultSet.getDate(column).toString();
-                case TIME:
-                    return resultSet.getTime(column).toString();
-                case TIMESTAMP:
-                    return resultSet.getTimestamp(column).toString();
-//            case  BINARY = -2;
-//            case  VARBINARY = -3;
-//            case  LONGVARBINARY = -4;
-//            case  NULL = 0;
-//            case  OTHER = 1111;
-//            case  JAVA_OBJECT = 2000;
-//            case  DISTINCT = 2001;
-//            case  STRUCT = 2002;
-//            case  ARRAY = 2003;
-                case BLOB:
-                    return SqlTypeEncoder.encodeBlob(resultSet.getBlob(column));
-                case CLOB:
-                    return SqlTypeEncoder.encodeClob(resultSet.getClob(column));
-//            case  REF = 2006;
-//            case  DATALINK = 70;
-                case BOOLEAN:
-                    return String.valueOf(resultSet.getBoolean(column));
-                case ROWID:
-                    return SqlTypeEncoder.encodeRowid(resultSet.getRowId(column));
-                case NCHAR:
-                    return resultSet.getString(column);
-//            case  NVARCHAR = -9;
-//            case  LONGNVARCHAR = -16;
-//            case  NCLOB = 2011;
-                case SQLXML:
-                    return SqlTypeEncoder.encodeSQLXML(resultSet.getSQLXML(column));
-//            case  REF_CURSOR = 2012;
-//            case  TIME_WITH_TIMEZONE = 2013;
-//            case  TIMESTAMP_WITH_TIMEZONE = 2014;
-                default:
-                    return resultSet.getString(column);
-            }
-        } catch (SQLException e) {
+            return ObjectMapperFactory.get().writeValueAsString(value);
+        } catch (SQLException | JsonProcessingException e) {
             LOGGER.severe(() -> String.format("Failed encode value on %d of type %d", column, columnType));
             return "";
         }
     }
 
-    private static Object decodeValue(String next, int columnType) {
+    private static <R> R decodeValue(String v, Class<R> returnType, R def) {
+        try {
+            final ObjectMapper objectMapper = ObjectMapperFactory.get();
+            return objectMapper.readValue(v, returnType);
+        } catch (JsonProcessingException | RuntimeException e) {
+            LOGGER.severe(() -> String.format("Failed decode value %s into %s", v, returnType.getName()));
+            return def;
+        }
+    }
+
+    public static Object decodeValue(String next, int columnType) {
         if (next == null) {
             return null;
         }
@@ -233,28 +192,28 @@ public class ResultSetUtil {
 //            case  BIT = -7;
             case TINYINT:
             case SMALLINT:
-                return Short.valueOf(next);
+                return decodeValue(next, Short.class, (short)0);
             case INTEGER:
-                return Integer.valueOf(next);
+                return decodeValue(next, Integer.class, 0);
             case BIGINT:
-                return new BigInteger(next);
+                return decodeValue(next, Long.class, 0L);
             case FLOAT:
-                return Float.valueOf(next);
+                return decodeValue(next, Float.class, 0f);
             case NUMERIC:
             case DECIMAL:
             case REAL:
             case DOUBLE:
-                return Double.valueOf(next);
+                return decodeValue(next, Double.class, 0.0);
             case CHAR:
             case VARCHAR:
             case LONGVARCHAR:
                 return next;
             case DATE:
-                return Date.valueOf(next);
+                return decodeValue(next, Date.class, Date.valueOf(LocalDate.MIN));
             case TIME:
-                return Time.valueOf(next);
+                return decodeValue(next, Time.class, Time.valueOf(LocalTime.MIN));
             case TIMESTAMP:
-                return Timestamp.valueOf(next);
+                return decodeValue(next, Timestamp.class, Timestamp.valueOf(LocalDateTime.MIN));
 //            case  BINARY = -2;
 //            case  VARBINARY = -3;
 //            case  LONGVARBINARY = -4;
@@ -271,11 +230,11 @@ public class ResultSetUtil {
 //            case  REF = 2006;
 //            case  DATALINK = 70;
             case BOOLEAN:
-                return Boolean.valueOf(next.toLowerCase());
+                return decodeValue(next, Boolean.class, false);
             case ROWID:
                 return SqlTypeEncoder.decodeRowid(next);
             case NCHAR:
-                return next.charAt(0);
+                return next.length()>0 ? next.charAt(0): '\0';
 //            case  NVARCHAR = -9;
 //            case  LONGNVARCHAR = -16;
 //            case  NCLOB = 2011;

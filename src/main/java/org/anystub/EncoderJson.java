@@ -8,8 +8,7 @@ public class EncoderJson<R extends Object>  implements EncoderSimple<R>{
         if (r==null) {
             return "";
         }
-        if (r.getClass().isPrimitive() ||
-            r.getClass().equals(String.class)) {
+        if (r.getClass().equals(String.class)) {
             return String.valueOf(r);
         }
 
