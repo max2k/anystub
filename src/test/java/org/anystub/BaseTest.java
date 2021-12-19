@@ -2,6 +2,7 @@ package org.anystub;
 
 import org.anystub.mgmt.BaseManagerFactory;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
@@ -459,5 +460,18 @@ public class BaseTest {
 
     }
 
+
+    @Test
+    void testCS() throws IOException {
+        Base locate = new Base("src/test/resources/anystub/testCS.yml");
+        String s = locate.request(() -> "Привет привет", String.class, 1);
+        assertEquals("Привет привет", s);
+        locate.save();
+
+        locate = new Base("src/test/resources/anystub/testCS.yml").constrain(RequestMode.rmNone);
+        s = locate.request(() -> "Привет привет", String.class, 1);
+        assertEquals("Привет привет", s);
+
+    }
 
 }

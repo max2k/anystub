@@ -105,7 +105,7 @@ public class BaseManagerImpl implements BaseManager {
 
 
     protected void stubInitialization(Base newStub) {
-        // default initializator does nothing
+        // default initializer does nothing
     }
 
 }

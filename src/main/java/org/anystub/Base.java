@@ -7,6 +7,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -559,7 +560,8 @@ public class Base {
      */
     private void load() throws IOException {
         File file = new File(filePath);
-        try (InputStream input = new FileInputStream(file)) {
+        try (InputStream inputStream = new FileInputStream(file);
+             InputStreamReader input = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
             Yaml yaml = new Yaml(new SafeConstructor());
             Object load = yaml.load(input);
 
@@ -598,7 +600,8 @@ public class Base {
                 throw new IOException("stub file isn't created");
         }
 
-        try (FileWriter output = new FileWriter(file)) {
+        try (FileOutputStream out = new FileOutputStream(file);
+             OutputStreamWriter output = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
             Yaml yaml = new Yaml(new SafeConstructor());
             Map<String, Object> saveList = new LinkedHashMap<>();
 
