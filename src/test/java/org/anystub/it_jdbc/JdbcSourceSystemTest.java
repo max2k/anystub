@@ -149,7 +149,7 @@ public class JdbcSourceSystemTest {
     }
 
     @Test
-    @AnyStubId(filename = "blobTest")
+    @AnyStubId(filename = "blobTest", requestMode = RequestMode.rmAll)
     public void testBlob() {
         for (int ii=0; ii<2; ii++) {
             jdbcTemplate.execute("DROP TABLE BLOBREPORT IF EXISTS");

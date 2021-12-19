@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.anystub.ObjectMapperFactory;
 import org.h2.tools.SimpleResultSet;
 
+import java.sql.Blob;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -173,6 +174,55 @@ public class ResultSetUtil {
                     columnType == LONGVARCHAR) {
                 return value.toString();
             }
+
+            switch (columnType) {
+//            case  BIT = -7;
+//                case TINYINT:
+//                case SMALLINT:
+//                case INTEGER:
+//                case BIGINT:
+//                case FLOAT:
+//                case NUMERIC:
+//                case DECIMAL:
+//                case REAL:
+//                case DOUBLE:
+                case CHAR:
+                case VARCHAR:
+                case LONGVARCHAR:
+                case NCHAR:
+                    return resultSet.getString(column);
+//                case DATE:
+//                case TIME:
+//                case TIMESTAMP:
+//            case  BINARY = -2;
+//            case  VARBINARY = -3;
+//            case  LONGVARBINARY = -4;
+//            case  NULL = 0;
+//            case  OTHER = 1111;
+//            case  JAVA_OBJECT = 2000;
+//            case  DISTINCT = 2001;
+//            case  STRUCT = 2002;
+//            case  ARRAY = 2003;
+                case BLOB:
+                    return SqlTypeEncoder.encodeBlob(resultSet.getBlob(column));
+                case CLOB:
+                    return SqlTypeEncoder.encodeClob(resultSet.getClob(column));
+//            case  REF = 2006;
+//            case  DATALINK = 70;
+//                case BOOLEAN:
+                case ROWID:
+                    return SqlTypeEncoder.encodeRowid(resultSet.getRowId(column));
+//            case  NVARCHAR = -9;
+//            case  LONGNVARCHAR = -16;
+//            case  NCLOB = 2011;
+                case SQLXML:
+                    return SqlTypeEncoder.encodeSQLXML(resultSet.getSQLXML(column));
+//            case  REF_CURSOR = 2012;
+//            case  TIME_WITH_TIMEZONE = 2013;
+//            case  TIMESTAMP_WITH_TIMEZONE = 2014;
+                default:
+            }
+
             return ObjectMapperFactory.get().writeValueAsString(value);
         } catch (SQLException | JsonProcessingException e) {
             LOGGER.severe(() -> String.format("Failed encode value on %d of type %d", column, columnType));
@@ -230,6 +280,7 @@ public class ResultSetUtil {
 //            case  STRUCT = 2002;
 //            case  ARRAY = 2003;
             case BLOB:
+//                return decodeValue(next, Blob.class, null);
                 return SqlTypeEncoder.decodeBlob(next);
             case CLOB:
                 return SqlTypeEncoder.decodeClob(next);
