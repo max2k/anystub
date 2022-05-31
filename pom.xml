@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.anystub</groupId>
-    <artifactId>anystub</artifactId>
+    <artifactId>anystub_tst</artifactId>
     <version>0.7.8-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -28,8 +28,8 @@
 
     <scm>
         <url>anystub-repo</url>
-        <connection>scm:git:git@github.com:anystub/anystub.git</connection>
-        <developerConnection>scm:git:git@github.com:anystub/anystub.git</developerConnection>
+        <connection>scm:git:git@github.com:max2k/anystub.git</connection>
+        <developerConnection>scm:git:git@github.com:max2k/anystub.git</developerConnection>
       <tag>anystub-0.4.1</tag>
     </scm>
 
