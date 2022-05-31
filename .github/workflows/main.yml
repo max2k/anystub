@@ -48,4 +48,4 @@ jobs:
         run: |
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=org.anystub:anystub
           ls -al
-          ls -al targets/*
+          ls -al target/*
